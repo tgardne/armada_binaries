@@ -1,0 +1,95 @@
+USNO Double Star data for WDS 20324+4118
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+HER   3AB    1967 2007    7  65  54   1.5   0.9  9.40 11.94 O6.5Iab   -001-006 -001-003 +40 4220 N    203222.42+411818.9
+       1967.        65.      .       1.5       .        9.1    .     13.     .                3.0   1 Her1967       1   
+       1974.705     22.9     .       0.90      .         .     .      5.0    .                0.9   1 Wak1985  Ma   2   
+       1986.86      67.      .       1.51      .        9.2    .     12.5    .                1.0   1 Aru1992  C    4   
+       1991.25      54.      .       0.948     .        9.218 0.023  11.941 0.245  511 222    0.3   1 HIP1997a Hh   5   
+       1991.46      53.6     .       0.98      .        9.40  0.02   11.94  0.25   530 100    0.3   1 TYC2002  Ht   6   
+       1991.46        .      .        .        .       11.03  0.05     .     .     430  90    0.3   1 TYC2002  Ht   7   
+       2005.8681      .      .    <  0.05      .         .     .       .     .     545  85    3.8   1 Msn2009  Su   7   
+       2006.4988    56.4    0.11     0.9139   0.0023     .     .      2.93  0.29   583 340    2.4   1 CaN2014  Hf   7   
+       2007.8654    54.42   0.53     0.934    0.016      .     .      3.02  0.03   912 125    2.2   1 MzA2010  Cl   7   
+
+MZA  25AC    1998 2015    5 324 324  20.4  20.5  9.40 15.4  O6.5Iab   -001-002                   N    203222.42+411818.9
+       1998.47     323.6     .      20.35      .        5.187 0.018  11.387 0.022 1256 245    1.3   1 TMA2003  E2   7   
+       1998.47        .      .        .        .        4.745 0.036  10.944 0.019 1633 160    1.3   1 TMA2003  E2   7   
+       1998.47        .      .        .        .        4.339 0.016  10.672 0.017 2210 300    1.3   1 TMA2003  E2   7   
+       2002.717    323.7    0.6     20.682    0.114     8.90  0.06   14.50  0.14   609  70    0.2   4 UC_2013b Eu   7   
+       2007.8654   323.18   0.39    20.472    0.039      .     .      6.02  0.02   912 125    2.2   1 MzA2010  Cl   7   
+       2014.6485   323.26    .      20.574     .         .     .       .     .                0.2   1 Cnt2016  C    7   
+       2015.000    323.724   .      20.509     .        8.126  .     13.929  .     673 440    1.0   1 Kpp2018m Hg   7   
+
+MZA  25AD    2003 2015    4 226 226   5.4   5.5  9.40 16.8  O6.5Iab   -001-006                   N    203222.42+411818.9
+       2003.734    226.2     .       5.37      .         .     .       .     .                2.5   1 Skf2014b Es   7   
+       2006.450    225.7     .       5.51      .         .     .       .     .                3.8   1 Skf2014b Ek   7   
+       2007.8654   225.25   0.41     5.532    0.020      .     .      7.38  0.15   912 125    2.2   1 MzA2010  Cl   7   
+       2015.000    225.818   .       5.512     .        8.126  .     15.684  .     673 440    1.0   1 Kpp2018m Hg   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+HER   3     Measures disagree.                                                      .       
+            Includes V729 Cyg, a Beta Lyr type eclipsing binary, P = 6.59787d.      Zas2012 
+            Schulte 5 = V729 Cyg was first resolved by Herbig (1967). The primary   Her1967 
+            is a short-period eclipsing binary, consisting of two luminous evolved  .       
+            stars.                                                                  CaN2014 
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+Aru1992      Argue, A.N., Bunclark, P.S., Irwin, M.J., Lampens, P., Sinachopoulos, D., &         1992MNRAS.259..563A
+             Wayman, P.A.                                                                                           
+             MNRAS 259, 563, 1992                                                                                   
+CaN2014      Caballero-Nieves, S.M., Nelan, E.P., Gies, D.R., Wallace, D.J., DeGioia-Eastwood,   2014AJ....147...40C
+             K., Herrero, A., Jao, W.-J., Mason, B.D., Massey, P., Moffat, A.F., & Walborn, N.                      
+             AJ 147, 40, 2014                                                                                       
+Cnt2016      Cunat, J.M. Lopez                                                                   2016OED....16...86C
+             El Observador de Estrellas Dobles, Issue #16, 86, 2016                                                 
+Her1967      Herbig, G.H.                                                                        1967PASP...79..502H
+             PASP 79, 502, 1967                                                                                     
+HIP1997a     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997  (incl. Hp photometry, vol. 10)                                   
+Kpp2018m     Knapp, W.R.A. & Nanson, J.                                                          2018JDSO...14..503K
+             JDSO 14, 503, 2018                                                                  .                  
+Msn2009      Mason, B.D., Hartkopf, W.I., Gies, D.R., Henry, T.J., & Helsel, J.W.                2009AJ....137.3358M
+             AJ 137, 3358, 2009                                                                                     
+MzA2010      Maiz-Apellaniz, J.                                                                  2010A&A...518A...1M
+             A&A 518, A1, 2010                                                                                      
+Skf2014b     Skiff, B.A.                                                                         ...................
+             Webb Soc., Double Star Circ. 22, 2014 (may not be properly precessed)                                  
+TMA2003      2MASS Catalog                                                                       .                  
+             2MASS Point Src Cat., 2003 all-sky release (http://pegasus.phast.umass.edu/)                           
+             (Note: 2MASS photometry also added by cataloguer to 2MASS astrometry published                         
+             under other references.)                                                                               
+TYC2002      Fabricius, C., Hog, E., Makarov, V.V., Mason, B.D., Wycoff, G.L., & Urban, S.E.     2002A&A...384..180F
+             A&A 384, 180-189, 2002                                                                                 
+             (re-reduction of Tycho data)                                                                           
+UC_2013b     Hartkopf, W.I., Mason, B.D., Finch, C.T., Zacharias, N., Wycoff, G.L., & Hsu, D.    2013AJ....146...76H
+             AJ 146, 76, 2013                  (UC 301 - 5058)                                                      
+             (Relative astrometry is derived from individual measurements, not precessed means.                     
+             UCAC aperture magnitudes are listed, unless the duplicity flag indicates a blended                     
+             image (a flag value of 30 or higher). Model fit magnitudes are given for both                          
+             components if either has such a flag. Model fit magnitudes are indicated by the                        
+             letter "f" following the filter information.                                                           
+             APASS photometry extracted from UCAC4 catalog is listed under reference AAV2012.                       
+             Due to aperture method used, APASS photometry is only included for pairs wider                         
+             than 10" (Henden, private comm.) Photometry for pairs wider than 10" which showed                      
+             identical values for both components in all filters were removed, as well.                             
+Wak1985      Walker, R.L.                                                                        .                  
+             Pub. USNO 25, Pt.2, 1985                                                                               
+Zas2012      Zasche, P.                                                                          ...................
+             private communication, 2012                                                                            
+
+------------------------------------------------------------------------------------------------------------------------
+

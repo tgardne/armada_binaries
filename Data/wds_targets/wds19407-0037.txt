@@ -1,0 +1,136 @@
+USNO Double Star data for WDS 19407-0037
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+CHR  88Aa,Ab 1985 2017   17  41 197   0.1   0.1  5.9   7.6  A3IV      +017+017          -00 3813 NO   194043.31-003716.7
+       1985.5139    41.1     .       0.087     .         .     .       .     .     549  22    3.6   1 McA1987a Sc P 4   
+       1989.3086   340.6     .       0.084     .         .     .       .     .     549  22    4.0   1 McA1990  Sc   4   
+       1990.3434  :336.0     .    :  0.084     .         .     .       .     .     549  22    4.0   1 Hrt2000a Sc   5   
+       1990.7533   311.9     .       0.080     .         .     .       .     .     549  22    3.8   1 Hrt1992b Sc   4   
+       1991.25        .      .    G   .        .        5.64   .       .     .     511 222    0.3   1 HIP1997g Hh   7   
+       1994.7068   241.1     .       0.078     .         .     .       .     .     549  22    3.8   1 Hrt2000a Sc   5   
+       1995.4386   227.2     .       0.076     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
+       1995.7663   220.4     .       0.077     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
+       1996.5281   205.3     .       0.086     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
+       1997.4592   191.0     .       0.081     .         .     .       .     .     538  76    2.5   1 Hrt2000a Sc   5   
+       2003.6029      .      .    U   .        .         .     .       .     .     880 155    3.6   1 Rbr2018  A    7   
+       2006.5237    33.1     .       0.091     .         .     .      1.72   .     550  40    3.5   1 Hor2008  S    7   
+       2006.5237    29.1     .       0.092     .         .     .      1.75   .     550  40    3.5   1 Hor2008  S    7   
+       2008.4735     6.2    1.5      0.095    0.003      .     .      2.01  0.10   550  40    3.5   1 Hor2012a S    7   
+       2009.2646   346.4    0.1      0.0859   0.0006     .     .      1.7    .     657   5    4.1   1 Tok2010  S    7   
+       2014.7638   247.1    0.1      0.0703   0.0001     .     .      1.2    .     788 132    4.1   1 Tok2015c St   7   
+       2014.7638   250.7    0.6      0.0639   0.0005     .     .      1.5    .     596 121    4.1   2 Tok2015c St   7   
+       2014.7638   251.6    0.6      0.0612   0.0004     .     .      1.7    .     517  84    4.1   2 Tok2015c St   7   
+       2017.5333   197.1    0.3      0.0910   0.0004     .     .    : 1.5    .     534  22    4.1   2 Tok2018c St   7   
+
+HJ 2888AB    1830 2015    8 355 352  30.0  40.3  5.66 14.06 A3IV      +008+023                   N    194043.31-003716.7
+       1830.70     354.5     .      30.        .         .     .    s12.0    .                0.5   1 HJ_1833c Mb   6   
+       1900.49     354.8     .      42.56      .        6.5    .     13.7    .                1.0   2 Bu_1903  Ma   4   
+       1912.55     354.2     .      42.03      .        5.8    .     13.7    .                1.0   3 Bu_1913  Ma   4   
+       1924.68     353.5     .      42.16      .        5.3    .     12.5    .                0.2   2 Opi1927  Ma   3   
+       1960.57     353.4     .      42.02      .        5.5    .     13.0    .                0.9   1 Wor1967a Ma   2   
+       1991.25        .      .    <  0.1       .         .     .       .     .     511 222    0.3   1 HIP1997e Hh   6   
+       1998.75     352.5     .      40.52      .        5.411 0.019  11.527 0.023 1256 245    1.3   1 TMA2003  E2   7   
+       1998.75        .      .        .        .        5.349 0.026  10.938 0.027 1633 160    1.3   1 TMA2003  E2   7   
+       1998.75        .      .        .        .        5.293 0.017  10.748 0.025 2210 300    1.3   1 TMA2003  E2   7   
+       2000.62     352.1    0.1     40.078    0.264     7.79  0.28   13.73  0.07   609  70    0.2   8 UC_2013b Eu   7   
+       2015.000    351.890   .      40.319     .        5.674  .     13.428  .     673 440    1.0   1 Kpp2018m Hg   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+CHR  88Aa,Ab          20.56    y    0.0854 a  150.8     185.7      1996.01    y  0.058     328.1     3  Tok2015c
+               +/-     0.14         0.0024      7.0      12.6         1.04       0.030      27.5   
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+CHR  88Aa,Ab      3    Tok2015c    224.9   0.076    206.3   0.079    189.0   0.081    172.1   0.081
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+CHR  88     45 Aql.                                                                 .       
+            Aa,Ab: Malkov et al. (2012) derive dynamical, photometric, and          .       
+            spectroscopic masses 1.88 +/- 0.45, 3.34, and 2.09 Msun, respectively.  Mlk2012 
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+Bu_1903      Burnham, S.W.                                                                       1903PYerO...2....1B
+             Pub. Yerkes Obs. 2, 1, 1903                                                                            
+Bu_1913      Burnham, S.W.                                                                       1913QB811.B8.......
+             Carnegie Inst. Wash. #168, 1913                                                                        
+HIP1997e     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (single star systems)                                                                                  
+HIP1997g     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (non-component double star solution: G = acceleration solution,                                        
+             O = orbit solution, V = variability-induced mover, X = stochastic solution)                            
+HJ_1833c     Herschel, J.F.W.                                                                    1833MmRAS...6....1H
+             MemRAS 6, 1, 1833                                                                                      
+Hor2008      Horch, E.P., van Altena, W.F., Cyr, W.M., Jr., Kinsman-Smith, L., Srivastava, A.,   2008AJ....136..312H
+             & Zhou, J.                                                                                             
+             AJ 136, 312, 2008                                                                                      
+Hor2012a     Horch, E.P., Bahi, L.A.P., Gaulin, J.R., Howell, S.B., Sherry, W.H., Galle, R.B.,   2012AJ....143...10H
+             & van Altena, W.F.                                                                                     
+             AJ 143, 10, 2012                                                                                       
+Hrt1992b     Hartkopf, W.I., McAlister, H.A., & Franz, O.G.                                      1992AJ....104..810H
+             AJ 104, 810, 1992                                                                                      
+Hrt1997      Hartkopf, W.I., McAlister, H.A., Mason, B.D., ten Brummelaar, T.A., Roberts, J.C.,  1997AJ....114.1639H
+             Jr., Turner, N.H., & Wilson, J.W.                                                                      
+             AJ 114, 1639, 1997                                                                                     
+Hrt2000a     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Roberts, L.C., Jr., Turner, N.H.,     2000AJ....119.3084H
+             ten Brummelaar, T.A., Prieto, C.M., Ling, J.F., & Franz, O.G.                                          
+             AJ 119, 3084, 2000                                                                                     
+Kpp2018m     Knapp, W.R.A. & Nanson, J.                                                          2018JDSO...14..503K
+             JDSO 14, 503, 2018                                                                  .                  
+McA1987a     McAlister, H.A., Hartkopf, W., Hutter, D., Shara, M., & Franz, O.                   1987AJ.....92..183M
+             AJ 92, 183, 1987                                                                                       
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+Mlk2012      Malkov, O.Yu., Tamazian, V.S., Docobo, J.A., & Chulkov, D.A.                        2012A&A...546A..69M
+             A&A 546, A69, 2012                                                                                     
+Opi1927      Opik, E.                                                                            1927PTarO..26e...1O
+             Pub. Tartu Obs. 26, #5, 1927                                                                           
+Rbr2018      Roberts, L.C., Jr. & Mason, B.D.                                                    2018MNRAS.473.4497R
+             MNRAS 473, 4497, 2018                                                                                  
+TMA2003      2MASS Catalog                                                                       .                  
+             2MASS Point Src Cat., 2003 all-sky release (http://pegasus.phast.umass.edu/)                           
+             (Note: 2MASS photometry also added by cataloguer to 2MASS astrometry published                         
+             under other references.)                                                                               
+Tok2010      Tokovinin, A., Mason, B., & Hartkopf, W.                                            2010AJ....139..743T
+             AJ 139, 743, 2010                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2015c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2015AJ....150...50T
+             AJ 150, 50, 2015                  (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2018c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A. & Horch, E.P.              2018AJ....155..235T
+             AJ 155, 235, 2018                                                                                      
+UC_2013b     Hartkopf, W.I., Mason, B.D., Finch, C.T., Zacharias, N., Wycoff, G.L., & Hsu, D.    2013AJ....146...76H
+             AJ 146, 76, 2013                  (UC 301 - 5058)                                                      
+             (Relative astrometry is derived from individual measurements, not precessed means.                     
+             UCAC aperture magnitudes are listed, unless the duplicity flag indicates a blended                     
+             image (a flag value of 30 or higher). Model fit magnitudes are given for both                          
+             components if either has such a flag. Model fit magnitudes are indicated by the                        
+             letter "f" following the filter information.                                                           
+             APASS photometry extracted from UCAC4 catalog is listed under reference AAV2012.                       
+             Due to aperture method used, APASS photometry is only included for pairs wider                         
+             than 10" (Henden, private comm.) Photometry for pairs wider than 10" which showed                      
+             identical values for both components in all filters were removed, as well.                             
+Wor1967a     Worley, C.E.                                                                        1967AJ.....72..899W
+             AJ 72, 899, 1967                                                                                       
+
+------------------------------------------------------------------------------------------------------------------------
+

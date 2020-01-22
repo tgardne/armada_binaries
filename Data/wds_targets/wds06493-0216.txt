@@ -1,0 +1,168 @@
+USNO Double Star data for WDS 06493-0216
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+FIN 322      1952 2018   59  88 254   0.1   0.1  6.18  6.90 B8IIIn    -009-004          -02 1776 NO   064916.41-021619.3
+       1952.20      87.7     .       0.119     .         .     .       .     .                0.7   4 Fin1953d J    0   
+       1953.22     101.3     .       0.126     .         .     .       .     .                0.7   7 Fin1953d J    0   
+       1954.16     104.8     .       0.117     .         .     .      0.0    .                0.7   2 Fin1954c J    0   
+       1955.23      94.6     .       0.113     .         .     .       .     .                0.7   2 Fin1956a J    0   
+       1956.20      92.9     .       0.121     .         .     .       .     .                0.7   1 Fin1956a J    0   
+       1958.06    q 82.2     .       0.12      .        6.5    .      6.4    .                2.1   2 B__1960b Mb   0   
+       1959.23      90.2     .       0.120     .         .     .      0.0    .                0.7   3 Fin1959a J    0   
+       1960.21      81.6     .       0.118     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.22      80.1     .       0.117     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.22      66.6     .       0.110     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.22      65.5     .       0.110     .         .     .      0.2    .                0.7   1 Fin1961  J    1   
+       1960.23      64.4     .       0.114     .         .     .       .     .                0.7   1 Fin1961  J    1   
+       1960.23      66.3     .       0.106     .         .     .      0.2    .                0.7   1 Fin1961  J    1   
+       1960.23      65.6     .       0.109     .         .     .       .     .                0.7   1 Fin1961  J    1   
+       1960.24      72.1     .        .        .         .     .       .     .                0.7   1 Fin1961  J    1   
+       1960.24      63.7     .       0.114     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.27      58.1     .       0.117     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.28      54.4     .        .        .         .     .       .     .                0.7   1 Fin1961  J    1   
+       1960.28      61.7     .       0.108     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.28      62.5     .       0.107     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.32      52.9     .       0.113     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.33      58.3     .       0.110     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.33      63.7     .       0.117     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.33      60.0     .       0.117     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.81      51.5     .       0.126     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1960.81      49.6     .       0.123     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1961.04      55.5     .       0.113     .         .     .      0.0    .                0.7   1 Fin1961  J    1   
+       1961.15      51.6     .       0.107     .         .     .      0.0    .                0.7   1 Fin1962a J    1   
+       1962.20      57.2     .       0.112     .         .     .      0.0    .                0.7   3 Fin1963a J    1   
+       1963.210     47.4     .       0.114     .         .     .      0.0    .                0.7   2 Fin1964a J    2   
+       1964.189     45.3     .       0.120     .         .     .      0.0    .                0.7   4 Fin1965a J    2   
+       1965.199     39.0     .       0.109     .         .     .      0.0    .                0.7   2 Fin1965a J    2   
+       1966.219     35.4     .       0.109     .         .     .      0.0    .                0.7   2 Fin1966a J    2   
+       1967.314     30.3     .       0.111     .         .     .      0.0    .                0.7   1 Fin1969a J    2   
+       1976.8569  q 75.8    0.4      0.104    0.005      .     .       .     .     552  20    3.8   1 McA1978b Sc   2   
+       1976.8597  q 75.0    0.5      0.106    0.002      .     .       .     .     552  20    3.8   1 McA1978b Sc   2   
+       1977.9136  q 71.0     .       0.112     .         .     .       .     .     552  20    2.1   1 McA1982b Sc   2   
+       1978.1456  q 70.7    0.8      0.119    0.001      .     .       .     .     470        3.8   1 McA1980b Sc   2   
+       1979.11      74.4     .       0.15      .         .     .       .     .                0.6   3 Hei1980a Ma   2   
+       1980.1527  q 68.5     .       0.137     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1980.1579  q 68.6     .       0.141     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1980.7283  q 63.6     .       0.136     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1980.8814  q 65.7     .       0.143     .         .     .       .     .     470        2.1   1 McA1984b Sc   4   
+       1983.0140    58.9     .       0.162     .         .     .       .     .     549  22    1.8   1 McA1997  Sc   5   
+       1983.0466    60.6     .       0.158     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1983.0658    56.9     .       0.157     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1984.0570    58.5     .       0.158     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1984.9988    57.3     .       0.159     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1985.8371    54.4     .       0.161     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1987.2734    52.9     .       0.158     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1988.2536    50.4     .       0.153     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1989.3072    48.4     .       0.154     .         .     .       .     .     549  22    4.0   1 McA1990  Sc   4   
+       1991.25      43.      .       0.141     .        6.184 0.055   6.896 0.106  511 222    0.3   1 HIP1997a Hh   5   
+       1993.0887    39.4     .       0.135     .         .     .       .     .     549  22    4.0   1 Hrt2000a Sc   5   
+       1995.9229    28.7     .       0.124     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
+       1997.1244    22.8     .       0.120     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
+       2010.9644   281.2    0.1      0.0894   0.0004     .     .      0.8    .     543  22    4.1   2 Tok2012d St   7   
+       2013.1268   270.7    0.1      0.1044   0.0004     .     .      0.9    .     543  22    4.1   2 Tok2014a St   7   
+       2014.8524   264.7    0.1      0.1125   0.0010     .     .      0.9    .     788 132    4.1   2 Tok2015c St   7   
+       2015.9065   260.3    0.0      0.1218   0.0001     .     .      0.8    .     543  22    4.1   2 Tok2016a St   7   
+       2018.2336   253.5    0.0      0.1336   0.0000     .     .      0.9    .     534  22    4.1   2 Tok2019c St   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+FIN 322               58.69    y    0.148  a  112.2     241.6      1969.56    y  0.293      68.0     3  Tok2015c
+               +/-     1.61         0.006       1.2       0.9         0.78       0.015       6.0   
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+FIN 322           3    Tok2015c    259.8   0.119    256.5   0.123    253.3   0.126    250.3   0.127
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+FIN 322     Malkov et al. (2012) derive dynamical, photometric, and spectroscopic   .       
+            masses of 4.91 +/- 2.98, 4.84, and 3.31 Msun, respectively.             Mlk2012 
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+B__1960b     van den Bos, W.H.                                                                   1960PYerO...9....1B
+             Pub. Yerkes Obs. 9, pt. 1, 1960                                                                        
+Fin1953d     Finsen, W.S.                                                                        1953CiUO..113..170F
+             Union Obs. Johannesburg Circ. 113, 170, 1953                                                           
+Fin1954c     Finsen, W.S.                                                                        1954CiUO..114..240F
+             Union Obs. Johannesburg Circ. 114, 240, 1954                                                           
+Fin1956a     Finsen, W.S.                                                                        1956CiUO..115..259F
+             Union Obs. Johannesburg Circ. 115, 259, 1956                                                           
+Fin1959a     Finsen, W.S.                                                                        1959CiUO..118..315F
+             Union Obs. Johannesburg Circ. 118, 315, 1959                                                           
+Fin1961      Finsen, W.S.                                                                        1961CiUO..120..367F
+             Union Obs. Johannesburg Circ. 120, 367, 1961                                                           
+Fin1962a     Finsen, W.S.                                                                        1962ROCi..121...10F
+             Republic Obs. Circ. 121, 10, 1962                                                                      
+Fin1963a     Finsen, W.S.                                                                        1963ROCi..122...32F
+             Republic Obs. Circ. 122, 32, 1963                                                                      
+Fin1964a     Finsen, W.S.                                                                        1964ROCi..123...53F
+             Republic Obs. Circ. 123, 53, 1964                                                                      
+Fin1965a     Finsen, W.S.                                                                        1965ROCi..124...79F
+             Republic Obs. Circ. 124, 79, 1965                                                                      
+Fin1966a     Finsen, W.S.                                                                        1966ROCi..125..108F
+             Republic Obs. Circ. 125, 108, 1966                                                                     
+Fin1969a     Finsen, W.S.                                                                        1969ROCi..128..187F
+             Republic Obs. Circ. 128, 187, 1969                                                                     
+Hei1980a     Heintz, W.D.                                                                        1980ApJS...44..111H
+             ApJS 44, 111, 1980                                                                                     
+HIP1997a     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997  (incl. Hp photometry, vol. 10)                                   
+Hrt1997      Hartkopf, W.I., McAlister, H.A., Mason, B.D., ten Brummelaar, T.A., Roberts, J.C.,  1997AJ....114.1639H
+             Jr., Turner, N.H., & Wilson, J.W.                                                                      
+             AJ 114, 1639, 1997                                                                                     
+Hrt2000a     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Roberts, L.C., Jr., Turner, N.H.,     2000AJ....119.3084H
+             ten Brummelaar, T.A., Prieto, C.M., Ling, J.F., & Franz, O.G.                                          
+             AJ 119, 3084, 2000                                                                                     
+McA1978b     McAlister, H.A.                                                                     1978ApJ...225..932M
+             ApJ 225, 932, 1978                                                                                     
+McA1980b     McAlister, H.A. & Fekel, F.C.                                                       1980ApJS...43..327M
+             ApJS 43, 327, 1980                                                                                     
+McA1982b     McAlister, H.A. & Hendry, E.M.                                                      1982ApJS...48..273M
+             ApJS 48, 273, 1982                                                                                     
+McA1983      McAlister, H.A., Hendry, E.M., Hartkopf, W.I., Campbell, B.G., & Fekel, F.C.        1983ApJS...51..309M
+             ApJS 51, 309, 1983                                                                                     
+McA1984b     McAlister, H.A. & Hartkopf, W.I.                                                    ...................
+             Catalog of Interferometric Measurements of Binary Stars, CHARA Contrib. #1, 1984                       
+                                               (previously unpublished KPNO 2.1m and 3.8m data)                     
+McA1987b     McAlister, H.A., Hartkopf, W.I., Hutter, D.J., & Franz, O.G.                        1987AJ.....93..688M
+             AJ 93, 688, 1987                                                                                       
+McA1989      McAlister, H.A., Hartkopf, W.I., Sowell, J.R., Dombrowski, E.G., & Franz, O.G.      1989AJ.....97..510M
+             AJ 97, 510, 1989                                                                                       
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+McA1997      Fu, H.-H., Hartkopf, W.I., Mason, B.D., McAlister, H.A., Dombrowski, E.G., &        1997AJ....114.1623F
+             Franz, O.G.                                                                                            
+             AJ 114, 1623, 1997                                                                                     
+Mlk2012      Malkov, O.Yu., Tamazian, V.S., Docobo, J.A., & Chulkov, D.A.                        2012A&A...546A..69M
+             A&A 546, A69, 2012                                                                                     
+Tok2012d     Hartkopf, W.I., Tokovinin, A., & Mason, B.D.                                        2012AJ....143...42H
+             AJ 143, 42, 2012                  (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2014a     Tokovinin, A., Mason, B.D., & Hartkopf, W.I.                                        2014AJ....147..123T
+             AJ 147, 123, 2014                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2015c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2015AJ....150...50T
+             AJ 150, 50, 2015                  (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2016a     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2016AJ....151..153T
+             AJ 151, 153, 2016                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2019c     Tokovinin, A., Mason, B.D., Mendez, R.A., Horch, E.P. & Briceno, C.                 2019AJ....158...48T
+             AJ 158, 48, 2019                                                                                       
+
+------------------------------------------------------------------------------------------------------------------------
+

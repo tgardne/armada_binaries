@@ -1,0 +1,355 @@
+USNO Double Star data for WDS 02500+2716
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+MCA  10Aa,Ab 1980 2003    4 129 180   0.3   0.1  3.63   .   B8Vn      +067-117          +26  471 N    024959.03+271537.8
+       1980.7253   129.1     .       0.298     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1983.8231      .      .    <  0.022     .         .     .       .     .     600  14    6.0   1 Bag1985  S    5   
+       1983.9596      .      .    <  0.022     .         .     .       .     .     600  14    6.0   1 Bag1985  S    5   
+       1984.7036   181.7     .       0.128     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1988.6572   203.9     .       0.230     .         .     .       .     .     549  22    3.8   1 McA1990  Sc   4   
+       1991.25        .      .    <  0.1       .        3.58   .       .     .     511 222    0.3   1 HIP1997e Hh   7   
+       1994.8978      .      .    <  0.120     .         .     .       .     .     600 200    1.0   1 Bag1999a S    5   
+       2001.7414      .      .    <  0.10      .         .     .       .     .     900 340    3.6   1 Rbr2007  A    7   
+       2002.7490      .      .    <  0.24      .         .     .       .     .     800 155    3.6   1 Rbr2011c A    7   
+       2003.9504   180.4    0.7      0.119    0.002      .     .       .     .     550  24    1.5   1 Hrt2008  Su   7   
+       2004.9827      .      .    U   .        .         .     .       .     .     880 155    3.6   1 Rbr2018  A    7   
+
+STT  47AB    1834 2012   26 250 292  15.0  34.0  3.63 11.04 B8Vn      +067-117 -002+001          NL U 024959.03+271537.8
+       1834.10    :250.0     .    : 15.0       .         .     .       .     .                0.2   1 Smy1844  Ma   6   
+       1852.15     255.1     .      18.75      .         .     .       .     .                0.4   1 Stt1906B Ma   5   
+       1866.53     260.57    .      20.590     .         .     .       .     .                0.2   3 D__1870d Ma   7   
+       1867.704    261.4     .      20.590     .         .     .       .     .                0.2   1 D__1870d Ma   7   
+       1870.          .      .        .        .         .     .      5.42   .                0.4  14 Pck1879  Zp D 7   
+       1871.05     261.6     .      20.83      .        4.1    .     11.2    .                0.2   5 D__1883  Ma   3   
+       1879.40     265.8     .      21.18      .        3.4    .     10.8    .                0.5   2 Bu_1883  Ma   3   
+       1887.03     267.7     .      21.36      .        3.5    .     11.5    .                0.3   4 Enh1887a Ma   3   
+       1890.0      268.0     .      22.06      .         .     .       .     .                0.4   2 Rnz1892  Ma   3   
+       1893.96     265.0     .      21.920     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1896.23     268.5     .      23.2       .         .     .       .     .                0.3   3 Brt1926a Pa X 3   
+       1897.91     270.6     .      22.737     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1898.784    271.1     .      22.91      .         .     .       .     .                0.3   3 Hu_1901a Ma   3   
+       1898.806    271.3     .      22.95      .         .     .       .     .                0.9   1 Hu_1901a Ma   3   
+       1903.101    272.0     .      22.80      .         .     .       .     .                0.4   2 Com1908  Ma   6   
+       1903.81     272.4     .      22.54      .         .     .       .     .                1.0   3 Bu_1906  Ma   3   
+       1903.94     272.4     .      24.46      .         .     .       .     .                0.3   1 Gra1908  Ma   3   
+       1908.11     273.6     .      23.51      .         .     .       .     .                0.3   3 Prz1908  Ma   3   
+       1910.          .      .        .        .         .     .      4.90   .                0.2     Wen1913  Z  D 7   
+       1910.          .      .        .        .         .     .      4.95   .                0.2     Wen1913  Z  D 7   
+       1910.          .      .        .        .         .     .      5.22   .                0.3  26 Pck1912  Zp D 7   
+       1910.          .      .        .        .         .     .      5.24   .                0.2     Wen1913  Z  D 7   
+       1910.          .      .        .        .         .     .      6.66   .                0.2     Wen1913  Z  D 7   
+       1910.          .      .        .        .         .     .      7.26   .                0.2     Wen1913  Z  D 7   
+       1912.69     274.3     .      23.54      .        4.1    .     11.3    .                1.0   3 Bu_1913  Ma   3   
+       1915.84     276.6     .      23.95      .         .     .       .     .                0.4   3 Com1929  Ma   6   
+       1921.852    277.1     .      24.76      .         .     .       .     .                0.7   2 StG1963  Ma   4   
+       1923.643    277.6     .      24.52      .         .     .       .     .                0.7   3 Dic1963b Ma   4   
+       1944.          .      .        .        .         .     .      7.72  0.14              0.4   4 Wal1947  Zw D 7   
+       1991.00     291.0     .      31.06      .         .     .       .     .                0.3   1 Gir1992  Mb   5   
+       1991.25        .      .    <  0.1       .         .     .       .     .                0.3   1 HIP1997e Hh   6   
+       1997.88     291.6     .      32.11      .        3.657 0.294  10.667 0.060 1256 245    1.3   1 TMA2003  E2   7   
+       1997.88        .      .        .        .        3.803 0.238  10.457 0.022 1633 160    1.3   1 TMA2003  E2   7   
+       1997.88        .      .        .        .        3.864 0.036  10.407 0.020 2210 300    1.3   1 TMA2003  E2   7   
+       2001.629    290.8    0.2     32.062    0.081     7.13  0.38   11.36  0.05   609  70    0.2   3 UC_2013b Eu   7   
+       2008.994    290.2     .      32.77      .         .     .       .     .                0.2   1 Smr2009c C    7   
+       2010.9718   293.5     .      33.44      .         .     .       .     .                0.3   1 ITF2011b C    7   
+       2012.888    292.     0.4     34.0      0.19       .     .       .     .                0.4   3 Nug2013  C    7   
+
+H 5 116AC    1782 2012   25 189 233  39.3  28.5  3.63 10.66 B8Vn      +067-117 +007-005 +26  471 NL U 024959.03+271537.8
+       1782.98     189.2     .      39.33      .         .     .       .     .                0.2   1 H__1785  Mb   7   
+       1783.734    189.      .      39.3       .         .     .       .     .                0.2   1 H__1867  Mb   5   
+       1834.10     196.2     .      38.0       .         .     .       .     .                0.2   1 Smy1844  Ma   6   
+       1852.15     199.1     .      35.46      .         .     .       .     .                0.4   1 Stt1906B Ma   6   
+       1872.79     203.0     .      34.45      .        4.1    .     11.0    .                0.2   2 D__1883  Ma   3   
+       1879.40     203.5     .      34.03      .        3.4    .     10.4    .                0.5   2 Bu_1883  Ma   3   
+       1887.06     206.0     .      32.72      .        3.5    .     11.0    .                0.3   7 Enh1887a Ma   3   
+       1890.0      206.4     .      32.79      .         .     .       .     .                0.4   3 Rnz1892  Ma   3   
+       1896.85     207.8     .      32.863     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1897.38     209.2     .      33.2       .         .     .       .     .                0.3   2 Brt1926a Pa X 3   
+       1897.91     207.7     .      32.635     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1898.784    207.3     .      32.85      .         .     .       .     .                0.3   3 Hu_1901a Ma   3   
+       1898.806    208.3     .      32.70      .         .     .       .     .                0.9   1 Hu_1901a Ma   3   
+       1903.101    208.2     .      32.38      .         .     .       .     .                0.4   2 Com1908  Ma   6   
+       1903.81     209.2     .      32.06      .         .     .       .     .                1.0   3 Bu_1906  Ma   3   
+       1908.11     210.1     .      31.93      .         .     .       .     .                0.3   3 Prz1908  Ma   3   
+       1910.          .      .        .        .         .     .      7.32   .                0.3   4 Pck1912  Zp D 7   
+       1912.69     210.9     .      31.56      .        4.1    .     11.0    .                1.0   3 Bu_1913  Ma   3   
+       1915.84     211.6     .      31.49      .         .     .       .     .                0.4   3 Com1929  Ma   6   
+       1921.850    212.7     .      31.36      .         .     .       .     .                0.7   2 StG1963  Ma   4   
+       1923.643    212.8     .      31.05      .         .     .       .     .                0.7   3 Dic1963b Ma   4   
+       1944.          .      .        .        .         .     .      7.45  0.15              0.4   4 Wal1947  Zw D 7   
+       1991.00     228.7     .      28.42      .         .     .       .     .                0.3   1 Gir1992  Mb   5   
+       1997.88     231.1     .      27.93      .        3.657 0.294   9.252 0.020 1256 245    1.3   1 TMA2003  E2   7   
+       1997.88        .      .        .        .        3.803 0.238   8.668 0.018 1633 160    1.3   1 TMA2003  E2   7   
+       1997.88        .      .        .        .        3.864 0.036   8.585 0.020 2210 300    1.3   1 TMA2003  E2   7   
+       2001.631    230.7     .      28.172     .        7.13  0.38   10.88   .     609  70    0.2   1 UC_2013b Eu   7   
+       2008.994    230.3     .      27.17      .         .     .       .     .                0.2   1 Smr2009c C    7   
+       2010.9718   234.8     .      27.61      .         .     .       .     .                0.3   1 ITF2011b C    7   
+       2012.888    233.     0.5     28.5      0.27       .     .       .     .                0.4   3 Nug2013  C    7   
+
+H 6   5AD    1821 2011   29 227 237 127.6 122.5  3.63  8.80 B8Vn      +067-117 +028-015 +26  470 NL   024959.03+271537.8
+       1779.74        .      .     125.58      .         .     .       .     .                0.2   1 H__1782  Mb   7   
+       1821.95     226.6     .     127.557     .         .     .       .     .                0.1   1 SHJ1824  Ma   7   
+       1834.10     225.0     .     124.8       .         .     .       .     .                0.2   1 Smy1844  Ma   6   
+       1852.14     228.7     .     127.11      .         .     .       .     .                0.4   2 Stt1906B Ma   6   
+       1877.78     229.9     .     126.86      .        4.1    .      8.0    .                0.2   1 D__1883  Ma   3   
+       1879.93     230.2     .     125.90      .        3.4    .      8.5    .                0.5   2 Bu_1883  Ma   3   
+       1886.43     230.4     .     125.50      .        3.5    .      9.0    .                0.3   5 Enh1887a Ma   3   
+       1890.0      230.8     .     125.48      .         .     .       .     .                0.4   3 Rnz1892  Ma   3   
+       1893.96     230.2     .     125.352     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1896.23     230.9     .     126.1       .         .     .       .     .                0.3   3 Brt1926a Pa X 3   
+       1896.85     230.7     .     126.114     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1897.91     231.2     .     125.131     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1898.78     231.3     .     125.92      .         .     .       .     .                0.3   2 Hu_1901a Ma   3   
+       1899.94     231.2     .     125.98      .         .     .       .     .                0.3   2 BnW1909  Ma   3   
+       1903.101    231.5     .     125.54      .         .     .       .     .                0.4   2 Com1908  Ma   6   
+       1903.81     231.1     .     125.19      .         .     .       .     .                1.0   3 Bu_1906  Ma   3   
+       1904.48     231.5     .     125.68      .         .     .       .     .                0.3   2 Gra1908  Ma   3   
+       1912.3      231.5     .     124.567     .         .     .       .     .                0.2   1 WFD1920b T    7   
+       1912.69     231.8     .     124.90      .        4.1    .      9.5    .                1.0   3 Bu_1913  Ma   3   
+       1915.84     231.9     .     124.94      .         .     .       .     .                0.4   2 Com1929  Ma   6   
+       1921.856    232.5     .     124.88      .         .     .       .     .                0.7   2 StG1963  Ma   4   
+       1923.643    232.3     .     124.90      .         .     .       .     .                0.7   3 Dic1963b Ma   4   
+       1929.82     232.7     .     124.192     .         .     .       .     .                0.2   1 WFC1958a Pa   7   
+       1944.          .      .        .        .         .     .      4.80  0.18              0.4   4 Wal1947  Zw D 7   
+       1957.95     234.1     .     123.687     .         .     .       .     .                0.2   1 WFC1975  Pa   7   
+       1991.00     236.3     .     121.66      .         .     .       .     .                0.3   1 Gir1992  Mb   5   
+       1991.68     236.1     .     122.82      .        3.579 0.009   8.801 0.019  530 100    0.3   1 TYC2002  Ht   6   
+       1991.68        .      .        .        .        3.478 0.014  10.038 0.036  430  90    0.3   1 TYC2002  Ht   7   
+       1997.88     236.4     .     122.58      .        3.657 0.294   6.691 0.020 1256 245    1.3   1 TMA2003  E2   7   
+       1997.88        .      .        .        .        3.803 0.238   6.139 0.017 1633 160    1.3   1 TMA2003  E2   7   
+       1997.88        .      .        .        .        3.864 0.036   6.026 0.018 2210 300    1.3   1 TMA2003  E2   7   
+       2001.629    236.2    0.1    122.898    0.107     7.13  0.38    8.82  0.04   609  70    0.2   6 UC_2013b Eu   7   
+       2002.783    236.0     .     122.45      .         .     .       .     .                0.2   1 Arn2003c Mg   6   
+       2008.994    233.3     .     121.39      .         .     .       .     .                0.2   1 Smr2009c C    7   
+       2010.          .      .        .        .        3.489  .      9.820-0.010  440  98    0.2   1 AAV2012  Zc   7   
+       2010.          .      .        .        .        3.596  .      9.333-0.010  550  89    0.2   1 AAV2012  Zc   7   
+ Aa,D  2011.784    237.1     .     122.45      .         .     .       .     .                0.2   1 Arn2012a Mg   7   
+
+JNN   2AE    2008 2010    2  34  32   7.3   7.4  3.80 19.5  B8Vn      +067-117                   NU K 024959.03+271537.8
+       2008.73      33.90   0.10     7.328    0.006      .     .     15.73  0.11  1580 103    8.1   1 Jnn2011b A    7   
+       2010.64      31.93   0.10     7.438    0.006      .     .     15.75  0.11  1580 103    8.1   1 Jnn2011b A    7   
+
+JNN   2AF    2008 2010    2 229 231   9.1   9.0  3.80 21.0  B8Vn      +067-117                   NU K 024959.03+271537.8
+       2008.73     229.06   0.10     9.051    0.006      .     .     17.02  0.19  1580 103    8.1   1 Jnn2011b A    7   
+       2010.64     230.62   0.10     8.992    0.006      .     .     17.41  0.14  1580 103    8.1   1 Jnn2011b A    7   
+
+JNN   2AG    2008 2010    2  26  25  12.2  12.3  3.80 16.3  B8Vn      +067-117                   NU K 024959.03+271537.8
+       2008.73      25.93   0.10    12.222    0.006      .     .     12.92  0.10  1580 103    8.1   1 Jnn2011b A    7   
+       2010.64      24.80   0.10    12.341    0.006      .     .     11.97  0.10  1580 103    8.1   1 Jnn2011b A    7   
+
+SLV   1BC    1834 2015   22 174 164  31.6  30.5 11.04 10.66           -002+001 +007-005          N    024956.78+271549.8
+       1834.10    :173.6     .    : 31.55      .         .     .       .     .                0.2   1 Smy1844  Ma G 6   
+       1852.15     167.2     .      29.42      .         .     .       .     .                0.4   1 Stt1906B Ma G 6   
+       1879.40     165.7     .      30.60      .       10.8    .     10.4    .                0.5   2 Bu_1883  Ma G 6   
+       1887.05     166.2     .      29.40      .       11.5    .     11.0    .                0.3   4 Enh1887a Ma G 6   
+       1890.00     165.4     .      29.56      .         .     .       .     .                0.4   2 Rnz1892  Ma G 6   
+       1896.85     166.3     .      29.898     .         .     .       .     .                0.3   1 WFC1998  Pa   7   
+       1897.91     165.4     .      30.114     .         .     .       .     .                0.3   1 WFC1998  Pa   7   
+       1898.78     165.2     .      30.65      .         .     .       .     .                0.3   3 Hu_1901a Ma G 6   
+       1898.81     165.8     .      30.24      .         .     .       .     .                0.9   1 Hu_1901a Ma G 6   
+       1903.10     165.7     .      30.27      .         .     .       .     .                0.4   2 Com1908  Ma G 6   
+       1903.81     166.6     .      29.74      .         .     .       .     .                1.0   3 Bu_1906  Ma G 6   
+       1908.11     165.6     .      30.04      .         .     .       .     .                0.3   3 Prz1908  Ma G 6   
+       1912.69     165.9     .      29.75      .       11.3    .     11.0    .                1.0   3 Bu_1913  Ma G 6   
+       1915.84     166.2     .      30.46      .         .     .       .     .                0.4   3 Com1929  Ma G 6   
+       1921.85     165.5     .      30.42      .         .     .       .     .                0.7   2 StG1963  Ma G 6   
+       1923.64     165.7     .      30.28      .         .     .       .     .                0.7   3 Dic1963b Ma G 6   
+       1967.714    164.56    .      30.353     .         .     .       .     .                0.4   1 Slv1972  Po N 2   
+       1991.00     165.7     .      30.85      .         .     .       .     .                0.3   1 Gir1992  Mb G 6   
+       1997.88     164.6     .      30.47      .       10.667 0.060   9.252 0.020 1256 245    1.3   1 TMA2003  E2   7   
+       1997.88        .      .        .        .       10.457 0.022   8.668 0.018 1633 160    1.3   1 TMA2003  E2   7   
+       1997.88        .      .        .        .       10.407 0.020   8.585 0.020 2210 300    1.3   1 TMA2003  E2   7   
+       2001.630    164.5    0.1     30.511    0.006    11.36  0.05   10.88   .     609  70    0.2   3 UC_2013b Eu   7   
+       2010.9718   164.6     .      30.35      .         .     .       .     .                0.3   1 ITF2011b C    7   
+       2015.000    164.243   .      30.524     .       11.193  .     10.761  .     673 440    1.0   1 Kpp2018m Hg   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+LINEAR ELEMENTS:
+
+                    X0.........  XA.......  Y0.........  YA.......   T0...... RHO0... THETA0  Reference
+STT  47AB            -28.821896  -0.075224    -9.753252  -0.108135   1983.033  30.427 288.70  Hrt2017a
+               +/-     0.372570   0.006133     0.627697   0.010336      0.250   0.406   1.14
+H 5 116AC            -19.918388  -0.063932    20.991812  -0.107119   1969.503  28.938 223.50  Hrt2017a
+               +/-     0.175511   0.002411     0.685149   0.009416      0.080   0.511   0.97
+H 6   5AD           -100.829201  -0.039205    71.364090  -0.099964   1966.509 123.529 234.71  Hrt2017a
+               +/-     0.233288   0.004532     0.395884   0.007646      0.570   0.298   0.16
+
+
+LINEAR EPHEMERIDES:
+
+Name           Reference   ... 2015.0 ..   ... 2020.0 ..   ... 2025.0 ..   ... 2030.0 ..   ... 2035.0 ..   ... 2040.0 ..
+                           theta ..rho..   theta ..rho..   theta ..rho..   theta ..rho..   theta ..rho..   theta ..rho..
+STT  47AB      Hrt2017a    292.9  33.906   293.5  34.465   294.1  35.027   294.6  35.593   295.2  36.161   295.7  36.733
+H 5 116AC      Hrt2017a    234.8  27.944   236.1  27.903   237.3  27.876   238.6  27.863   239.9  27.864   241.2  27.879
+H 6   5AD      Hrt2017a    237.1 122.385   237.3 122.279   237.6 122.175   237.8 122.073   238.1 121.974   238.3 121.877
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+MCA  10     Aa,Ab: 41 Ari = Bharani. Aa is a spectroscopic binary and resolved      .       
+            interferometer pair.                                                    .       
+STT  47     AB: Optical pair, based on study of relative motion of the              .       
+            components using the method of apparent motion parameters.              Kiy2008 
+H 5 116     AC: H V 116.                                                            .       
+            AC: Optical pair, based on study of relative motion of the              .       
+            components using the method of apparent motion parameters.              Kiy2008 
+H 6   5     AD: H VI 5. D is BD+26@470.                                             .       
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+AAV2012      AAVSO Photometric All-Sky Survey (APASS), Data Release 6                            .                  
+             http://www.aavso.org/apass                                                                             
+             (Note: APASS photometry extracted from UCAC4 catalog; no observations dates are                        
+             given, so a coarse date of 2010 was assumed for all measures. Negative errors mean                     
+             the star was observed on only one night for that magnitude; therefore, the error                       
+             is purely Poisson rather than nightly scatter. Due to aperture method used, APASS                      
+             photometry is only included for pairs wider than 10" (Henden, private comm.)                           
+Arn2003c     Arnold, D.                                                                          2003DSO.....9....4A
+             Double Star Observer 9, #4, 2003                                                                       
+Arn2012a     Arnold, D.                                                                          2012JDSO....8...32A
+             JDSO 8, 32, 2012                                                                                       
+Bag1985      Balega, Y.Y. & Balega, I.I.                                                         1985SvAL...11...47B
+             SvAL 11, 47, 1985                                                                                      
+Bag1999a     Balega, I.I., Balega, Y.Y., Maksimov, A.F., Pluzhnik, E.A., Shkhagosheva, Z.U., &   1999A&AS..140..287B
+             Vasyuk, V.A.                                                                                           
+             A&AS 140, 287, 1999                                                                                    
+BnW1909      Baranov, W.A.                                                                       .                  
+             Pub. Obs. Imp. Univ. Kasan #20, 1909                                                                   
+Brt1926a     Barton, S.G.                                                                        1926AJ.....36..155B
+             AJ 36, 155, 1926                  (BRT   1 - BRT  62)                                                  
+Bu_1883      Burnham, S.W.                     (BU  864 - 1025)                                  1883MmRAS..47..167B
+             MemRAS 47, 167, 1883                                                                                   
+Bu_1906      Burnham, S.W.                                                                       1906QB821.B972.....
+             Burnham Double Star Cat., 1906                                                                         
+Bu_1913      Burnham, S.W.                                                                       1913QB811.B8.......
+             Carnegie Inst. Wash. #168, 1913                                                                        
+Com1908      Comstock, G.C.                                                                      1908PWasO..12.....C
+             Pub. Washburn Obs. 12, Pt.1, 1908                                                                      
+Com1929      Comstock, G.C.                                                                      1929PWasO..14.....C
+             Pub. Washburn Obs. 14, Pt.1, 1929                                                                      
+D__1870d     Dembowski, H.                                                                       1870AN.....76...81D
+             AN 76, 81, 1870                   (some data also in Mis. Micrometriche)                               
+D__1883      Dembowski, H.                                                                       ...................
+             Misure micrometriche di Stelle Doppie e multiple...                                                    
+             (Rome, Coi tipi del Salviucci), vol. I, 1883                                                           
+Dic1963b     Dick, J.                                                                            1963VeBB....3.....D
+             Pub. Berlin Babelsberg Obs. 14, Pt.3, 1963                                                             
+Enh1887a     Engelhardt, B. von                                                                  1887AN....117....1E
+             AN 117, 1, 1887                                                                                        
+Gir1992      Girard, P.M.                                                                        ...................
+             Webb Soc., Double Star Circ. 5, 1992                                                                   
+Gra1908      Gratschov, M.                                                                       .                  
+             Pub. Engelhardt Obs. #2, 21, 1908                                                                      
+H__1782      Herschel, W.                                                                        1782RSPT...72..112H
+             Phil. Trans. R. Soc. 72, 112, 1782                                                                     
+H__1785      Herschel, W.                                                                        1785RSPT...75...40H
+             Phil. Trans. R. Soc. 75, 40, 1785                                                                      
+H__1867      Herschel, W.                                                                        1867MmRAS..35...21H
+             MemRAS 35, 21, 1867                                                                                    
+HIP1997e     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (single star systems)                                                                                  
+Hrt2008      Hartkopf, W.I., Mason, B.D., & Rafferty, T.                                         2008AJ....135.1334H
+             AJ 135, 1334, 2008                                                                                     
+Hrt2017a     Hartkopf, W.I. & Mason, B.D.                                                        ...................
+             Catalog of Rectilinear Elements (v 2017.09.20)                                                         
+             (http://www.usno.navy.mil/USNO/astrometry/optical-IR-prod/wds/lin1)                                    
+Hu_1901a     Hussey, W.J.                                                                        1901PLicO...5.....H
+             Pub. Lick Obs. 5, 1901                                                                                 
+ITF2011b     Falcon, I.T.                                                                        2011OED.....7...51F
+             El Observador de Estrellas Dobles, Issue #7, 51, 2011                                                  
+Jnn2011b     Janson, M., Bonavita, M., Klahr, H., Lafreniere, D., Jayawardhana, R.,              2011ApJ...736...89J
+             & Zinnecker, H.                                                                                        
+             ApJ 736, 89, 2011                                                                                      
+Kiy2008      Kiyaeva, O.V., Kiselev, A.A. & Izmailov, I.S.                                       2008SvAL...32..405K
+             SvAL 34, 405, 2008                                                                                     
+Kpp2018m     Knapp, W.R.A. & Nanson, J.                                                          2018JDSO...14..503K
+             JDSO 14, 503, 2018                                                                  .                  
+McA1983      McAlister, H.A., Hendry, E.M., Hartkopf, W.I., Campbell, B.G., & Fekel, F.C.        1983ApJS...51..309M
+             ApJS 51, 309, 1983                                                                                     
+McA1987b     McAlister, H.A., Hartkopf, W.I., Hutter, D.J., & Franz, O.G.                        1987AJ.....93..688M
+             AJ 93, 688, 1987                                                                                       
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+Nug2013      Nugent, R.L. & Iverson, E.W.                                                        2013JDSO....9..113N
+             JDSO 9, 113, 2013                                                                                      
+Pck1879      Pickering, E., Searle, A., & Upton, W.                                              1879AnHar..11..105P
+             Harvard Ann. 11, 105, 1879                                                                             
+             (Visual photometry with double-image photometer on 15in Harvard refractor)                             
+             (no dates given for measures; default date = decade of publication added.)                             
+Pck1912      Pickering, E.                                                                       1912AnHar..64..159P
+             Harvard Ann. 64, 159, 1912                                                                             
+             (Visual photometry with double-image photometer on 15in Harvard refractor and                          
+             5in at Arequipa. No dates listed; default date = decade of publication added.)                         
+Prz1908      Przbyllok, E.                                                                       1908VeHei...5....1P
+             Veroff. Sternw. Heidelberg 5, 1, 1908                                                                  
+Rbr2007      Roberts, L.C., Jr., Turner, N.H., & ten Brummelaar, T.A.                            2007AJ....133..545R
+             AJ 133, 545, 2007                                                                                      
+Rbr2011c     Roberts, L.C., Jr.                                                                  2011MNRAS.413.1200R
+             MNRAS 413, 1200, 2011                                                                                  
+Rbr2018      Roberts, L.C., Jr. & Mason, B.D.                                                    2018MNRAS.473.4497R
+             MNRAS 473, 4497, 2018                                                                                  
+Rnz1892      Renz, F.                                                                            .                  
+             Bull. Imp. Acad. Sci. St. Petersburg 34, 459, 1892                                                     
+SHJ1824      South, J. & Herschel, J.                                                            1824RSPT..114R...1H
+             Phil. Trans. R. Soc. 114, 1, 1824                                                                      
+Slv1972      Salukvadze, G.                                                                      1972AbaOB..43...95S
+             Bull. Abastumani Obs. #43, 95, 1972                                                                    
+Smr2009c     Schlimmer, J.S.                                                                     2009JDSO....5..112S
+             JDSO 5, 112, 2009                                                                                      
+Smy1844      Smyth, W.H.                                                                         1844QB43.S66.......
+             Cycle of Celestial Objects 2, 1844                                                                     
+StG1963      Struve, G.                                                                          1963VeBB....3.....S
+             Pub. Berlin Babelsberg Obs. 14, Pt.3, 1963                                                             
+Stt1906B     Struve, O.                                                                          1906QB821.B972.....
+             cited in BDS (Burnham Double Star Cat., 1906)                                                          
+TMA2003      2MASS Catalog                                                                       .                  
+             2MASS Point Src Cat., 2003 all-sky release (http://pegasus.phast.umass.edu/)                           
+             (Note: 2MASS photometry also added by cataloguer to 2MASS astrometry published                         
+             under other references.)                                                                               
+TYC2002      Fabricius, C., Hog, E., Makarov, V.V., Mason, B.D., Wycoff, G.L., & Urban, S.E.     2002A&A...384..180F
+             A&A 384, 180-189, 2002                                                                                 
+             (re-reduction of Tycho data)                                                                           
+UC_2013b     Hartkopf, W.I., Mason, B.D., Finch, C.T., Zacharias, N., Wycoff, G.L., & Hsu, D.    2013AJ....146...76H
+             AJ 146, 76, 2013                  (UC 301 - 5058)                                                      
+             (Relative astrometry is derived from individual measurements, not precessed means.                     
+             UCAC aperture magnitudes are listed, unless the duplicity flag indicates a blended                     
+             image (a flag value of 30 or higher). Model fit magnitudes are given for both                          
+             components if either has such a flag. Model fit magnitudes are indicated by the                        
+             letter "f" following the filter information.                                                           
+             APASS photometry extracted from UCAC4 catalog is listed under reference AAV2012.                       
+             Due to aperture method used, APASS photometry is only included for pairs wider                         
+             than 10" (Henden, private comm.) Photometry for pairs wider than 10" which showed                      
+             identical values for both components in all filters were removed, as well.                             
+Wal1947      Wallenquist, A.                                                                     1947UppAn...2....2W
+             Ann. Uppsala Astron. Obs. 2, No.2, 1947                                                                
+             (A catalogue containing results of the two prior series, plus additional measures                      
+             with the 14-inch refractor and wedge photometer)                                                       
+Wen1913      Wendell, O.C.                                                                       1913AnHar..69..180W
+             Harvard Ann. 69, 180, 1913                                                                             
+             (Visual photometry with double-image photometer attached to 15-inch refractor at                       
+             Harvard, and 5-inch at Arequipa. No published dates, but date range 1903-1912;                         
+             default date of 1910 added.)                                                                           
+WFC1958a     Schorr, R. & Kohlschuetter, A.                                                      .                  
+             AGK2 Cat. North of -2.5 deg, Vol. 1-15, 1958 (Bergedorf)                                               
+WFC1975      Dieckvoss, W.                                                                       .                  
+             AGK3 Cat. North of -2.5 deg dec, Vol. 1-8, 1975                                                        
+WFC1998      Urban, S.E., Corbin, T.E., Wycoff, G.L., Martin, J.C., Jackson, E.S.,               1998AJ....115.1212U
+             Zacharias, M.I., & Hall, D.M.                                                                          
+             AJ 115, 1212, 1998 (Astrographic Cat. 2000)                                                            
+WFD1920b     Dyson, F.W.                                                                         .                  
+             Greenwich Cat. of stars for 1910.0, 1920                                                               
+
+------------------------------------------------------------------------------------------------------------------------
+

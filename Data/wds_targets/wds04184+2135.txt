@@ -1,0 +1,330 @@
+USNO Double Star data for WDS 04184+2135
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+MCA  14Aa,Ab 1975 2005   80 106 190   0.1   0.2  5.60  8.1  F0V       +094-037          +21  618 NO   041823.14+213445.8
+       1957.62        .      .    U   .        .         .     .       .     .                2.1   1 B__1959a Mb   0   
+       1975.7152   106.0    2.0      0.080    0.003      .     .      2.5    .     517  20    3.8   1 McA1977  Sc   2   
+       1975.9583    91.9    1.7      0.074    0.003      .     .       .     .     517  20    3.8   1 McA1977  Sc   2   
+       1976.8566    34.9    1.5      0.069    0.005      .     .       .     .     552  20    3.8   1 McA1978b Sc   2   
+       1976.8594    33.5    1.5      0.073    0.009      .     .       .     .     552  20    3.8   1 McA1978b Sc   2   
+       1976.9221    32.9    1.0      0.072    0.008      .     .       .     .     552  20    3.8   1 McA1979a Sc   2   
+       1977.0860    26.7    1.0      0.083    0.008      .     .       .     .     552  20    3.8   1 McA1979a Sc   2   
+       1977.6390     8.8     .       0.101     .         .     .       .     .     552  20    2.1   1 McA1982b Sc   2   
+       1977.7412     3.1    0.8      0.110    0.008      .     .       .     .     511  41a   3.8   1 McA1980b Sc   2   
+       1978.1482   352.2    0.5      0.113    0.010      .     .       .     .     470        3.8   1 McA1980b Sc   2   
+       1978.6175   340.7    0.8      0.108    0.008      .     .       .     .     470        3.8   1 McA1980b Sc   2   
+       1978.8748   333.3    2.0      0.086    0.013      .     .       .     .     520  30    3.9   1 BLM1982  S    2   
+       1979.7727   304.3     .       0.090     .         .     .       .     .     470        3.8   1 McA1982d Sc   2   
+       1980.1523   285.9     .       0.075     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1980.7173   259.0     .       0.079     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1980.7254   255.8     .       0.085     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1980.7282   259.1     .       0.087     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1980.938       .      .    <  0.101     .         .     .       .     .     600  50    1.5   1 Ebe1986  S    5   
+       1982.7541   191.4     .       0.139     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1982.7570   192.3     .       0.141     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1982.7596   190.0     .       0.136     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1982.7624   192.5     .       0.143     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1982.7652   193.0     .       0.136     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1983.0463   186.0     .       0.138     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1983.0628   187.7     .       0.156     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1983.7099   181.9     .       0.152     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1983.7126   179.5     .       0.155     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1983.9328   181.0    1.9      0.149    0.010      .     .       .     .     550   3    2.0   1 Bnu1984  S    4   
+       1983.9570   176.7     .       0.157     .         .     .       .     .     600  14    6.0   1 Bag1985  S    4   
+       1984.0513   175.1     .       0.152     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1984.0567   174.9     .       0.152     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1984.0594   172.9     .       0.142     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1984.779    157.3     .       0.146     .         .     .       .     .     550        1.0   1 Tok1985  Ig   4   
+       1984.8423   162.8     .       0.148     .         .     .       .     .     600  14    6.0   1 Bag1987  S    4   
+       1984.8447   164.0     .       0.148     .         .     .       .     .     600  14    6.0   1 Bag1987  S    4   
+       1984.8503   165.4     .       0.147     .         .     .       .     .     600  14    6.0   1 Bag1987  S    4   
+       1984.9298   164.5    2.6      0.141    0.013      .     .       .     .     550        1.9   1 Bnu1986  S    4   
+       1984.9988   161.1     .       0.144     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1985.1053   161.0    2.7      0.137    0.013      .     .       .     .     550        1.9   1 Bnu1986  S    4   
+       1985.1816   156.4     .       0.142     .         .     .       .     .     600  14    6.0   1 Bag1987  S    4   
+       1985.1845   158.3     .       0.146     .         .     .       .     .     600  14    6.0   1 Bag1987  S    4   
+       1985.2038   158.0    3.0      0.125    0.013      .     .       .     .     700        2.0   1 Bnu1986  S    4   
+       1985.740    144.9     .       0.118   <0.005      .     .       .     .     550        1.0   1 Tok1988  Ig   4   
+       1985.8368   146.7     .       0.117     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1985.8396   145.5     .       0.123     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1985.8531   146.7     .       0.123     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1986.6563   127.2     .       0.095     .         .     .       .     .                6.0   1 Bag1989a S    4   
+       1986.8855   111.3     .       0.089     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1986.8880   112.5     .       0.086     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1987.7645    57.4     .       0.078     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1988.1636    34.4     .       0.081     .         .     .       .     .     549  22    3.6   1 McA1993  Sc   4   
+       1988.6544    16.2     .       0.095     .         .     .       .     .     549  22    3.8   2 McA1990  Sc   4   
+       1988.6572    15.5     .       0.096     .         .     .       .     .     549  22    3.8   1 McA1990  Sc   4   
+       1988.8047      .      .    <  0.05      .         .     .       .     .                2.1   1 Iso1990b S    5   
+       1988.9085     8.0     .       0.108     .         .     .       .     .     538  76    1.8   1 McA1997  Sc   5   
+       1989.1601     0.4     .       0.123     .         .     .       .     .     549  22    1.8   2 McA1997  Sc   5   
+       1989.1629     3.0     .       0.114     .         .     .       .     .     508  41a   1.8   4 McA1997  Sc   5   
+       1989.1656     2.6     .       0.113     .         .     .       .     .     508  41a   1.8   2 McA1997  Sc   5   
+       1989.2282     0.9     .       0.111     .         .     .       .     .     549  22    3.8   1 McA1990  Sc   4   
+       1989.7056   347.0     .       0.112     .         .     .       .     .     549  22    3.8   1 Hrt1992b Sc   4   
+       1989.7112   348.0     .       0.120     .         .     .       .     .     508  41a   3.8   2 Hrt1992b Sc   4   
+       1989.8067   347.1    3.       0.114    0.005      .     .       .     .     600        6.0   1 Bag1994  S    4   
+       1990.2686   340.5     .       0.112     .         .     .       .     .     508  41a   3.8   2 Hrt1992b Sc   4   
+       1990.7541   318.3     .       0.101     .         .     .       .     .     549  22    3.8   1 Hrt1992b Sc   4   
+       1991.25        .      .    <  0.1       .         .     .       .     .     511 222    0.3   1 HIP1997e Hh   6   
+       1991.25        .      .    O   .        .        5.64   .       .     .     511 222    0.3   1 HIP1997g Hh   7   
+       1991.8927   257.6     .       0.096     .         .     .       .     .     549  22    3.8   1 Msn1993a Sc   4   
+       1992.6905  :230.      .    :  0.10      .         .     .       .     .     630  30    2.1   1 Miu1993  S    5   
+       1993.7644   199.1    3.       0.127    0.005      .     .       .     .     600        6.0   1 Bag1994  S    4   
+       1993.913    194.     6.       0.139    0.008      .     .      2.3   0.4   2200 400    5.0   1 Pat1998  Si   5   
+       1993.9159  :198.6     .    :  0.124     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
+       1993.9187   197.1     .       0.126     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
+       1994.7189   183.9    1.0      0.1464   0.0025     .     .      1.67  0.14   656   8    6.0   1 Sco1998  S    5   
+       1994.9418   180.7    2.0      0.148    0.003      .     .       .     .     600 130    6.0   1 Bag1999a S    5   
+       1994.9444   181.2    2.0      0.147    0.003      .     .       .     .     600 130    6.0   1 Bag1999a S    5   
+       1995.1475   179.2     .       0.151     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
+       1995.7619   171.2     .       0.155     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
+       1995.9256   167.2     .       0.150     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
+       1996.024    168.     2.       0.146    0.003      .     .      1.6   0.1   2200 400    5.0   1 Pat1998  Si   5   
+       1996.8677   156.8     .       0.121     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
+       1997.1352   148.1     .       0.123     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
+       1998.7763    83.0    0.7      0.069    0.002      .     .      2.06  0.17   545  30    6.0   1 Bag2002  S    6   
+       1998.7776      .      .        .        .         .     .      2.12  0.12   545  30    6.0   1 Plz2005  S    7   
+       2000.952       .      .    <  0.069     .         .     .       .     .    1253 296    3.6   1 Lmp2013  A    7   
+       2000.952    175.     3.       0.122    0.005      .     .       .     .    2177 378    3.6   1 Lmp2013  A    7   
+       2000.952    175.     3.       0.134    0.003      .     .       .     .    1643 353    3.6   1 Lmp2013  A    7   
+       2002.8829      .      .    <  0.14      .         .     .       .     .     900 340    3.6   1 Rbr2005  A    6   
+       2003.7154      .      .    U   .        .         .     .       .     .     880 155    3.6   1 Rbr2018  A    7   
+       2005.8634   189.6     .       0.155     .         .     .       .     .     550  24    3.8   1 Msn2009  Su   7   
+
+LMP  52Aa,Ac 2000 2000    2 130 133   0.2   0.3  5.60   .   F0V       +094-037                   N    041823.14+213445.8
+       2000.952       .      .    <  0.069     .         .     .       .     .    1253 296    3.6   1 Lmp2013  A    7   
+       2000.952    130.     2.       0.22     0.02       .     .       .     .    1643 353    3.6   1 Lmp2013  A    7   
+       2000.952    133.     3.       0.27     0.03       .     .       .     .    2177 378    3.6   1 Lmp2013  A    7   
+
+LMP  52Aa,Ad 2000 2000    1 270 270   0.3   0.3  5.60   .   F0V       +094-037                   N    041823.14+213445.8
+       2000.952    270.     3.       0.259    0.006      .     .       .     .    1253 296    3.6   1 Lmp2013  A    7   
+       2000.952       .      .    <  0.090     .         .     .       .     .    1643 353    3.6   1 Lmp2013  A    7   
+       2000.952       .      .    <  0.120     .         .     .       .     .    2177 378    3.6   1 Lmp2013  A    7   
+
+BUP  52AB    1893 2015   12  63  61 168.6 158.7  5.60 10.35 F0V       +095-035 +012-036 +21  618 N    041823.14+213445.8
+       1893.01      62.5     .     168.569     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1893.92      62.2     .     168.301     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1897.07      62.3     .     168.113     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1909.69      62.3     .     166.60      .        5.9    .      9.5    .                1.0   3 Bu_1913  Ma   3   
+       1918.85      62.2     .     166.21      .         .     .       .     .                0.3   2 VvS1919  Ma V 3   
+       1936.90      61.9     .     165.178     .         .     .       .     .                0.3   1 WFC1950a Pa   6   
+       1991.36      61.5     .     160.460     .        5.662 0.009  10.352 0.088  530 100    0.3   1 TYC2000d Ht   7   
+       1991.36        .      .        .        .        5.973 0.014  11.238 0.120  430  90    0.3   1 TYC2000d Ht   7   
+       1995.718     62.0     .     161.4       .         .     .       .     .                1.2   1 Hsw2004  Pa   6   
+       1997.83      61.5     .     159.96      .        5.058 0.037   8.983 0.020 1256 245    1.3   1 TMA2003  E2   7   
+       1997.83        .      .        .        .        4.936 0.059   8.784 0.034 1633 160    1.3   1 TMA2003  E2   7   
+       1997.83        .      .        .        .        4.903 0.020   8.650 0.017 2210 300    1.3   1 TMA2003  E2   7   
+       2000.959     61.7    0.0    159.495    0.054     7.63  0.37   10.20  0.04   609  70    0.2   4 UC_2013b Eu   7   
+       2006.936     61.1     .     158.99      .         .     .       .     .                0.2   1 Arn2007c Mg   7   
+       2010.          .      .        .        .        5.669  .     10.382 0.040  550  89    0.2   1 AAV2012  Zc   7   
+       2010.          .      .        .        .        5.980  .     11.119 0.050  440  98    0.2   1 AAV2012  Zc   7   
+       2015.000     61.250   .     158.669     .        5.589  .     10.137  .     673 440    1.0   1 Kpp2018m Hg   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+MCA  14Aa,Ab          11.35    y    0.1329 a  125.5     350.7      1977.74    y  0.167     339.      2  Pbx2000b
+               +/-     0.021        0.95        0.73      0.61        0.056      0.0044      1.9   
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+MCA  14Aa,Ab      2    Pbx2000b    210.9   0.111    190.5   0.140    175.9   0.153    161.9   0.146
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+MCA  14     51 Tau. Hyad (vB 24). B is BD+21@619. A is a long-period spectroscopic  .       
+            binary, resolved by speckle interferometry. Analysis of the             .       
+            spectroscopic/interferometric orbit is given by McAlister (1977).       McA1977 
+            1978.1490:  Theta was incorrectly given as 325.5 degrees                McA1980b
+            See Baize & Petit (1989) catalog of doubles with variable component.    Baz1989d
+            A new orbit with a period of 11.3 years was determined by Dombrowski    Dmb1991 
+            (1991).                                                                 Msn1993a
+            Torres et al. (1997) derive a combined spectroscopic/astrometric        Trr1997a
+            solution, yielding an orbital parallax 0.01792 /- 0.00058 and masses    .       
+            1.80 +/= 0.13 and 1.46 +/- 0.18 Msun.                                   .       
+            Hipparcos astrometric solution adopted some elements from the orbit of  HIP1997d
+            Deutsch & Lowen (1971).                                                 Deu1971 
+            Aa,Ab: Martin et al. (1998) derive component masses 1.756 +/- 0.343     .       
+            and 0.953 +/- 0.247 Msun.                                               Mig1998 
+            Pourbaix (2000) gives a combined solution for this resolved SB2,        Pbx2000b
+            yielding orbital parallaxes and component masses.                       .       
+            Aa,Ab: Malkov et al. (2012) derive dynamical, photometric, and          .       
+            spectroscopic masses 2.96 +/- 0.47, 2.99, and 1.45 Msun, respectively.  Mlk2012 
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+AAV2012      AAVSO Photometric All-Sky Survey (APASS), Data Release 6                            .                  
+             http://www.aavso.org/apass                                                                             
+             (Note: APASS photometry extracted from UCAC4 catalog; no observations dates are                        
+             given, so a coarse date of 2010 was assumed for all measures. Negative errors mean                     
+             the star was observed on only one night for that magnitude; therefore, the error                       
+             is purely Poisson rather than nightly scatter. Due to aperture method used, APASS                      
+             photometry is only included for pairs wider than 10" (Henden, private comm.)                           
+Arn2007c     Arnold, D.                                                                          2007JDSO....3..119A
+             JDSO 3, 119, 2007                                                                                      
+B__1959a     van den Bos, W.H.                                                                   1959ApJS....4...45V
+             ApJS 4, 45, 1959                                                                                       
+Bag1985      Balega, Y.Y. & Balega, I.I.                                                         1985SvAL...11...47B
+             SvAL 11, 47, 1985                                                                                      
+Bag1987      Balega, I.I. & Balega, Y.Y.                                                         1987SvAL...13..208B
+             SvAL 13, 208, 1987                                                                                     
+Bag1989a     Balega, I.I. Balega, Yu.Yu., & Vasyuk, V.A.                                         1989AISAO..28..107B
+             Astrofiz. Issled. Izv. Spets. Ast. Obs. 28, 107, 1989                                                  
+                                               (some data also in Bag1991b)                                         
+Bag1994      Balega, I.I., Balega, Y.Y., Belkin, I.N., Maximov, A.F., Orlov, V.G., Pluzhnik,     1994A&AS..105..503B
+             E.A., Shkhagosheva, Z.U., & Vasyuk, V.A.                                                               
+             A&AS 105, 503, 1994                                                                                    
+Bag1999a     Balega, I.I., Balega, Y.Y., Maksimov, A.F., Pluzhnik, E.A., Shkhagosheva, Z.U., &   1999A&AS..140..287B
+             Vasyuk, V.A.                                                                                           
+             A&AS 140, 287, 1999                                                                                    
+Bag2002      Balega, I.I., Balega, Yu.Yu., Hofmann, K.-H., Maksimov, A.F., Pluzhnik, E.A.,       2002A&A...385...87B
+             Schertl, D., Shkhagosheva, Z.U., & Weigelt, G.                                                         
+             A&A 385, 87, 2002                                                                                      
+Baz1989d     Baize, P. & Petit, M.                                                               1989A&AS...77..497B
+             A&AS 77, 497, 1989                                                                                     
+BLM1982      Morgan, B.L., Beckmann, G.K., Scadden, R.J., & Vine, H.A.                           1982MNRAS.198..817M
+             MNRAS 198, 817, 1982                                                                                   
+Bnu1984      Bonneau, D., Carquillat, J.M., & Vidal, J.L.                                        1984A&AS...58..729B
+             A&AS 58, 729, 1984                                                                                     
+Bnu1986      Bonneau, D., Balega, Y., Blazit, A, Foy, R., Vakili, F., & Vidal, J.L.              1986A&AS...65...27B
+             A&AS 65, 27, 1986                                                                                      
+Bu_1913      Burnham, S.W.                                                                       1913QB811.B8.......
+             Carnegie Inst. Wash. #168, 1913                                                                        
+Deu1971      Deutsch, A.J. & Lowen, L.                                                           1971PASP...83..298D
+             PASP 83, 298, 1971                                                                                     
+Dmb1991      Dombrowski, E.G.                                                                    .                  
+             PhD thesis, Georgia State Univ., 1991                                                                  
+Ebe1986      Ebersberger, J., Weigelt, G., & Orellana, R.B.                                      1986A&AS...64..131E
+             A&AS 64, 131, 1986                                                                                     
+HIP1997d     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (DMSA/O Orbital Solutions)                                                                             
+HIP1997e     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (single star systems)                                                                                  
+HIP1997g     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (non-component double star solution: G = acceleration solution,                                        
+             O = orbit solution, V = variability-induced mover, X = stochastic solution)                            
+Hrt1992b     Hartkopf, W.I., McAlister, H.A., & Franz, O.G.                                      1992AJ....104..810H
+             AJ 104, 810, 1992                                                                                      
+Hrt1997      Hartkopf, W.I., McAlister, H.A., Mason, B.D., ten Brummelaar, T.A., Roberts, J.C.,  1997AJ....114.1639H
+             Jr., Turner, N.H., & Wilson, J.W.                                                                      
+             AJ 114, 1639, 1997                                                                                     
+Hrt2000a     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Roberts, L.C., Jr., Turner, N.H.,     2000AJ....119.3084H
+             ten Brummelaar, T.A., Prieto, C.M., Ling, J.F., & Franz, O.G.                                          
+             AJ 119, 3084, 2000                                                                                     
+Hsw2004      Harshaw, R.                                                                         ...................
+             Webb Soc., Double Star Circ. 12, 2004                                                                  
+Iso1990b     Isobe, S., Norimoto, Y., Noguchi, M., Ohtsubo, J., Baba, N., Miura, N.,             1990PNAOJ...1..381I
+             Yanaka, H., & Tanaka, T.                                                                               
+             Pub. Natl. Astron. Obs. Japan 1, 381, 1990                                                             
+Kpp2018m     Knapp, W.R.A. & Nanson, J.                                                          2018JDSO...14..503K
+             JDSO 14, 503, 2018                                                                  .                  
+Lmp2013      Lampens, P., Prieur, J.-L., Argyle, R.W., & Cuypers, J.                             2013AN....334..237L
+             AN 334, 237, 2013                                                                                      
+             (Multiple measures for same epoch, due to two reduction techniques. JHK component                      
+             magnitudes derived using differential photometry plus combined magnitudes from                         
+             2MASS and other sources.)                                                                              
+McA1977      McAlister, H.A.                                                                     1977ApJ...215..159M
+             ApJ 215, 159, 1977                                                                                     
+McA1978b     McAlister, H.A.                                                                     1978ApJ...225..932M
+             ApJ 225, 932, 1978                                                                                     
+McA1979a     McAlister, H.A. & DeGioia, K.A.                                                     1979ApJ...228..493M
+             ApJ 228, 493, 1979                                                                                     
+McA1980b     McAlister, H.A. & Fekel, F.C.                                                       1980ApJS...43..327M
+             ApJS 43, 327, 1980                                                                                     
+McA1982b     McAlister, H.A. & Hendry, E.M.                                                      1982ApJS...48..273M
+             ApJS 48, 273, 1982                                                                                     
+McA1982d     McAlister, H.A. & Hendry, E.M.                                                      1982ApJS...49..267M
+             ApJS 49, 267, 1982                                                                                     
+McA1983      McAlister, H.A., Hendry, E.M., Hartkopf, W.I., Campbell, B.G., & Fekel, F.C.        1983ApJS...51..309M
+             ApJS 51, 309, 1983                                                                                     
+McA1987b     McAlister, H.A., Hartkopf, W.I., Hutter, D.J., & Franz, O.G.                        1987AJ.....93..688M
+             AJ 93, 688, 1987                                                                                       
+McA1989      McAlister, H.A., Hartkopf, W.I., Sowell, J.R., Dombrowski, E.G., & Franz, O.G.      1989AJ.....97..510M
+             AJ 97, 510, 1989                                                                                       
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+McA1993      McAlister, H.A., Mason, B.D., Hartkopf, W.I., & Shara, M.M.                         1993AJ....106.1639M
+             AJ 106, 1639, 1993                                                                                     
+McA1997      Fu, H.-H., Hartkopf, W.I., Mason, B.D., McAlister, H.A., Dombrowski, E.G., &        1997AJ....114.1623F
+             Franz, O.G.                                                                                            
+             AJ 114, 1623, 1997                                                                                     
+Mig1998      Martin, Ch., Mignard, F., Hartkopf, W.I., & McAlister, H.A.                         1998A&AS..133..149M
+             A&AS 133, 149, 1998                                                                                    
+Miu1993      Miura, N., Ni-ino, M., Baba, N., Iribe, T., & Isobe, S.                             1993PASJ....3..153M
+             Pub. Natl. Astron. Obs. Japan 3, 153, 1993                                                             
+Mlk2012      Malkov, O.Yu., Tamazian, V.S., Docobo, J.A., & Chulkov, D.A.                        2012A&A...546A..69M
+             A&A 546, A69, 2012                                                                                     
+Msn1993a     Mason, B.D., McAlister, H.A., Hartkopf, W.I., & Bagnuolo, W.G.                      1993AJ....105..220M
+             AJ 105, 220, 1993                                                                                      
+Msn2009      Mason, B.D., Hartkopf, W.I., Gies, D.R., Henry, T.J., & Helsel, J.W.                2009AJ....137.3358M
+             AJ 137, 3358, 2009                                                                                     
+Pat1998      Patience, J., Ghez, A.M., Reid, I.N., Weinberger, A.J., & Matthews, K.              1998AJ....115.1972P
+             AJ 115, 1972, 1998                                                                                     
+Pbx2000b     Pourbaix, D.                                                                        2000A&AS..145..215P
+             A&AS 145, 215, 2000                                                                                    
+Plz2005      Pluzhnik, E.A.                                                                      2005A&A...431..587P
+             A&A 431, 587, 2005                                                                                     
+Rbr2005      Roberts, L.C., Jr., Turner, N.H., Bradford, L.W., ten Brummelaar, T., Oppenheimer,  2005AJ....130.2262R
+             B., Kuhn, J., Whitman, K., Perrin, M., et al.                                                          
+             AJ 130, 2262, 2005                                                                                     
+Rbr2018      Roberts, L.C., Jr. & Mason, B.D.                                                    2018MNRAS.473.4497R
+             MNRAS 473, 4497, 2018                                                                                  
+Sco1998      Scholler, M., Balega, I.I., Balega, Y.Y., Hofmann, K.-H., Reinheimer, T., &         1998SvAL...24..283S
+             Weigelt, G.                                                                                            
+             SvAL 24, 283-287, 1998                                                                                 
+TMA2003      2MASS Catalog                                                                       .                  
+             2MASS Point Src Cat., 2003 all-sky release (http://pegasus.phast.umass.edu/)                           
+             (Note: 2MASS photometry also added by cataloguer to 2MASS astrometry published                         
+             under other references.)                                                                               
+Tok1985      Tokovinin, A.A.                                                                     1985A&AS...61..483T
+             A&AS 61, 483, 1985                                                                                     
+Tok1988      Tokovinin, A.A. & Ismailov, R.M.                                                    1988A&AS...72..563T
+             A&AS 72, 563, 1988                                                                                     
+Trr1997a     Torres, G., Stefanik, R.P., & Latham, D.W.                                          1997ApJ...474..256T
+             ApJ 474, 256, 1997                                                                                     
+TYC2000d     Hog, E., Fabricius, C., Makarov, V.V., Urban, S., Corbin, T., Wycoff, G., Bastian,  2000A&A...357..367H
+             U., Schwekendiek, P., & Wicenec, A.                                                                    
+             Tycho-2 Cat., A&A 357, 367, 2000                                                                       
+             (one component in Tycho-2 supplement-1)                                                                
+UC_2013b     Hartkopf, W.I., Mason, B.D., Finch, C.T., Zacharias, N., Wycoff, G.L., & Hsu, D.    2013AJ....146...76H
+             AJ 146, 76, 2013                  (UC 301 - 5058)                                                      
+             (Relative astrometry is derived from individual measurements, not precessed means.                     
+             UCAC aperture magnitudes are listed, unless the duplicity flag indicates a blended                     
+             image (a flag value of 30 or higher). Model fit magnitudes are given for both                          
+             components if either has such a flag. Model fit magnitudes are indicated by the                        
+             letter "f" following the filter information.                                                           
+             APASS photometry extracted from UCAC4 catalog is listed under reference AAV2012.                       
+             Due to aperture method used, APASS photometry is only included for pairs wider                         
+             than 10" (Henden, private comm.) Photometry for pairs wider than 10" which showed                      
+             identical values for both components in all filters were removed, as well.                             
+VvS1919      de Vos van Steenwijk, J.E.                                                          1919MNRAS..80..223S
+             MNRAS 80, 223, 1919                                                                                    
+             Vista Variables in Via Lactea                                                                          
+WFC1950a     Baillaud, J.                                                                        .                  
+             Paris Obs., 1950 (+17 to +25 deg zones)                                                                
+WFC1998      Urban, S.E., Corbin, T.E., Wycoff, G.L., Martin, J.C., Jackson, E.S.,               1998AJ....115.1212U
+             Zacharias, M.I., & Hall, D.M.                                                                          
+             AJ 115, 1212, 1998 (Astrographic Cat. 2000)                                                            
+
+------------------------------------------------------------------------------------------------------------------------
+

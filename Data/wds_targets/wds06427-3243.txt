@@ -1,0 +1,31 @@
+USNO Double Star data for WDS 06427-3243
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+HDS 932      1991 2016    4   0 356   0.3   0.2  7.12  8.41 F0V       +015+007          -32 3298      064243.38-324246.0
+       1991.25       0.      .       0.281     .        7.122 0.009   8.407 0.030  511 222    0.3   1 HIP1997a Hh   5   
+       2015.0273   356.6    0.0      0.1874   0.0001     .     .      1.4    .     543  22    4.1   2 Tok2015c St   7   
+       2015.9090   356.2    0.0      0.1796   0.0003     .     .      1.4    .     543  22    4.1   2 Tok2016a St   7   
+       2016.9584   355.9    0.1      0.1724   0.0002     .     .      1.6    .     788 132    4.1   2 Tok2018c St   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+HIP1997a     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997  (incl. Hp photometry, vol. 10)                                   
+Tok2015c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2015AJ....150...50T
+             AJ 150, 50, 2015                  (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2016a     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2016AJ....151..153T
+             AJ 151, 153, 2016                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2018c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A. & Horch, E.P.              2018AJ....155..235T
+             AJ 155, 235, 2018                                                                                      
+
+------------------------------------------------------------------------------------------------------------------------
+

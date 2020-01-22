@@ -1,0 +1,62 @@
+USNO Double Star data for WDS 14242+1616
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+MCA  39      1980 2017   11 151 158   0.1   0.0  6.8    .   F5+A2     -032+005          +16 2642      142411.28+161625.1
+       1980.1558   150.9     .       0.053     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1980.4782   154.0     .       0.053     .         .     .       .     .     470        3.8   1 McA1983  Sc   2   
+       1981.472       .      .    <  0.030     .         .     .       .     .     470        3.8   1 Hrt1984  Sc   5   
+       1984.2837      .      .    <  0.025     .         .     .       .     .     600        6.0   1 Bnu1986  S    5   
+       1984.3999      .      .    <  0.031     .         .     .       .     .     450        3.6   1 Bnu1986  S    5   
+       1984.3999      .      .    <  0.038     .         .     .       .     .     550        3.6   1 Bnu1986  S    5   
+       1984.3999      .      .    <  0.049     .         .     .       .     .     700        3.6   1 Bnu1986  S    5   
+       1987.2660   158.4     .       0.048     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1988.2516   153.8     .       0.065     .         .     .       .     .     538  76    3.8   1 McA1989  Sc   4   
+       1989.2263   160.0     .       0.049     .         .     .       .     .     549  22    3.8   1 McA1990  Sc   4   
+       1991.25        .      .    <  0.1       .         .     .       .     .     511 222    0.3   1 HIP1997e Hh   6   
+       1991.25        .      .    S   .        .        6.90   .       .     .     511 222    0.3   1 HIP1997h Hh   7   
+       1991.3259   150.6     .       0.058     .         .     .       .     .     549  22    3.8   1 Hrt1994  Sc   4   
+       1992.3063  :157.4     .       0.054     .         .     .       .     .     508  41a   3.8   2 Hrt1994  Sc   4   
+       1993.1964   149.9     .       0.047     .         .     .       .     .     549  22    3.8   1 Hrt1994  Sc   4   
+       2004.5278      .      .    U   .        .         .     .       .     .     880 155    3.6   1 Rbr2018  A    7   
+       2015.3365   148.7    0.8      0.0550   0.0002     .     .      1.3    .     543  22    4.1   2 Tok2016a St   7   
+       2016.1348   150.2    1.5      0.0506   0.0001     .     .      1.0    .     534  22    4.1   2 Tok2018c St   7   
+       2017.3689   157.5    2.8      0.0427   0.0012     .     .    : 1.0    .     534  22    4.1   2 Tok2018c St   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+Bnu1986      Bonneau, D., Balega, Y., Blazit, A, Foy, R., Vakili, F., & Vidal, J.L.              1986A&AS...65...27B
+             A&AS 65, 27, 1986                                                                                      
+HIP1997e     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (single star systems)                                                                                  
+HIP1997h     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (S = suspected non-single)                                                                             
+Hrt1984      Hartkopf, W.I. & McAlister, H.A.                                                    1984PASP...96..105H
+             PASP 96, 105, 1984                                                                                     
+Hrt1994      Hartkopf, W.I., McAlister,H.A., Mason, B.D., Barry, D.J., Turner, N., & Fu, H.-H.   1994AJ....108.2299H
+             AJ 108, 2299, 1994                                                                                     
+McA1983      McAlister, H.A., Hendry, E.M., Hartkopf, W.I., Campbell, B.G., & Fekel, F.C.        1983ApJS...51..309M
+             ApJS 51, 309, 1983                                                                                     
+McA1989      McAlister, H.A., Hartkopf, W.I., Sowell, J.R., Dombrowski, E.G., & Franz, O.G.      1989AJ.....97..510M
+             AJ 97, 510, 1989                                                                                       
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+Rbr2018      Roberts, L.C., Jr. & Mason, B.D.                                                    2018MNRAS.473.4497R
+             MNRAS 473, 4497, 2018                                                                                  
+Tok2016a     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2016AJ....151..153T
+             AJ 151, 153, 2016                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2018c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A. & Horch, E.P.              2018AJ....155..235T
+             AJ 155, 235, 2018                                                                                      
+
+------------------------------------------------------------------------------------------------------------------------
+

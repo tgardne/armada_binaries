@@ -1,0 +1,59 @@
+USNO Double Star data for WDS 09446+6459
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+CHR 176      1988 2005    4  60 211   0.1   0.1  6.2    .   F3Vn      -047+025          +65  731 NO   094436.62+645902.6
+       1988.1640    59.8     .       0.068     .         .     .       .     .     549  22    3.6   1 McA1993  Sc   4   
+       1991.25        .      .    <  0.1       .        6.28   .       .     .     511 222    0.3   1 HIP1997e Hh   6   
+       1993.2014   173.7     .       0.067     .         .     .       .     .     549  22    3.8   1 McA1993  Sc   4   
+       1994.8696   188.0     .       0.090     .         .     .       .     .     549  22    3.6   1 Hrt2000a Sc   5   
+       2005.2444  q210.8    1.3      0.114    0.003      .     .       .     .     545  30    6.0   1 Bag2013  S    7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+CHR 176               21.724   y    0.1152 a   74.4      25.5      2000.621   y  0.351     262.3     3  Cve2016b
+               +/-      .            .           .         .           .          .           .    
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+CHR 176           3    Cve2016b    184.0   0.083    191.1   0.095    196.7   0.102    202.0   0.102
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+CHR 176     Cvetkovic et al. (2016) estimate spectral types A4 and A4, masses 2.10  .       
+            and 2.10 Msun. Dynamical parallax is 9.61 +/- 0.08 mas.                 Cve2016b
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+Bag2013      Balega, I.I., Balega, Yu.Yu., Gasanova, L.T., Dyachenko, V.V., Maksimov, A.F.,      2013AstBu..68...53B
+             Malogolovets, E.V., Rastegaev, D.A., & Shkhagosheva, Z.U.                                              
+             Astrophys. Bull. 68, 53, 2013                                                                          
+Cve2016b     Cvetkovic, Z., Pavlovic, R. & Ninkovic, S.                                          2016AJ....151...83C
+             AJ 151, 83, 2016                                                                                       
+HIP1997e     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (single star systems)                                                                                  
+Hrt2000a     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Roberts, L.C., Jr., Turner, N.H.,     2000AJ....119.3084H
+             ten Brummelaar, T.A., Prieto, C.M., Ling, J.F., & Franz, O.G.                                          
+             AJ 119, 3084, 2000                                                                                     
+McA1993      McAlister, H.A., Mason, B.D., Hartkopf, W.I., & Shara, M.M.                         1993AJ....106.1639M
+             AJ 106, 1639, 1993                                                                                     
+
+------------------------------------------------------------------------------------------------------------------------
+

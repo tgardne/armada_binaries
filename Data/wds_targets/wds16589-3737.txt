@@ -1,0 +1,177 @@
+USNO Double Star data for WDS 16589-3737
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+SEE 315      1897 2017   54 203 268   0.3   0.2  6.54  7.32 A3V       +010-037          -3711131 NO   165852.25-373713.5
+       1897.52     203.4     .       0.31      .        7.2    .      7.2    .                0.6   1 See1898b Ma   0   
+       1909.6         .      .    U   .        .         .     .       .     .                0.2   1 I__1909  Ma   0   
+       1927.55     173.3     .       0.18      .         .     .      0.2    .                0.7   2 B__1928b Ma   0   
+       1928.45     188.4     .       0.19      .         .     .      0.2    .                0.7   1 B__1932a Ma   0   
+       1929.74     196.6     .       0.18      .         .     .      0.3    .                0.7   2 B__1932a Ma   0   
+       1931.47     207.6     .       0.19      .        7.2    .      7.6    .                0.7   4 B__1932a Ma   0   
+       1931.57     208.9     .       0.18      .        6.8    .      7.1    .                0.7   4 Fin1932a Ma   0   
+       1932.45     218.0     .       0.19      .        7.1    .      7.3    .                0.7   4 B__1934a Ma   0   
+       1932.65     218.4     .       0.21      .        6.5    .      6.8    .                0.7   4 Fin1934b Ma   0   
+       1933.55     221.7     .       0.19      .        7.1    .      7.3    .                0.7   4 B__1934a Ma   0   
+       1933.61     221.0     .       0.18      .        6.9    .      7.0    .                0.7   4 Fin1934b Ma   0   
+       1934.62     229.4     .       0.17      .        7.3    .      7.5    .                0.7   4 B__1937b Ma   0   
+       1935.26     238.0     .       0.19      .         .     .       .     .                0.6   4 Vou1947b Ma   0   
+       1936.23     241.8     .       0.20      .         .     .       .     .                0.6   4 Vou1947b Ma   0   
+       1936.59     240.8     .       0.18      .        7.1    .      7.4    .                0.7   4 B__1937b Ma   0   
+       1936.96     246.1     .       0.17      .        6.8    .      7.0    .                0.7   3 Fin1951a Ma   0   
+       1937.27     251.9     .       0.19      .         .     .       .     .                0.6   4 Vou1947b Ma   0   
+       1938.00     246.6     .       0.20      .        7.2    .      7.5    .                0.7   4 B__1950c Ma   0   
+       1938.26     256.2     .       0.18      .         .     .       .     .                0.6   4 Vou1947b Ma   0   
+       1939.22     261.4     .       0.20      .         .     .       .     .                0.6   4 Vou1947b Ma   0   
+       1940.23     277.7     .       0.17      .        7.1    .      7.3    .                0.7   5 B__1950c Ma   0   
+       1945.26     326.2     .       0.16      .         .     .       .     .                0.6   3 Vou1955  Ma   0   
+       1946.31     349.3     .       0.19      .        7.2    .      7.4    .                0.7   2 B__1950c Ma   0   
+       1947.63     353.      .       0.132     .         .     .       .     .                0.7   2 B__1951a J    0   
+       1947.64     358.3     .       0.16      .        7.1    .      7.3    .                0.7   3 B__1950c Ma   0   
+       1950.58      51.1     .       0.18      .        7.0    .      7.2    .                0.7   1 B__1951a Ma   0   
+       1951.65      48.6     .       0.159     .         .     .       .     .                0.7   2 Fin1953d J    0   
+       1952.53      63.9     .       0.20      .        7.1    .      7.3    .                0.7   2 B__1956a Ma   0   
+       1952.61      55.2     .       0.143     .         .     .       .     .                0.7   5 Fin1953d J    0   
+       1953.67      61.8     .       0.139     .         .     .       .     .                0.7   2 Fin1954c J    0   
+       1954.61      83.3     .       0.140     .         .     .       .     .                0.7   2 Fin1954c J    0   
+       1954.67      87.8     .       0.141     .         .     .       .     .                0.7   1 Fin1956a J    0   
+       1955.68      95.4     .       0.142     .         .     .       .     .                0.7   2 Fin1956a J    0   
+       1957.69     112.2     .       0.141     .         .     .       .     .                0.7   1 Fin1958  J    0   
+       1959.41     119.1     .       0.20      .        7.0    .      7.3    .                0.7   4 B__1960a Ma   0   
+       1959.65     117.6     .       0.146     .         .     .      0.0    .                0.7   4 Fin1960b J    0   
+       1960.46     128.8     .       0.18      .        7.0    .      7.2    .                0.7   8 B__1961a Ma   1   
+       1960.69     124.0     .       0.146     .         .     .      0.0    .                0.7   8 Fin1961  J    1   
+       1962.68     151.5     .       0.174     .         .     .      0.0    .                0.7   9 Fin1963a J    1   
+       1963.670    164.1     .       0.138     .         .     .      0.0    .                0.7   8 Fin1964a J    2   
+       1964.61     158.3     .       0.18      .        7.0    .      7.3    .                0.7   4 B__1965a Ma   2   
+       1964.706    171.0     .       0.140     .         .     .      0.0    .                0.7   4 Fin1965a J    2   
+       1965.55    :170.      .    :  0.20      .         .     .       .     .                0.7   1 Knp1969a Ma   2   
+       1965.66     178.3     .       0.19      .        7.0    .      7.3    .                0.7   4 B__1966a Ma   2   
+       1965.66     183.9     .       0.19      .        7.0    .      7.2    .                0.7   3 Nbg1966  Ma   2   
+       1966.677    183.4     .       0.144     .         .     .      0.0    .                0.7   2 Fin1967a J    2   
+       1970.558    210.5     .       0.23      .         .     .       .     .                0.9   1 Wor1972b Mb   2   
+       1976.310    253.2     .       0.21      .         .     .      0.0    .                1.0   1 Hln1977a Mb   2   
+       1978.73     273.4     .       0.22      .         .     .       .     .                0.7   1 WRH1980  Ma   2   
+       1979.20     277.3     .       0.16      .         .     .       .     .                0.9   3 Hei1980a Mb   2   
+       1991.25      65.      .       0.173     .        6.543 0.064   7.322 0.131  511 222    0.3   1 HIP1997a Hh   5   
+       2006.2000   187.9     .       0.174     .         .     .       .     .     550  24    4.0   1 Msn2009  Su   7   
+       2008.5409   205.4    0.1      0.1884   0.0003     .     .    : 1.0    .     551  22    4.0   1 Tok2010  S    7   
+       2014.1816   243.5    0.0      0.1878   0.0000     .     .      0.8    .     543  22    4.1   2 Tok2015c St   7   
+       2017.3530   268.4    0.0      0.1638   0.0009     .     .      0.5    .     788 132    4.1   2 Tok2018c St   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+SEE 315               38.73    y    0.186  a   39.4     243.9      1984.63    y  0.154     102.4     2  Tok2015c
+               +/-     4.48         0.006       8.6       1.7         1.11       0.106      11.2   
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+SEE 315           2    Tok2015c    256.8   0.177    265.0   0.168    274.3   0.157    285.0   0.146
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+SEE 315     Also known as B   885. See's observation in 1897 is dubious.            .       
+            Malkov et al. (2012) derive dynamical, photometric, and spectroscopic   .       
+            masses of 3.78 +/- 1.45, 3.70, and 2.00 Msun, respectively.             Mlk2012 
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+B__1928b     van den Bos, W.H.                                                                   1928AnLei..144...1V
+             Ann. Leiden Obs. 14, Pt.4, 1928                                                                        
+B__1932a     van den Bos, W.H.                                                                   1932CiUO...87..273V
+             Union Obs. Johannesburg Circ. 87, 273, 1932                                                            
+B__1934a     van den Bos, W.H.                                                                   1934CiUO...92...61V
+             Union Obs. Johannesburg Circ. 92, 61, 1934                                                             
+B__1937b     van den Bos, W.H.                                                                   1937CiUO...98..362V
+             Union Obs. Johannesburg Circ. 98, 362, 1937                                                            
+B__1950c     van den Bos, W.H.                                                                   1950CiUO..109..371V
+             Union Obs. Johannesburg Circ. 109, 371, 1950                                                           
+B__1951a     van den Bos, W.H.                                                                   1951CiUO..111...13V
+             Union Obs. Johannesburg Circ. 111, 13, 1951                                                            
+B__1956a     van den Bos, W.H.                                                                   1956CiUO..115..266V
+             Union Obs. Johannesburg Circ. 115, 266, 1956                                                           
+B__1960a     van den Bos, W.H.                                                                   1960CiUO..119..321V
+             Union Obs. Johannesburg Circ. 119, 321, 1960                                                           
+B__1961a     van den Bos, W.H.                                                                   1961CiUO..120..353V
+             Union Obs. Johannesburg Circ. 120, 353, 1961                                                           
+B__1965a     van den Bos, W.H.                                                                   1965ROCi..124...70V
+             Republic Obs. Circ. 124, 70, 1965                                                                      
+B__1966a     van den Bos, W.H.                                                                   1966ROCi..125...93V
+             Republic Obs. Circ. 125, 93, 1966                                                                      
+Fin1932a     Finsen, W.S.                                                                        1932CiUO...86..237F
+             Union Obs. Johannesburg Circ. 86, 237, 1932                                                            
+Fin1934b     Finsen, W.S.                                                                        1934CiUO...92...31F
+             Union Obs. Johannesburg Circ. 92, 31, 1934                                                             
+Fin1951a     Finsen, W.S.                                                                        1951CiUO..112..104F
+             Union Obs. Johannesburg Circ. 112, 104, 1951                                                           
+Fin1953d     Finsen, W.S.                                                                        1953CiUO..113..170F
+             Union Obs. Johannesburg Circ. 113, 170, 1953                                                           
+Fin1954c     Finsen, W.S.                                                                        1954CiUO..114..240F
+             Union Obs. Johannesburg Circ. 114, 240, 1954                                                           
+Fin1956a     Finsen, W.S.                                                                        1956CiUO..115..259F
+             Union Obs. Johannesburg Circ. 115, 259, 1956                                                           
+Fin1958      Finsen, W.S.                                                                        1958CiUO..117..302F
+             Union Obs. Johannesburg Circ. 117, 302, 1958                                                           
+Fin1960b     Finsen, W.S.                                                                        1960CiUO..119..333F
+             Union Obs. Johannesburg Circ. 119, 333, 1960                                                           
+Fin1961      Finsen, W.S.                                                                        1961CiUO..120..367F
+             Union Obs. Johannesburg Circ. 120, 367, 1961                                                           
+Fin1963a     Finsen, W.S.                                                                        1963ROCi..122...32F
+             Republic Obs. Circ. 122, 32, 1963                                                                      
+Fin1964a     Finsen, W.S.                                                                        1964ROCi..123...53F
+             Republic Obs. Circ. 123, 53, 1964                                                                      
+Fin1965a     Finsen, W.S.                                                                        1965ROCi..124...79F
+             Republic Obs. Circ. 124, 79, 1965                                                                      
+Fin1967a     Finsen, W.S.                                                                        1967ROCi..126..138F
+             Republic Obs. Circ. 126, 138, 1967                                                                     
+Hei1980a     Heintz, W.D.                                                                        1980ApJS...44..111H
+             ApJS 44, 111, 1980                                                                                     
+HIP1997a     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997  (incl. Hp photometry, vol. 10)                                   
+Hln1977a     Holden, F.                                                                          1977PASP...89..582H
+             PASP 89, 582, 1977                                                                                     
+I__1909      Innes, R.T.A.                                                                       .                  
+             Transvaal Obs. Circ. 1, 1, 1909                                                                        
+Knp1969a     Knipe, G.F.G.                                                                       1969ROCi..128..177K
+             Republic Obs. Circ. 128, 177, 1969                                                                     
+Mlk2012      Malkov, O.Yu., Tamazian, V.S., Docobo, J.A., & Chulkov, D.A.                        2012A&A...546A..69M
+             A&A 546, A69, 2012                                                                                     
+Msn2009      Mason, B.D., Hartkopf, W.I., Gies, D.R., Henry, T.J., & Helsel, J.W.                2009AJ....137.3358M
+             AJ 137, 3358, 2009                                                                                     
+Nbg1966      Newburg, J.L.                                                                       1966ROCi..125..105N
+             Republic Obs. Circ. 125, 105, 1966                                                                     
+See1898b     See, T.J.J.                                                                         1898AJ.....18..181S
+             AJ 18, 181, 1898                                                                                       
+Tok2010      Tokovinin, A., Mason, B., & Hartkopf, W.                                            2010AJ....139..743T
+             AJ 139, 743, 2010                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2015c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2015AJ....150...50T
+             AJ 150, 50, 2015                  (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2018c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A. & Horch, E.P.              2018AJ....155..235T
+             AJ 155, 235, 2018                                                                                      
+Vou1947b     Voute, J.G.                                                                         1947AnBos...6....1V
+             Ann. Bosscha Obs. Lembang 6, Pt.4, D1, 1947                                                            
+Vou1955      Voute, J.G.                                                                         1955JO.....38..109V
+             J. Obs. 38, 109, 1955             (a few errata noted in Vou1956)                                      
+Wor1972b     Worley, C.E.                                                                        1972AJ.....77..878W
+             AJ 77, 878, 1972                                                                                       
+WRH1980      Wilson, R.H.                                                                        1980A&AS...39..197W
+             A&AS 39, 197, 1980                                                                                     
+
+------------------------------------------------------------------------------------------------------------------------
+

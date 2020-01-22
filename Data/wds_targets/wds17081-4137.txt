@@ -1,0 +1,109 @@
+USNO Double Star data for WDS 17081-4137
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+I   407      1902 2018   25 186 239   0.8   0.1  8.28  7.50 A5IV      -021-040          -4111282  O   170805.63-413652.7
+       1902.41     186.2     .       0.76      .         .     .      0.6    .                0.5   2 I__1905  Ma   0   
+       1910.7      195.      .       0.7       .         .     .      0.5    .                0.2   1 I__1911  Ma   7   
+       1911.63     185.2     .       0.73      .         .     .      0.5    .                0.2   2 I__1912  Ma   0   
+       1924.38     184.6     .       0.81      .         .     .       .     .                0.2   4 Vou1926  Ma   0   
+       1925.64     183.2     .       0.77      .         .     .      0.7    .                0.7   1 I__1948a Ma   0   
+       1926.58     186.1     .       0.67      .         .     .       .     .                0.5   3 Cta1927  Ma   0   
+       1929.5      183.4     .       0.71      .         .     .       .     .                0.5   1 Cta9999  Ma   0   
+       1938.48     184.1     .       0.53      .        7.7    .      8.2    .                0.7   4 B__1947  Ma   0   
+       1938.53     181.0     .       0.58      .         .     .       .     .                0.4   4 Smw1951  Ma   0   
+       1942.29     180.7     .       0.57      .         .     .       .     .                0.4   3 Vou1955  Ma   0   
+       1947.47     179.5     .       0.57      .         .     .       .     .                0.2   3 Smw1948  Ma   0   
+       1955.57     175.8     .       0.51      .         .     .       .     .                0.2   4 Hei1956a Ma   0   
+       1959.53     179.0     .       0.29      .        7.9    .      8.3    .                0.7   4 B__1960a Ma   0   
+       1960.63     180.9     .       0.36      .         .     .       .     .                0.7   4 Ltg1961a Ma   1   
+       1966.68     177.4     .       0.29      .        7.8    .      8.3    .                0.7   1 Nbg1968  Ma   2   
+       1978.72     171.1     .       0.48      .         .     .       .     .                0.7   1 WRH1980  Ma   2   
+       1989.3110   168.7     .       0.163     .         .     .       .     .     549  22    4.0   1 McA1990  Sc   4   
+       1990.3485   167.3     .       0.164     .         .     .       .     .     549  22    4.0   1 Hrt1993  Sc   4   
+       1991.25     166.      .       0.159     .        8.28   .      7.50   .     550        0.3   1 HIP1997a Hh   5   
+       1991.3888   164.4     .       0.158     .         .     .       .     .     538  76    4.0   1 Hrt1993  Sc   4   
+       1992.4537   163.0     .       0.154     .         .     .       .     .     549  22    4.0   1 Hrt1996b Sc   4   
+       2008.5409    98.6    0.3      0.0959   0.0022     .     .    : 1.4    .     551  22    4.0   1 Tok2010  S    7   
+       2009.2591    95.9    0.0      0.0990   0.0001     .     .      0.8    .     551  22    4.1   1 Tok2010  S    7   
+       2014.3019   252.7    0.0      0.1138   0.0002     .     .      0.9    .     543  22    4.1   2 Tok2015c St   7   
+       2018.2510   239.2    0.0      0.1349   0.0001     .     .      0.8    .     534  22    4.1   2 Tok2019c St   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+I   407              292.32    y    0.574  a  101.4     180.7      1979.86    y  0.772     135.6     4  Zir2013d
+               +/-      .            .           .         .           .          .           .    
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+I   407           4    Zir2013d    245.4   0.123    242.1   0.128    239.1   0.134    236.4   0.140
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+B__1947      van den Bos, W.H.                                                                   1947CiUO..105..134V
+             Union Obs. Johannesburg Circ. 105, 134, 1947                                                           
+B__1960a     van den Bos, W.H.                                                                   1960CiUO..119..321V
+             Union Obs. Johannesburg Circ. 119, 321, 1960                                                           
+Cta1927      Costa, D.F.                                                                         .                  
+             Obs. Nacional Rio de Janeiro, 1927                                                                     
+Cta9999      Costa, D.F.                                                                         ...................
+             Unpublished, manuscript or reference not found.                                                        
+Hei1956a     Heintz, W.D.                                                                        1956MNRAS.116..248H
+             MNRAS 116, 248, 1956                                                                                   
+HIP1997a     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997  (incl. Hp photometry, vol. 10)                                   
+Hrt1993      Hartkopf, W.I., Mason, B.D., Barry, D.J., McAlister, H.A., Bagnuolo, W.G., &        1993AJ....106..352H
+             Prieto, C.M.                                                                                           
+             AJ 106, 352, 1993                                                                                      
+Hrt1996b     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Turner, N.H., Barry, D.J., Franz, .   1996AJ....111..936H
+             O.G., & Prieto, C.M                                                                                    
+             AJ 111, 936, 1996                                                                                      
+I__1905      Innes, R.T.A.                                                                       1905AnCap...2....4I
+             Ann. Cape Obs. 2, Pt.4, 1905                                                                           
+I__1911      Innes, R.T.A.                                                                       .                  
+             Transvaal Obs. Circ. 1, 61, 1911                                                                       
+I__1912      Innes, R.T.A.                                                                       .                  
+             Transvaal Obs. Circ. 1, 111, 1912                                                                      
+I__1948a     Innes, R.T.A.                                                                       1948CiUO..106..193I
+             Union Obs. Johannesburg Circ. 106, 193, 1948                                                           
+Ltg1961a     Lategan, O.P.                                                                       1961CiUO..120..364L
+             Union Obs. Johannesburg Circ. 120, 364, 1961                                                           
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+Nbg1968      Newburg, J.L.                                                                       1968ROCi..127..165N
+             Republic Obs. Circ. 127, 165, 1968                                                                     
+Smw1948      Simonov, G.V.                                                                       1948MmMtS...9.....1
+             Mem. Mt. Stromlo Obs. 2, #9, 1948                                                                      
+Smw1951      Simonov, G.V.                                                                       1951AnBos...9....1S
+             Ann. Bosscha Obs. Lembang 9, Pt.1, 1951                                                                
+Tok2010      Tokovinin, A., Mason, B., & Hartkopf, W.                                            2010AJ....139..743T
+             AJ 139, 743, 2010                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2015c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2015AJ....150...50T
+             AJ 150, 50, 2015                  (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2019c     Tokovinin, A., Mason, B.D., Mendez, R.A., Horch, E.P. & Briceno, C.                 2019AJ....158...48T
+             AJ 158, 48, 2019                                                                                       
+Vou1926      Voute, J.G.                                                                         1926AnBos...1....3V
+             Ann. Bosscha Obs. Lembang 1, Pt.2, 1926                                                                
+Vou1955      Voute, J.G.                                                                         1955JO.....38..109V
+             J. Obs. 38, 109, 1955             (a few errata noted in Vou1956)                                      
+WRH1980      Wilson, R.H.                                                                        1980A&AS...39..197W
+             A&AS 39, 197, 1980                                                                                     
+Zir2013d     Zirm, H.                                                                            2013IAUDS.180....1Z
+             Inf. Circ. 180, 1, 2013                                                                                
+
+------------------------------------------------------------------------------------------------------------------------
+

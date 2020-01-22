@@ -1,0 +1,38 @@
+USNO Double Star data for WDS 17556+0204
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+HDS2527      1991 2018    8 205 123   0.1   0.1  7.42  7.92 A3        +008+004          +02 3427      175537.51+020429.7
+       1991.25     205.      .       0.127     .        7.424 0.149   7.921 0.236  511 222    0.3   1 HIP1997a Hh   5   
+       2006.5569  :171.3     .    :  0.115     .         .     .       .     .     550  24    2.5   1 Hrt2009  Su   7   
+       2014.2229  q138.8     .       0.1044    .         .     .     -0.88   .     692  40    4.3   1 Hor2015b S    7   
+       2014.2229  q139.3     .       0.1004    .         .     .     -1.19   .     880  50    4.3   1 Hor2015b S    7   
+       2014.4582  q137.9     .       0.1002    .         .     .     -0.80   .     692  40    4.3   1 Hor2015b S    7   
+       2014.4582  q138.1     .       0.1003    .         .     .     -1.16   .     880  50    4.3   1 Hor2015b S    7   
+       2017.5332   125.9    0.1      0.1009   0.0016     .     .    : 0.1    .     534  22    4.1   2 Tok2018c St   7   
+       2018.2539   123.0    0.1      0.0990   0.0001     .     .      0.3    .     534  22    4.1   2 Tok2019c St   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+HIP1997a     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997  (incl. Hp photometry, vol. 10)                                   
+Hor2015b     Horch, E.P., van Belle, G.T., Davidson, J.W., Jr., Ciastko, L.A., Everett, M.E., &  2015AJ....150..151H
+             Bjorkman, K.S.                                                                                         
+             AJ 150, 151, 2015                                                                                      
+Hrt2009      Hartkopf, W.I. & Mason, B.D.                                                        2009AJ....138..813H
+             AJ 138, 813, 2009                                                                                      
+Tok2018c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A. & Horch, E.P.              2018AJ....155..235T
+             AJ 155, 235, 2018                                                                                      
+Tok2019c     Tokovinin, A., Mason, B.D., Mendez, R.A., Horch, E.P. & Briceno, C.                 2019AJ....158...48T
+             AJ 158, 48, 2019                                                                                       
+
+------------------------------------------------------------------------------------------------------------------------
+

@@ -1,0 +1,101 @@
+USNO Double Star data for WDS 17018-5108
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+I  1306      1926 2018   18 200 197   0.4   0.2  7.23  7.27 A7V       -005-052          -5010955  O   170146.35-510751.6
+       1926.51     199.9     .       0.36      .         .     .      0.5    .                0.7   1 I__1948a Ma   0   
+       1929.32     196.2     .       0.28      .         .     .       .     .                0.6   4 Vou1932  Ma   0   
+       1952.48     202.2     .       0.20      .        7.2    .      7.5    .                0.7   1 B__1956a Ma   0   
+       1953.62     202.9     .       0.141     .         .     .       .     .                0.7   5 Fin1953d J    0   
+       1953.66     209.2     .       0.143     .         .     .       .     .                0.7   1 Fin1954c J    0   
+       1954.61     206.8     .       0.136     .         .     .       .     .                0.7   2 Fin1954c J    0   
+       1959.69     215.0     .       0.114     .         .     .      0.0    .                0.7   4 Fin1960b J    0   
+       1960.69        .      .    <  0.113     .         .     .       .     .                0.7   1 Fin1961  J    1   
+       1960.70        .      .    <  0.105     .         .     .       .     .                0.7   1 Fin1961  J    1   
+       1962.68        .      .    <  0.108     .         .     .       .     .                0.7   1 Fin1963a J    1   
+       1963.662       .      .    <  0.109     .         .     .       .     .                0.7   1 Fin1964a J    2   
+       1964.697       .      .    <  0.107     .         .     .       .     .                0.7   1 Fin1965a J    2   
+       1985.33    q191.8     .       0.20      .         .     .      0.0    .                0.9   3 Hei1987a Mb   4   
+       1989.3028  q190.7     .       0.219     .         .     .       .     .     549  22    4.0   1 McA1990  Sc   4   
+       1990.3485  q190.8     .       0.225     .         .     .       .     .     549  22    4.0   1 Hrt1993  Sc   4   
+       1991.25     190.      .       0.231     .        7.226 0.029   7.267 0.030  511 222    0.3   1 HIP1997a Hh   5   
+       1992.4539  q191.4     .       0.239     .         .     .       .     .     549  22    4.0   1 Hrt1996b Sc   4   
+       2008.5409  q194.1    0.0      0.2580   0.0002     .     .    :-0.9    .     551  22    4.0   1 Tok2010  S    7   
+       2009.2616  q194.2    0.0      0.2561   0.0004     .     .     -0.2    .     657   5    4.1   1 Tok2010  S    7   
+       2013.7453   195.9    0.0      0.2401   0.0001     .     .      0.4    .     543  22    4.1   2 Tok2014a St   7   
+       2015.4953   196.2    0.0      0.2319   0.0000     .     .      0.2    .     543  22    4.1   2 Tok2016a St   7   
+       2016.3889   198.1    0.0      0.2274   0.0001     .     .      0.3    .     788 132    4.1   1 Tok2018c St   7   
+       2018.3982   197.0    0.0      0.2169   0.0001     .     .      0.2    .     788 132    4.1   2 Tok2019c St   7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+I  1306              193.7     y    0.317  a   84.6      12.8      1989.59    y  0.187     149.0     4  Tok2016e
+               +/-      .            .           .         .           .          .           .    
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+I  1306           4    Tok2016e    196.7   0.229    197.0   0.224    197.4   0.218    197.7   0.212
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+B__1956a     van den Bos, W.H.                                                                   1956CiUO..115..266V
+             Union Obs. Johannesburg Circ. 115, 266, 1956                                                           
+Fin1953d     Finsen, W.S.                                                                        1953CiUO..113..170F
+             Union Obs. Johannesburg Circ. 113, 170, 1953                                                           
+Fin1954c     Finsen, W.S.                                                                        1954CiUO..114..240F
+             Union Obs. Johannesburg Circ. 114, 240, 1954                                                           
+Fin1960b     Finsen, W.S.                                                                        1960CiUO..119..333F
+             Union Obs. Johannesburg Circ. 119, 333, 1960                                                           
+Fin1961      Finsen, W.S.                                                                        1961CiUO..120..367F
+             Union Obs. Johannesburg Circ. 120, 367, 1961                                                           
+Fin1963a     Finsen, W.S.                                                                        1963ROCi..122...32F
+             Republic Obs. Circ. 122, 32, 1963                                                                      
+Fin1964a     Finsen, W.S.                                                                        1964ROCi..123...53F
+             Republic Obs. Circ. 123, 53, 1964                                                                      
+Fin1965a     Finsen, W.S.                                                                        1965ROCi..124...79F
+             Republic Obs. Circ. 124, 79, 1965                                                                      
+Hei1987a     Heintz, W.D.                                                                        1987ApJS...65..161H
+             ApJS 65, 161, 1987                                                                                     
+HIP1997a     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997  (incl. Hp photometry, vol. 10)                                   
+Hrt1993      Hartkopf, W.I., Mason, B.D., Barry, D.J., McAlister, H.A., Bagnuolo, W.G., &        1993AJ....106..352H
+             Prieto, C.M.                                                                                           
+             AJ 106, 352, 1993                                                                                      
+Hrt1996b     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Turner, N.H., Barry, D.J., Franz, .   1996AJ....111..936H
+             O.G., & Prieto, C.M                                                                                    
+             AJ 111, 936, 1996                                                                                      
+I__1948a     Innes, R.T.A.                                                                       1948CiUO..106..193I
+             Union Obs. Johannesburg Circ. 106, 193, 1948                                                           
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+Tok2010      Tokovinin, A., Mason, B., & Hartkopf, W.                                            2010AJ....139..743T
+             AJ 139, 743, 2010                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2014a     Tokovinin, A., Mason, B.D., & Hartkopf, W.I.                                        2014AJ....147..123T
+             AJ 147, 123, 2014                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2016a     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2016AJ....151..153T
+             AJ 151, 153, 2016                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2016e     Tokovinin, A.                                                                       2016AJ....152..138T
+             AJ 152, 138, 2016                                                                                      
+Tok2018c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A. & Horch, E.P.              2018AJ....155..235T
+             AJ 155, 235, 2018                                                                                      
+Tok2019c     Tokovinin, A., Mason, B.D., Mendez, R.A., Horch, E.P. & Briceno, C.                 2019AJ....158...48T
+             AJ 158, 48, 2019                                                                                       
+Vou1932      Voute, J.G.                                                                         1932AnBos...6....3V
+             Ann. Bosscha Obs. Lembang 6, Pt.1, A1, 1932                                                            
+
+------------------------------------------------------------------------------------------------------------------------
+

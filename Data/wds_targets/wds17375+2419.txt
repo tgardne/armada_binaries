@@ -1,0 +1,99 @@
+USNO Double Star data for WDS 17375+2419
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+CHR  63      1985 2008   23  73  57   0.1   0.1  5.9   7.3  A2Vn      -012+008          +24 3218 NO   173731.10+241835.9
+       1985.5210    73.1     .       0.082     .         .     .       .     .     549  22    3.6   1 McA1987a Sc P 4   
+       1986.4090    65.0     .       0.101     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1987.2690    58.9     .       0.097     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1988.1620    52.1     .       0.087     .         .     .       .     .     549  22    3.6   1 McA1993  Sc   4   
+       1988.2601    51.0     .       0.087     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
+       1988.6644    49.9     .       0.080     .         .     .       .     .     549  22    3.8   1 McA1990  Sc   4   
+       1989.2293    44.5     .       0.072     .         .     .       .     .     549  22    3.8   1 McA1990  Sc   4   
+       1989.7047    37.5     .       0.065     .         .     .       .     .     549  22    3.8   1 Hrt1992b Sc   4   
+       1990.2640    25.5     .       0.052     .         .     .       .     .     549  22    3.8   1 Hrt1992b Sc   4   
+       1991.25        .      .    <  0.1       .        5.80   .       .     .     511 222    0.3   1 HIP1997e Hh   6   
+       1991.3290   357.6     .       0.044     .         .     .       .     .     549  22    3.8   1 McA1993  Sc   4   
+       1992.3093   310.9     .       0.046     .         .     .       .     .     549  22    3.8   1 McA1993  Sc   4   
+       1993.2047   289.2     .       0.059     .         .     .       .     .     549  22    3.8   1 Hrt2000a Sc   5   
+       1994.7067      .      .    <  0.036     .         .     .       .     .     549  22    3.8   1 Hrt2000a Sc   7   
+       1995.3155    70.1     .       0.081     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
+       1996.3230    63.0     .       0.097     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
+       1996.5277    64.7     .       0.094     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
+       1997.1365    63.2     .       0.104     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
+       2006.5236    69.2     .       0.089     .         .     .      1.47   .     550  40    3.5   1 Hor2008  S    7   
+       2006.5236    70.8     .       0.089     .         .     .      1.31   .     550  40    3.5   1 Hor2008  S    7   
+       2007.4220    63.5     .       0.096     .         .     .      1.08   .     754  44    3.5   1 Hor2010  S    7   
+       2007.4247    63.7     .       0.102     .         .     .      1.34   .     550  40    3.5   1 Hor2010  S    7   
+       2007.6014    61.8     .       0.098     .         .     .       .     .     540  24    3.8   1 Msn2011d Su   7   
+       2008.4594    57.9     .       0.097     .         .     .      1.41   .     550  40    3.5   1 Hor2010  S    7   
+       2008.4650    57.0     .       0.094     .         .     .      1.23   .     754  44    3.5   1 Hor2010  S    7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+CHR  63               10.42    y    0.127  a  100.6      72.4      1995.51    y  0.753     259.8     3  Doc2016d
+               +/-     0.15         0.003       1.5       2.0         0.20       0.010       1.5   
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+CHR  63           3    Doc2016d    253.7   0.053     69.8   0.077     62.0   0.103     55.7   0.101
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+CHR  63     79 Her.                                                                 .       
+            Malkov et al. (2012) derive dynamical, photometric, and spectroscopic   .       
+            masses of 13.76 +/- 1.34, 3.71, and 2.09 Msun, respectively.            Mlk2012 
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+Doc2016d     Docobo, J.A., Tamazian, V.S., Malkov, O.Yu., Campo, P.P., & Chulkov, D.A.           2016MNRAS.459.1580D
+             MNRAS 459, 1580, 2016                                                                                  
+HIP1997e     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (single star systems)                                                                                  
+Hor2008      Horch, E.P., van Altena, W.F., Cyr, W.M., Jr., Kinsman-Smith, L., Srivastava, A.,   2008AJ....136..312H
+             & Zhou, J.                                                                                             
+             AJ 136, 312, 2008                                                                                      
+Hor2010      Horch, E.P., Falta, D., Anderson, L.M., DeSousa, M.D., Miniter, C.M., Ahmed, T., &  2010AJ....139..205H
+             van Altena, W.F.                                                                                       
+             AJ 139, 205, 2010                                                                                      
+Hrt1992b     Hartkopf, W.I., McAlister, H.A., & Franz, O.G.                                      1992AJ....104..810H
+             AJ 104, 810, 1992                                                                                      
+Hrt1997      Hartkopf, W.I., McAlister, H.A., Mason, B.D., ten Brummelaar, T.A., Roberts, J.C.,  1997AJ....114.1639H
+             Jr., Turner, N.H., & Wilson, J.W.                                                                      
+             AJ 114, 1639, 1997                                                                                     
+Hrt2000a     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Roberts, L.C., Jr., Turner, N.H.,     2000AJ....119.3084H
+             ten Brummelaar, T.A., Prieto, C.M., Ling, J.F., & Franz, O.G.                                          
+             AJ 119, 3084, 2000                                                                                     
+McA1987a     McAlister, H.A., Hartkopf, W., Hutter, D., Shara, M., & Franz, O.                   1987AJ.....92..183M
+             AJ 92, 183, 1987                                                                                       
+McA1989      McAlister, H.A., Hartkopf, W.I., Sowell, J.R., Dombrowski, E.G., & Franz, O.G.      1989AJ.....97..510M
+             AJ 97, 510, 1989                                                                                       
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+McA1993      McAlister, H.A., Mason, B.D., Hartkopf, W.I., & Shara, M.M.                         1993AJ....106.1639M
+             AJ 106, 1639, 1993                                                                                     
+Mlk2012      Malkov, O.Yu., Tamazian, V.S., Docobo, J.A., & Chulkov, D.A.                        2012A&A...546A..69M
+             A&A 546, A69, 2012                                                                                     
+Msn2011d     Mason, B.D., Hartkopf, W.I., Raghavan, D., Subasavage, J.P., Roberts, L.C., Jr.,    2011AJ....142..176M
+             Turner, N.H., & ten Brummelaar, T.A.                                                                   
+             AJ 142, 176, 2011                                                                                      
+
+------------------------------------------------------------------------------------------------------------------------
+

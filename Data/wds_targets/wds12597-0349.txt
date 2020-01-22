@@ -1,0 +1,237 @@
+USNO Double Star data for WDS 12597-0349
+
+Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
+new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
+format, errors, or missing information are welcome.
+
+------------------------------------------------------------------------------------------------------------------------
+
+MEASURES:
+
+CHR  39Aa,Ab 1983 2017   23 187  64   0.1   0.1  5.9   8.3  B9.5V     -037+008          -03 3384 NO   125939.55-034843.0
+       1879.336    335.9     .        .        .         .     .      0.0    .                0.3   1 Hwe1879  Ma   7   
+       1983.4271   186.9     .       0.120     .         .     .       .     .     549  22    3.8   1 Hrt2000a Sc   5   
+       1984.0549   198.8     .       0.112     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1984.3743   207.1     .       0.107     .         .     .       .     .     549  22    3.8   1 Hrt2000a Sc   5   
+       1984.3770   211.6     .       0.107     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1984.3853   208.0     .       0.095     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
+       1987.2630   318.6     .       0.055     .         .     .       .     .     549  22    3.8   1 Hrt2000a Sc   5   
+       1988.164       .      .    <  0.038     .         .     .       .     .     549  22    3.6   1 McA1993  Sc   5   
+       1989.2262   301.5     .       0.066     .         .     .       .     .     549  22    3.8   1 McA1990  Sc   4   
+       1989.3025   310.1     .       0.071     .         .     .       .     .     549  22    4.0   1 McA1990  Sc   4   
+       1990.2609   341.8     .       0.100     .         .     .       .     .     549  22    3.8   2 Hrt1992b Sc   4   
+       1990.2748   343.7     .       0.099     .         .     .       .     .     549  22    3.8   1 Hrt1992b Sc   4   
+       1991.25        .      .    G   .        .        5.79   .       .     .     511 222    0.3   1 HIP1997g Hh   7   
+       1991.3175     3.1     .       0.103     .         .     .       .     .     549  22    3.8   1 Hrt1994  Sc   4   
+       1991.3258     3.8     .       0.100     .         .     .       .     .     549  22    3.8   1 Hrt1994  Sc   4   
+       1991.3910     6.5     .       0.105     .         .     .       .     .     549  22    4.0   1 Hrt1993  Sc   4   
+       1993.0922    44.8     .       0.099     .         .     .       .     .     549  22    4.0   1 Hrt2000a Sc   5   
+       1993.0946    45.6     .       0.098     .         .     .       .     .     549  22    4.0   1 Hrt2000a Sc   5   
+       1993.1962  : 47.5     .    :  0.098     .         .     .       .     .     549  22    3.8   1 Hrt1994  Sc   4   
+       1996.1828    58.8     .       0.058     .         .     .       .     .     549  22    4.0   1 Hrt2000a Sc   5   
+       2004.0907      .      .    U   .        .         .     .       .     .     880 155    3.6   1 Rbr2018  A    7   
+       2006.1942  q164.3     .       0.093     .         .     .       .     .     550  24    4.0   1 Msn2009  Su   7   
+       2007.3155      .      .    <  0.054     .         .     .       .     .     550  24    2.5   1 Hrt2009  Su   7   
+       2009.2585  q236.7    0.2      0.0923   0.0005     .     .     -2.4    .     551  22    4.1   1 Tok2010  S    7   
+       2009.2585  q237.0    0.5      0.0906   0.0005     .     .     -2.1    .     657   5    4.1   1 Tok2010  S    7   
+       2014.2987   348.2    0.1      0.0972   0.0002     .     .      2.4    .     543  22    4.1   2 Tok2015c St   7   
+       2016.1347    30.1    0.2      0.1049   0.0004     .     .      2.4    .     534  22    4.1   3 Tok2018c St   7   
+       2017.3689    63.8    0.2      0.0855   0.0002     .     .      2.1    .     534  22    4.1   2 Tok2018c St   7   
+
+STF1704AB    1782 2017   27  58  54  22.3  20.6  5.80 10.3  B9.5V     -050+009 -036+011          N    125939.55-034843.0
+       1782.10      57.5     .      22.28      .         .     .       .     .                0.2   1 H__1785  Mb   7   
+       1828.        50.      .      20.        .         .     .      5.     .                0.5   1 HJ_1831  Mb   7   
+       1830.63      53.0     .      21.29      .        6.0    .     11.2    .                0.3   3 StF1837  Ma   3   
+       1834.21      55.0     .      20.0       .         .     .       .     .                0.2   1 Smy1844  Ma   6   
+       1844.33      55.8     .      21.19      .        7.0    .     11.5    .                0.3   1 Gsh1908  Ma   3   
+       1847.87      53.9     .      20.19      .         .     .       .     .                0.3   2 Mad1906A Ma   6   
+       1851.28      53.4     .      20.44      .         .     .       .     .                0.2   1 Da_1867  Ma   4   
+       1853.37    : 53.6     .    : 18.70      .         .     .       .     .                0.3   1 Mad1856  Ma   4   
+       1867.56      54.8     .      20.86      .        5.8    .     11.0    .                0.2   3 D__1884  Ma   3   
+       1874.30      52.8     .        .        .         .     .       .     .                0.2   2 WS_1875  Ma   5   
+       1874.30      53.0     .      21.9       .         .     .       .     .                0.2   1 WS_1875  Ma   5   
+       1874.30      53.2     .      22.6       .         .     .       .     .                0.2   1 Gld1875  Ma   3   
+       1879.27      52.9     .      20.77      .        6.5    .      9.5    .                0.3   1 Stn1879  Ma   3   
+       1879.33      54.0     .      21.07      .        6.5    .     11.2    .                0.3   2 Hwe1879  Ma   3   
+       1879.34    q 55.9     .        .        .        6.5    .      6.5    .                0.3   1 Hwe1879  Ma   3   
+       1880.30      53.8     .      20.42      .         .     .       .     .                0.5   1 Bu_1883  Ma   4   
+       1880.36      52.7     .      20.59      .        6.0    .     10.0    .                0.3   1 Stn1882  Ma   3   
+       1883.00      53.7     .      21.21      .        6.1    .     10.2    .                0.2   6 Eng1885a Ma   4   
+       1893.47      54.4     .      20.234     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1893.94      56.0     .      20.1       .         .     .       .     .                0.3   2 Brt1931  Pa X 0   
+       1894.41      56.0     .      21.426     .         .     .       .     .                0.3   1 WFC1998  Pa   6   
+       1905.22      53.7     .      20.80      .         .     .       .     .                1.0   1 Bu_1906  Ma   4   
+       1912.29      53.7     .      20.88      .        6.0    .     11.2    .                1.0   3 Bu_1913  Ma   4   
+       1930.42      53.2     .      20.70      .         .     .       .     .                0.7   2 StG1962b Ma   1   
+       1934.27      53.5     .      20.74      .         .     .    s10.8    .                0.3   2 Kui1961b Ma   0   
+       1934.32      53.8     .      20.86      .         .     .       .     .                0.9   1 Kui1961b Ma   0   
+       1944.          .      .        .        .         .     .      4.77  0.18              0.4   4 Wal1947  Zw D 7   
+       1958.45      53.8     .      20.83      .        6.1    .     10.8    .                0.9   2 B__1960b Mb   0   
+       1988.5         .      .        .        .        5.803 0.002  10.708 0.024  550  89    0.5   1 Sin1989  Z    7   
+       1991.25        .      .    <  0.1       .         .     .       .     .     511 222    0.3   1 HIP1997e Hh   6   
+       1999.11      53.4     .      20.81      .        5.415 0.018   9.125 0.020 1256 245    1.3   1 TMA2003  E2   7   
+       1999.11        .      .        .        .        5.368 0.042   8.741 0.036 1633 160    1.3   1 TMA2003  E2   7   
+       1999.11        .      .        .        .        5.269 0.017   8.588 0.021 2210 300    1.3   1 TMA2003  E2   7   
+       2000.207     53.8    1.2     20.82     0.33      7.71  0.36   10.69  0.06   609  70    0.2   2 UC_2013b Eu   7   
+       2010.          .      .        .        .        8.664-0.010  10.385  .     550  89    0.2   1 AAV2012  Zc   7   
+       2010.          .      .        .        .        9.002-0.010  10.813  .     440  98    0.2   1 AAV2012  Zc   7   
+       2017.40      53.7    0.735   20.57     0.286      .     .       .     .                0.4   1 Nug2018b C    7   
+
+------------------------------------------------------------------------------------------------------------------------
+
+ORBITAL ELEMENTS:
+
+                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
+CHR  39Aa,Ab           7.906   y    0.078  a   19.3      21.6      2011.562   y  0.363     174.9     2  Doc2015g
+               +/-      .            .           .         .           .          .           .    
+
+
+ORBITAL EPHEMERIDES:
+
+Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
+                                       2016.0           2017.0           2018.0           2019.0   
+CHR  39Aa,Ab      2    Doc2015g     27.3   0.105     51.4   0.094     86.2   0.073    151.9   0.052
+
+------------------------------------------------------------------------------------------------------------------------
+
+NOTES:
+
+CHR  39     Aa,Ab. 44 Vir. Rapid binary.                                            .       
+            1991.3921: This interferometric system has now completed nearly 180deg  .       
+            of revolution since its discovery in 1984.  A preliminary               .       
+            determination of orbital elements yields a low-eccentricity orbit with  .       
+            a period of 15.7 years. Absolute quadrant determinations based on       .       
+            reanalysis of earlier speckle data have ruled out a possible short-     .       
+            period high-eccentricity orbit. A more complete orbital analysis is in  .       
+            progress.                                                               .       
+            Aa,Ab: Malkov et al. (2012) derive dynamical, photometric, and          .       
+            spectroscopic masses 3.41 +/- 0.75, 3.58, and 2.00 Msun, respectively.  Mlk2012 
+STF1704     AB: H 4  51.                                                            MEv2010 
+
+------------------------------------------------------------------------------------------------------------------------
+
+REFERENCES:
+
+AAV2012      AAVSO Photometric All-Sky Survey (APASS), Data Release 6                            .                  
+             http://www.aavso.org/apass                                                                             
+             (Note: APASS photometry extracted from UCAC4 catalog; no observations dates are                        
+             given, so a coarse date of 2010 was assumed for all measures. Negative errors mean                     
+             the star was observed on only one night for that magnitude; therefore, the error                       
+             is purely Poisson rather than nightly scatter. Due to aperture method used, APASS                      
+             photometry is only included for pairs wider than 10" (Henden, private comm.)                           
+B__1960b     van den Bos, W.H.                                                                   1960PYerO...9....1B
+             Pub. Yerkes Obs. 9, pt. 1, 1960                                                                        
+Brt1931      Barton, S.G.                      (BRT 349 - BRT 562)                               1931AJ.....41...35B
+             AJ 41, 35, 1931                   (no measures for BRT 529 - BRT 562)                                  
+Bu_1883      Burnham, S.W.                     (BU  864 - 1025)                                  1883MmRAS..47..167B
+             MemRAS 47, 167, 1883                                                                                   
+Bu_1906      Burnham, S.W.                                                                       1906QB821.B972.....
+             Burnham Double Star Cat., 1906                                                                         
+Bu_1913      Burnham, S.W.                                                                       1913QB811.B8.......
+             Carnegie Inst. Wash. #168, 1913                                                                        
+D__1884      Dembowski, H.                                                                       ...................
+             Misure micrometriche di Stelle Doppie e multiple...                                                    
+             (Rome, Coi tipi del Salviucci), vol. II, 1884                                                          
+Da_1867      Dawes, W.R.                                                                         1867MmRAS..35..137D
+             MemRAS 35, 137, 1867                                                                                   
+Doc2015g     Docobo, J.A. & Campo, P.                                                            2015IAUDS.187R...1D
+             Inf. Circ. 187, 1, 2015                                                                                
+Eng1885a     Engelmann, R.                                                                       1885AN....111..337E
+             AN 111, 337, 1885                                                                                      
+Gld1875      Gledhill, J.                                                                        1875MmRAS..42..101G
+             MemRAS 42, 101, 1875                                                                                   
+Gsh1908      Glaisher, J.                                                                        .                  
+             Cambridge Obs. 24, Pt.1, 1908                                                                          
+H__1785      Herschel, W.                                                                        1785RSPT...75...40H
+             Phil. Trans. R. Soc. 75, 40, 1785                                                                      
+HIP1997e     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (single star systems)                                                                                  
+HIP1997g     Hipparcos                                                                           1997yCat.1239....0E
+             Hipparcos Catalog, ESA SP-1200, 1997                                                                   
+             (non-component double star solution: G = acceleration solution,                                        
+             O = orbit solution, V = variability-induced mover, X = stochastic solution)                            
+HJ_1831      Herschel, J.F.W.                                                                    1831MmRAS...4..331H
+             MemRAS 4, part 2, 331, 1831                                                                            
+Hrt1992b     Hartkopf, W.I., McAlister, H.A., & Franz, O.G.                                      1992AJ....104..810H
+             AJ 104, 810, 1992                                                                                      
+Hrt1993      Hartkopf, W.I., Mason, B.D., Barry, D.J., McAlister, H.A., Bagnuolo, W.G., &        1993AJ....106..352H
+             Prieto, C.M.                                                                                           
+             AJ 106, 352, 1993                                                                                      
+Hrt1994      Hartkopf, W.I., McAlister,H.A., Mason, B.D., Barry, D.J., Turner, N., & Fu, H.-H.   1994AJ....108.2299H
+             AJ 108, 2299, 1994                                                                                     
+Hrt2000a     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Roberts, L.C., Jr., Turner, N.H.,     2000AJ....119.3084H
+             ten Brummelaar, T.A., Prieto, C.M., Ling, J.F., & Franz, O.G.                                          
+             AJ 119, 3084, 2000                                                                                     
+Hrt2009      Hartkopf, W.I. & Mason, B.D.                                                        2009AJ....138..813H
+             AJ 138, 813, 2009                                                                                      
+Hwe1879      Howe, H.A.                                                                          1879PCinO...5....1.
+             Pub. Cincinnati Obs. #5, 1879                                                                          
+Kui1961b     Kuiper, G.P.                                                                        1961ApJS....6....1K
+             ApJS 6, 1, 1961                                                                                        
+Mad1856      Maedler, J.H.                                                                       .                  
+             Dorpat Observations 13, 1, 1856                                                                        
+Mad1906A     Maedler, J.H.                                                                       1906MmRAS..56....1L
+             cited by Lewis (MemRAS 56, 1, 1906)                                                                    
+McA1987b     McAlister, H.A., Hartkopf, W.I., Hutter, D.J., & Franz, O.G.                        1987AJ.....93..688M
+             AJ 93, 688, 1987                                                                                       
+McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
+             AJ 99, 965, 1990                                                                                       
+McA1993      McAlister, H.A., Mason, B.D., Hartkopf, W.I., & Shara, M.M.                         1993AJ....106.1639M
+             AJ 106, 1639, 1993                                                                                     
+MEv2010      MacEvoy, B.                                                                         ...................
+             private communication, 2010 (see http://www.handprint.com/ASTRO/index.html)                            
+Mlk2012      Malkov, O.Yu., Tamazian, V.S., Docobo, J.A., & Chulkov, D.A.                        2012A&A...546A..69M
+             A&A 546, A69, 2012                                                                                     
+Msn2009      Mason, B.D., Hartkopf, W.I., Gies, D.R., Henry, T.J., & Helsel, J.W.                2009AJ....137.3358M
+             AJ 137, 3358, 2009                                                                                     
+Nug2018b     Nugent, R.L. & Iverson, E.W.                                                        2018JDSO...14..566N
+             JDSO 14, 566, 2018                                                                                     
+Rbr2018      Roberts, L.C., Jr. & Mason, B.D.                                                    2018MNRAS.473.4497R
+             MNRAS 473, 4497, 2018                                                                                  
+Sin1989      Sinachopoulos, D.                                                                   1989A&AS...81..103S
+             A&AS 81, 103, 1989                                                                                     
+Smy1844      Smyth, W.H.                                                                         1844QB43.S66.......
+             Cycle of Celestial Objects 2, 1844                                                                     
+StF1837      Struve, F.G.W.                                                                      1837AN.....14...249
+             Stellarum duplicium et multiplicium mensurae micrometricae...                                          
+             (Dorpat, Academiae scientiarum caesareae petropolitaneifique), 1837                                    
+StG1962b     Struve, G.                                                                          1962VeBB....2.....S
+             Pub. Berlin Babelsberg Obs. 14, Pt.2, 1962                                                             
+Stn1879      Stone, O.                                                                           1879PCinO...5....1S
+             Pub. Cincinnati Obs. #5, 1879                                                                          
+Stn1882      Stone, O.                                                                           1882PCinO...6....1S
+             Pub. Cincinnati Obs. #6, 1882                                                                          
+TMA2003      2MASS Catalog                                                                       .                  
+             2MASS Point Src Cat., 2003 all-sky release (http://pegasus.phast.umass.edu/)                           
+             (Note: 2MASS photometry also added by cataloguer to 2MASS astrometry published                         
+             under other references.)                                                                               
+Tok2010      Tokovinin, A., Mason, B., & Hartkopf, W.                                            2010AJ....139..743T
+             AJ 139, 743, 2010                 (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2015c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2015AJ....150...50T
+             AJ 150, 50, 2015                  (some measures corrected in Tok2017b)             2017AJ....154..110T
+Tok2018c     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A. & Horch, E.P.              2018AJ....155..235T
+             AJ 155, 235, 2018                                                                                      
+UC_2013b     Hartkopf, W.I., Mason, B.D., Finch, C.T., Zacharias, N., Wycoff, G.L., & Hsu, D.    2013AJ....146...76H
+             AJ 146, 76, 2013                  (UC 301 - 5058)                                                      
+             (Relative astrometry is derived from individual measurements, not precessed means.                     
+             UCAC aperture magnitudes are listed, unless the duplicity flag indicates a blended                     
+             image (a flag value of 30 or higher). Model fit magnitudes are given for both                          
+             components if either has such a flag. Model fit magnitudes are indicated by the                        
+             letter "f" following the filter information.                                                           
+             APASS photometry extracted from UCAC4 catalog is listed under reference AAV2012.                       
+             Due to aperture method used, APASS photometry is only included for pairs wider                         
+             than 10" (Henden, private comm.) Photometry for pairs wider than 10" which showed                      
+             identical values for both components in all filters were removed, as well.                             
+Wal1947      Wallenquist, A.                                                                     1947UppAn...2....2W
+             Ann. Uppsala Astron. Obs. 2, No.2, 1947                                                                
+             (A catalogue containing results of the two prior series, plus additional measures                      
+             with the 14-inch refractor and wedge photometer)                                                       
+WFC1998      Urban, S.E., Corbin, T.E., Wycoff, G.L., Martin, J.C., Jackson, E.S.,               1998AJ....115.1212U
+             Zacharias, M.I., & Hall, D.M.                                                                          
+             AJ 115, 1212, 1998 (Astrographic Cat. 2000)                                                            
+WS_1875      Wilson, J.M., Seabroke, G.M., et al.                                                1875MmRAS..42...59W
+             MemRAS 42, 59, 1875                                                                                    
+
+------------------------------------------------------------------------------------------------------------------------
+
