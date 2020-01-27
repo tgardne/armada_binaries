@@ -1,24 +1,8 @@
-USNO Double Star data for WDS 23586-1408
-
-Note: the data request software was rewritten in July 2017, following introduction of the WDS supplement. Please see the
-new datarequest.key file for a description of file contents. This effort is still ongoing; your comments regarding
-format, errors, or missing information are welcome.
-
-------------------------------------------------------------------------------------------------------------------------
-
-MEASURES:
-
-RST4136AB    1936 2018   31  18  13   0.2   0.2  7.73  8.54 F2V       -012+014          -14 6588 NO   235834.40-140730.3
+#RST4136AB    1936 2018   31  18  13   0.2   0.2  7.73  8.54 F2V       -012+014          -14 6588 NO   235834.40-140730.3
        1936.88      17.8     .       0.22      .        7.9    .      8.1    .                0.7   2 Rst1955  Ma   0   
        1944.59      10.0     .       0.21      .         .     .       .     .                0.6   3 Vou1955  Ma   0   
-       1950.88    q243.1     .       0.16      .        8.0    .      8.0    .                0.7   2 Rst1955  Ma   0   
-       1951.90    q252.0     .       0.17      .        8.0    .      8.0    .                0.7   2 Rst1955  Ma   0   
-       1958.58    q194.3     .       0.18      .        8.2    .      8.0    .                2.1   2 B__1960b Mb   0   
-       1962.79    q197.6     .       0.17      .        8.2    .      8.0    .                0.9   4 B__1963b Ma   1   
-       1962.94    q196.6     .       0.156     .         .     .      0.0    .                0.7   2 Fin1963a J    1   
        1963.85     199.7     .       0.21      .         .     .      0.0    .                0.7   3 Hln1965  Ma   2   
        1964.67     193.3     .       0.18      .         .     .      0.0    .                0.7   3 Hln1966  Ma   2   
-       1965.934   :181.0     .    :  0.140     .         .     .       .     .                0.7   2 Fin1966a J    2   
        1983.7149    28.7     .       0.155     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
        1985.8418    23.9     .       0.177     .         .     .       .     .     549  22    3.8   1 McA1987b Sc P 4   
        1986.8902    22.3     .       0.178     .         .     .       .     .     549  22    3.8   1 McA1989  Sc   4   
@@ -28,8 +12,6 @@ RST4136AB    1936 2018   31  18  13   0.2   0.2  7.73  8.54 F2V       -012+014  
        1990.9227    15.9     .       0.198     .         .     .       .     .     549  22    4.0   1 Hrt1996b Sc   4   
        1991.25      15.      .       0.203     .        7.726 0.038   8.543 0.080  511 222    0.3   1 HIP1997a Hh   5   
        1991.7198    12.4     .       0.184     .         .     .       .     .     538  76    4.0   1 Hrt1996b Sc   4   
-       1995.7666  :  9.2     .    :  0.174     .         .     .       .     .     549  22    2.5   1 Hrt1997  Sc   5   
-       1996.5393  :  6.5     .    :  0.182     .         .     .       .     .     549  22    2.5   1 Hrt2000a Sc   5   
        1999.8174   359.1     .       0.141     .         .     .       .     .     550  24    2.1   1 Msn2001b Su   6   
        2007.6019   215.0     .       0.115     .         .     .       .     .     540  24    3.8   1 Msn2011d Su   7   
        2008.5417   211.8    0.1      0.1322   0.0002     .     .    : 0.9    .     551  22    4.0   1 Tok2010  S    7   
@@ -40,114 +22,3 @@ RST4136AB    1936 2018   31  18  13   0.2   0.2  7.73  8.54 F2V       -012+014  
        2013.7349   200.8    0.0      0.1900   0.0001     .     .      1.0    .     543  22    4.1   2 Tok2014a St   7   
        2015.7418    17.4    0.0      0.1989   0.0001     .     .      0.7    .     788 132    4.1   2 Tok2016a St   7   
        2018.4840    13.0    0.0      0.1996   0.0000     .     .      0.7    .     788 132    4.1   2 Tok2019c St   7   
-
-B  2909AB,C  1958 1999    4 220 215  11.2  11.9  7.27 14.7  F2V       -021+010                   N    235834.40-140730.3
-       1958.58     219.6     .      11.24      .        7.3    .     14.8    .                2.1   2 B__1960b Mb   0   
-       1962.78     221.9     .      11.13      .        7.3    .     15.0    .                0.9   2 B__1963b Ma   1   
-       1998.54     216.0     .      11.68      .        6.451 0.018  12.169  .    1256 245    1.3   1 TMA2003  E2   7   
-       1998.54        .      .        .        .        6.328 0.023  12.087 0.067 1633 160    1.3   1 TMA2003  E2   7   
-       1998.54        .      .        .        .        6.260 0.021  11.816 0.053 2210 300    1.3   1 TMA2003  E2   7   
-       1999.74     214.6    0.4     11.875    0.120     8.33  0.17   14.38  0.12   609  70    0.2   3 UC_2013b Eu   7   
-
-------------------------------------------------------------------------------------------------------------------------
-
-ORBITAL ELEMENTS:
-
-                  ------P-------  ---a------  --i-----  Node----  -----T-------  -e------  omega---  G  Reference
-RST4136AB             53.81    y    0.205  a  102.5      17.1      1999.31    y  0.038      63.5     3  Doc2011f
-               +/-      .            .           .         .           .          .           .    
-
-
-ORBITAL EPHEMERIDES:
-
-Name            Grade  Reference   Theta   Rho      Theta   Rho      Theta   Rho      Theta   Rho  
-                                       2016.0           2017.0           2018.0           2019.0   
-RST4136AB         3    Doc2011f    197.3   0.208    195.9   0.208    194.5   0.205    193.0   0.200
-
-------------------------------------------------------------------------------------------------------------------------
-
-NOTES:
-
-RST4136     AB: Malkov et al. (2012) derive dynamical, photometric, and             .       
-            spectroscopic masses 4.86 +/- 1.99, 3.15, and 1.35 Msun, respectively.  Mlk2012 
-
-------------------------------------------------------------------------------------------------------------------------
-
-REFERENCES:
-
-B__1960b     van den Bos, W.H.                                                                   1960PYerO...9....1B
-             Pub. Yerkes Obs. 9, pt. 1, 1960                                                                        
-B__1963b     van den Bos, W.H.                                                                   1963AJ.....68..582V
-             AJ 68, 582, 1963                                                                                       
-Doc2011f     Docobo, J.A. & Campo, P.                                                            2011IAUDS.174....1D
-             Inf. Circ. 174, 1, 2011                                                                                
-Fin1963a     Finsen, W.S.                                                                        1963ROCi..122...32F
-             Republic Obs. Circ. 122, 32, 1963                                                                      
-Fin1966a     Finsen, W.S.                                                                        1966ROCi..125..108F
-             Republic Obs. Circ. 125, 108, 1966                                                                     
-HIP1997a     Hipparcos                                                                           1997yCat.1239....0E
-             Hipparcos Catalog, ESA SP-1200, 1997  (incl. Hp photometry, vol. 10)                                   
-Hln1965      Holden, F.                                                                          1965POMic...9..181H
-             Pub. Univ. Michigan Obs. 9, 181, 1965                                                                  
-Hln1966      Holden, F.                                                                          1966POMic...9..185H
-             Pub. Univ. Michigan Obs. 9, 185, 1966                                                                  
-Hrt1993      Hartkopf, W.I., Mason, B.D., Barry, D.J., McAlister, H.A., Bagnuolo, W.G., &        1993AJ....106..352H
-             Prieto, C.M.                                                                                           
-             AJ 106, 352, 1993                                                                                      
-Hrt1996b     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Turner, N.H., Barry, D.J., Franz, .   1996AJ....111..936H
-             O.G., & Prieto, C.M                                                                                    
-             AJ 111, 936, 1996                                                                                      
-Hrt1997      Hartkopf, W.I., McAlister, H.A., Mason, B.D., ten Brummelaar, T.A., Roberts, J.C.,  1997AJ....114.1639H
-             Jr., Turner, N.H., & Wilson, J.W.                                                                      
-             AJ 114, 1639, 1997                                                                                     
-Hrt2000a     Hartkopf, W.I., Mason, B.D., McAlister, H.A., Roberts, L.C., Jr., Turner, N.H.,     2000AJ....119.3084H
-             ten Brummelaar, T.A., Prieto, C.M., Ling, J.F., & Franz, O.G.                                          
-             AJ 119, 3084, 2000                                                                                     
-McA1987b     McAlister, H.A., Hartkopf, W.I., Hutter, D.J., & Franz, O.G.                        1987AJ.....93..688M
-             AJ 93, 688, 1987                                                                                       
-McA1989      McAlister, H.A., Hartkopf, W.I., Sowell, J.R., Dombrowski, E.G., & Franz, O.G.      1989AJ.....97..510M
-             AJ 97, 510, 1989                                                                                       
-McA1990      McAlister, H.A., Hartkopf, & Franz, O.G.                                            1990AJ.....99..965M
-             AJ 99, 965, 1990                                                                                       
-Mlk2012      Malkov, O.Yu., Tamazian, V.S., Docobo, J.A., & Chulkov, D.A.                        2012A&A...546A..69M
-             A&A 546, A69, 2012                                                                                     
-Msn2001b     Mason, B.D., Hartkopf, W.I., Holdenried, E.R., & Rafferty, T.J.                     2001AJ....121.3224M
-             AJ 121, 3224, 2001                                                                                     
-Msn2011d     Mason, B.D., Hartkopf, W.I., Raghavan, D., Subasavage, J.P., Roberts, L.C., Jr.,    2011AJ....142..176M
-             Turner, N.H., & ten Brummelaar, T.A.                                                                   
-             AJ 142, 176, 2011                                                                                      
-Rst1955      Rossiter, R.A.                                                                      1955POMic..11....1R
-             Pub. Univ. Michigan Obs. 11, 1, 1955                                                                   
-Sca1991a     Scardia, M.                                                                         1991A&AS...90..565S
-             A&AS 90, 565, 1991                                                                                     
-TMA2003      2MASS Catalog                                                                       .                  
-             2MASS Point Src Cat., 2003 all-sky release (http://pegasus.phast.umass.edu/)                           
-             (Note: 2MASS photometry also added by cataloguer to 2MASS astrometry published                         
-             under other references.)                                                                               
-Tok2010      Tokovinin, A., Mason, B., & Hartkopf, W.                                            2010AJ....139..743T
-             AJ 139, 743, 2010                 (some measures corrected in Tok2017b)             2017AJ....154..110T
-Tok2010d     Tokovinin, A., Cantarutti, R., Tighe, R., Schurter, P., van der Bliek, N.,          2010PASP..122.1483T
-             Martinez, M., & Mondaca, E.                                                                            
-             PASP 122, 1483, 2010                                                                                   
-Tok2014a     Tokovinin, A., Mason, B.D., & Hartkopf, W.I.                                        2014AJ....147..123T
-             AJ 147, 123, 2014                 (some measures corrected in Tok2017b)             2017AJ....154..110T
-Tok2016a     Tokovinin, A., Mason, B.D., Hartkopf, W.I., Mendez, R.A., & Horch, E.P.             2016AJ....151..153T
-             AJ 151, 153, 2016                 (some measures corrected in Tok2017b)             2017AJ....154..110T
-Tok2019c     Tokovinin, A., Mason, B.D., Mendez, R.A., Horch, E.P. & Briceno, C.                 2019AJ....158...48T
-             AJ 158, 48, 2019                                                                                       
-UC_2013b     Hartkopf, W.I., Mason, B.D., Finch, C.T., Zacharias, N., Wycoff, G.L., & Hsu, D.    2013AJ....146...76H
-             AJ 146, 76, 2013                  (UC 301 - 5058)                                                      
-             (Relative astrometry is derived from individual measurements, not precessed means.                     
-             UCAC aperture magnitudes are listed, unless the duplicity flag indicates a blended                     
-             image (a flag value of 30 or higher). Model fit magnitudes are given for both                          
-             components if either has such a flag. Model fit magnitudes are indicated by the                        
-             letter "f" following the filter information.                                                           
-             APASS photometry extracted from UCAC4 catalog is listed under reference AAV2012.                       
-             Due to aperture method used, APASS photometry is only included for pairs wider                         
-             than 10" (Henden, private comm.) Photometry for pairs wider than 10" which showed                      
-             identical values for both components in all filters were removed, as well.                             
-Vou1955      Voute, J.G.                                                                         1955JO.....38..109V
-             J. Obs. 38, 109, 1955             (a few errata noted in Vou1956)                                      
-
-------------------------------------------------------------------------------------------------------------------------
-
