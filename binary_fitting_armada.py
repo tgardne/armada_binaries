@@ -23,7 +23,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib as mpl
 from tqdm import tqdm
 from matplotlib.patches import Ellipse
-from ellipse_fitting import ellipse_bound,ellipse_fitting
+from ellipse_fitting import ellipse_bound,ellipse_fitting,ellipse_hull_fit
 
 ######################################################################
 ## DEFINE FITTING FUNCTIONS
@@ -114,6 +114,49 @@ def combined_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,u_coord,v_coord,uc
     diff = np.array(diff)
     return diff
 
+## function for bootstrap
+def bootstrap_data(params,t3,t3err,vp,vperr,v2,v2err,ucc,vcc,uc,vc,wl):
+    ra_results=[]
+    dec_results=[]
+
+    for i in tqdm(np.arange(1000)):
+    
+        r = np.random.randint(t3.shape[0],size=len(t3))
+        t3phi_boot = t3[r,:]
+        t3phierr_boot = t3err[r,:]
+        u_coords_boot = ucc[r,:]
+        v_coords_boot = vcc[r,:]
+
+        visphi_boot = vp[r,:]
+        visphierr_boot = vperr[r,:]
+        ucoords_boot = uc[r,:]
+        vcoords_boot = vc[r,:]
+
+        vis2_boot = v2[r,:]
+        vis2err_boot = v2err[r,:]
+    
+        t3phi_boot = t3phi_boot.reshape(int(t3phi_boot.shape[0])*int(t3phi_boot.shape[1]),t3phi_boot.shape[2])
+        t3phierr_boot = t3phierr_boot.reshape(int(t3phierr_boot.shape[0])*int(t3phierr_boot.shape[1]),t3phierr_boot.shape[2])
+        u_coords_boot = u_coords_boot.reshape(int(u_coords_boot.shape[0])*int(u_coords_boot.shape[1]),u_coords_boot.shape[2])
+        v_coords_boot = v_coords_boot.reshape(int(v_coords_boot.shape[0])*int(v_coords_boot.shape[1]),v_coords_boot.shape[2])
+        visphi_boot = visphi_boot.reshape(int(visphi_boot.shape[0])*int(visphi_boot.shape[1]),visphi_boot.shape[2])
+        visphierr_boot = visphierr_boot.reshape(int(visphierr_boot.shape[0])*int(visphierr_boot.shape[1]),visphierr_boot.shape[2])
+        ucoords_boot = ucoords_boot.reshape(int(ucoords_boot.shape[0])*int(ucoords_boot.shape[1]))
+        vcoords_boot = vcoords_boot.reshape(int(vcoords_boot.shape[0])*int(vcoords_boot.shape[1]))
+        vis2_boot = vis2_boot.reshape(int(vis2_boot.shape[0])*int(vis2_boot.shape[1]),vis2_boot.shape[2])
+        vis2err_boot = vis2err_boot.reshape(int(vis2err_boot.shape[0])*int(vis2err_boot.shape[1]),vis2err_boot.shape[2])
+
+        #do fit, minimizer uses LM for least square fitting of model to data
+        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_boot,t3phierr_boot,visphi_boot,visphierr_boot,vis2_boot,vis2err_boot,u_coords_boot,v_coords_boot,ucoords_boot,vcoords_boot,wl),
+                           nan_policy='omit')
+        result = minner.minimize()
+
+        ra_results.append(result.params['ra'].value)
+        dec_results.append(result.params['dec'].value)
+    ra_results=np.array(ra_results)
+    dec_results=np.array(dec_results)
+    return ra_results,dec_results
+
 ######################################################################
 ## LOAD DATA
 ######################################################################
@@ -135,8 +178,8 @@ exclude = input('exclude a telescope (e.g. E1): ')
 
 reduction_params = input('ncoh int_time (notes): ').split(' ')
 flag = input('fit to: vis2,cphase,dphase (separate with spaces): ').split(' ')
-#absolute = input('use absolute phase value (y/n)?')
-absolute='n'
+absolute = input('use absolute phase value (y/n)?')
+#absolute='n'
 
 ## check directory exists for save files
 save_dir="/Users/tgardne/ARMADA_epochs/%s/"%target_id
@@ -457,87 +500,143 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
     pdf.savefig()
     plt.close()
 
-##########################################################
-## Now do error ellipses
-print('Computing error ellipses')
-size = 0.5
-steps = 100
-ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
-dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
+###########################################################
+### Now do error ellipses
+#print('Computing error ellipses')
+#size = 0.5
+#steps = 100
+#ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
+#dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
+#
+#chi_sq = []
+#ra_results = []
+#dec_results = []
+#
+### draw plot
+#if plot_grid=='y':
+#    fig = plt.figure()
+#    ax = fig.add_subplot(111)
+#    plt.ion()
+#    plt.show()
+#for ra_try in tqdm(ra_grid):
+#    for dec_try in dec_grid:
+#
+#        #create a set of Parameters
+#        params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
+#
+#        #do fit, minimizer uses LM for least square fitting of model to data
+#        chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+#        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+#
+#        chi_sq.append(red_chi2)
+#        ra_results.append(ra_try)
+#        dec_results.append(dec_try)
+#    if plot_grid=='y':
+#        ax.cla()
+#        ax.set_xlim(min(ra_grid),max(ra_grid))
+#        ax.set_ylim(min(dec_grid),max(dec_grid))
+#        ax.set_xlabel('d_RA (mas)')
+#        ax.set_ylabel('d_DE (mas)')
+#        ax.scatter(ra_results,dec_results,c=chi_sq,cmap=cm.inferno_r)
+#        ax.invert_xaxis()
+#        #plt.colorbar()
+#        plt.draw()
+#        plt.pause(0.001)
+#if plot_grid=='y':
+#    plt.show()
+#    plt.close()
+#
+#ra_results = np.array(ra_results)
+#dec_results = np.array(dec_results)
+#chi_sq = np.array(chi_sq)
+#
+## write results
+##report_fit(result)
+#index = np.argmin(chi_sq)
+#
+#print('-----RESULTS-------')
+#print('ra12 = %s'%ra_results[index])
+#print('dec12 = %s'%dec_results[index])
+#print('redchi12 = %s'%chi_sq[index])
+#print('-------------------')
+#
+### plot chisq surface grid
+#plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
+#plt.colorbar()
+#plt.xlabel('d_RA (mas)')
+#plt.ylabel('d_DE (mas)')
+#plt.gca().invert_xaxis()
+#plt.axis('equal')
+#plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chisq.pdf"%(target_id,target_id,date))
+#plt.close()
+#
+### isolate region where delta_chisq < 1
+#index_err = np.where(chi_sq < (chi_sq[index]+1) )
+#chi_err = chi_sq[index_err]
+#ra_err = ra_results[index_err]
+#dec_err = dec_results[index_err]
+#
+### fit an ellipse to the data
+#a,b,angle = ellipse_fitting(ra_err,dec_err)
+#angle = angle*180/np.pi
+#ra_mean = np.mean(ra_err)
+#dec_mean = np.mean(dec_err)
+#
+### want to measure east of north (different than python)
+#angle_new = 90-angle
+#if angle_new<0:
+#    angle_new=360+angle_new
+#ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
+#
+#ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
+#plt.gca().add_patch(ell)
+#plt.scatter(ra_err, dec_err, c=chi_err, cmap=cm.inferno_r,zorder=2)
+#plt.colorbar()
+#plt.title('a,b,thet=%s'%ellipse_params)
+#plt.xlabel('d_RA (mas)')
+#plt.ylabel('d_DE (mas)')
+#plt.gca().invert_xaxis()
+#plt.axis('equal')
+#plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse.pdf"%(target_id,target_id,date))
+#plt.close()
 
-chi_sq = []
-ra_results = []
-dec_results = []
+#####################
+## Split data by time
+#####################
+print('Shape of t3phi = ',t3phi.shape)
+print('Shape of vis2 = ',vis2.shape)
+num = 20
+num2 = 15
+t3phi = t3phi.reshape(int(len(t3phi)/num),num,len(t3phi[0]))
+t3phierr = t3phierr.reshape(int(len(t3phierr)/num),num,len(t3phierr[0]))
+vis2 = vis2.reshape(int(len(vis2)/num2),num2,len(vis2[0]))
+vis2err = vis2err.reshape(int(len(vis2err)/num2),num2,len(vis2err[0]))
+visphi_new = visphi.reshape(int(len(visphi)/num2),num2,len(visphi[0]))
+visphierr = visphierr.reshape(int(len(visphierr)/num2),num2,len(visphierr[0]))
+tels = tels.reshape(int(len(tels)/num),num,len(tels[0]))
+vistels = vistels.reshape(int(len(vistels)/num2),num2,len(vistels[0]))
+u_coords = u_coords.reshape(int(len(u_coords)/num),num,len(u_coords[0]))
+v_coords = v_coords.reshape(int(len(v_coords)/num),num,len(v_coords[0]))
+ucoords = ucoords.reshape(int(len(ucoords)/num2),num2,1)
+vcoords = vcoords.reshape(int(len(vcoords)/num2),num2,1)
+print('New shape of t3phi = ',t3phi.shape)
+print('New shape of vis2 = ',vis2.shape)
 
-## draw plot
-if plot_grid=='y':
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    plt.ion()
-    plt.show()
-for ra_try in tqdm(ra_grid):
-    for dec_try in dec_grid:
+params = Parameters()
+params.add('ra',   value= ra_best)
+params.add('dec', value= dec_best)
+params.add('ratio', value= ratio_best, min=1.0)
+params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=2.0)
+params.add('ud2', value= ud2_best, vary=False)#min=0.0,max=2.0)
+params.add('bw', value=bw_best, vary=False)#min=0.0, max=0.1)
 
-        #create a set of Parameters
-        params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
+print('Bootstrap ALL data')
+ra_boot,dec_boot = bootstrap_data(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
 
-        #do fit, minimizer uses LM for least square fitting of model to data
-        chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
-
-        chi_sq.append(red_chi2)
-        ra_results.append(ra_try)
-        dec_results.append(dec_try)
-    if plot_grid=='y':
-        ax.cla()
-        ax.set_xlim(min(ra_grid),max(ra_grid))
-        ax.set_ylim(min(dec_grid),max(dec_grid))
-        ax.set_xlabel('d_RA (mas)')
-        ax.set_ylabel('d_DE (mas)')
-        ax.scatter(ra_results,dec_results,c=chi_sq,cmap=cm.inferno_r)
-        ax.invert_xaxis()
-        #plt.colorbar()
-        plt.draw()
-        plt.pause(0.001)
-if plot_grid=='y':
-    plt.show()
-    plt.close()
-
-ra_results = np.array(ra_results)
-dec_results = np.array(dec_results)
-chi_sq = np.array(chi_sq)
-
-# write results
-#report_fit(result)
-index = np.argmin(chi_sq)
-
-print('-----RESULTS-------')
-print('ra12 = %s'%ra_results[index])
-print('dec12 = %s'%dec_results[index])
-print('redchi12 = %s'%chi_sq[index])
-print('-------------------')
-
-## plot chisq surface grid
-plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
-plt.colorbar()
-plt.xlabel('d_RA (mas)')
-plt.ylabel('d_DE (mas)')
-plt.gca().invert_xaxis()
-plt.axis('equal')
-plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chisq.pdf"%(target_id,target_id,date))
-plt.close()
-
-## isolate region where delta_chisq < 1
-index_err = np.where(chi_sq < (chi_sq[index]+1) )
-chi_err = chi_sq[index_err]
-ra_err = ra_results[index_err]
-dec_err = dec_results[index_err]
-
-## fit an ellipse to the data
-a,b,angle = ellipse_fitting(ra_err,dec_err)
-angle = angle*180/np.pi
-ra_mean = np.mean(ra_err)
-dec_mean = np.mean(dec_err)
+ra_mean = np.mean(ra_boot)
+dec_mean = np.mean(dec_boot)
+a,b,theta = ellipse_hull_fit(ra_boot,dec_boot,ra_mean,dec_mean)
+angle = theta*180/np.pi
 
 ## want to measure east of north (different than python)
 angle_new = 90-angle
@@ -547,14 +646,13 @@ ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
 
 ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
 plt.gca().add_patch(ell)
-plt.scatter(ra_err, dec_err, c=chi_err, cmap=cm.inferno_r,zorder=2)
-plt.colorbar()
+plt.scatter(ra_boot, dec_boot, zorder=2)
 plt.title('a,b,thet=%s'%ellipse_params)
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.gca().invert_xaxis()
 plt.axis('equal')
-plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse.pdf"%(target_id,target_id,date))
+plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse_boot.pdf"%(target_id,target_id,date))
 plt.close()
 
 ## write results to a txt file

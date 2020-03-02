@@ -8,6 +8,7 @@
 
 import numpy as np
 from lmfit import minimize, Minimizer, Parameters, Parameter, report_fit
+from scipy.spatial import ConvexHull, convex_hull_plot_2d
     
 def ellipse_bound(params,x,y):
     a = params['a']
@@ -23,8 +24,8 @@ def ellipse_fitting(x,y):
 
     ## Do a chi2 fit
     params = Parameters()
-    params.add('a',   value = 0.02, min=0)
-    params.add('b',   value = 0.01, min=0)
+    params.add('a',   value = 0.02, min=0, max=1)
+    params.add('b',   value = 0.01, min=0, max=1)
     params.add('theta', value = 1, min=0, max=2*np.pi)
     
     minner = Minimizer(ellipse_bound, params, fcn_args=(x,y))
@@ -36,3 +37,21 @@ def ellipse_fitting(x,y):
     theta_best = result.params['theta'].value
     
     return a_best,b_best,theta_best
+
+def ellipse_hull_fit(x,y,xmean,ymean):
+
+    data_test = []
+    for x,y in zip(x,y):
+        data_test.append([x,y])
+    data_test = np.array(data_test)
+
+    hull = ConvexHull(data_test)
+    N=len(data_test[hull.vertices,0])
+    x = data_test[hull.vertices,0] - xmean
+    y = data_test[hull.vertices,1] - ymean
+    U, S, V = np.linalg.svd(np.stack((x, y)))
+    a,b = S/2
+    angle = np.arctan2(U[0][1],U[0][0])
+    if angle<0:
+        angle = angle+np.pi
+    return a,b,angle

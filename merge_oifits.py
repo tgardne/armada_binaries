@@ -35,10 +35,15 @@ for file in os.listdir(dir):
         if str(target_id)==str(obj):
             filelist.append(filename)
 
-## merge the files - using John's IDL routine
-outfile = os.path.join(dir2, '%s_%s.fits'%(target_id,date))
-infiles = filelist
+### merge the files - using John's IDL routine
+#outfile = os.path.join(dir2, '%s_%s.fits'%(target_id,date))
+#infiles = filelist
+#
+#idl = pidly.IDL('idl /Users/tgardne/mirc6b_idl_startup.pro')
+#idl.pro('merge_oidata',outfile=outfile,infiles=infiles)
+#idl.close()
 
-idl = pidly.IDL('idl /Users/tgardne/mirc6b_idl_startup.pro')
-idl.pro('merge_oidata',outfile=outfile,infiles=infiles)
-idl.close()
+## merge the files - using John Young C tools
+info_list = ['oifits-merge','%s/%s_%s.fits'%(dir2,target_id,date)]+filelist
+print(' '.join(info_list))
+os.system(' '.join(info_list))
