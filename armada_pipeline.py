@@ -161,7 +161,20 @@ if flip=='y':
 ###########################################
 ## Get an estimate of the orbital parameters
 ###########################################
-a,P,e,inc,omega,bigomega,T = read_orb6(target,path_orb6)
+try:
+    a,P,e,inc,omega,bigomega,T = read_orb6(target,path_orb6)
+except:
+    print('No elements found in ORB6')
+    
+self_params = input('Input own params?')
+if self_params=='y':
+    a = float(input('a (mas): '))
+    P = float(input('P (year): '))*365.25
+    e = float(input('ecc : '))
+    inc = float(input('inc (deg): '))*np.pi/180
+    omega = float(input('omega (deg): '))*np.pi/180
+    bigomega = float(input('bigomega (deg): '))*np.pi/180
+    T = float(input('T (mjd): '))
 
 ###########################################
 ## Combined WDS+ARMADA for fitting
