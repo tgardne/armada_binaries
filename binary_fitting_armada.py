@@ -23,7 +23,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib as mpl
 from tqdm import tqdm
 from matplotlib.patches import Ellipse
-from ellipse_fitting import ellipse_bound,ellipse_fitting,ellipse_hull_fit,ellipse_fitting2
+from ellipse_fitting import ellipse_bound,ellipse_fitting,ellipse_hull_fit
 
 ######################################################################
 ## DEFINE FITTING FUNCTIONS
