@@ -50,7 +50,7 @@ def ellipse_hull_fit(x,y,xmean,ymean):
     x = data_test[hull.vertices,0] - xmean
     y = data_test[hull.vertices,1] - ymean
     U, S, V = np.linalg.svd(np.stack((x, y)))
-    a,b = S/2
+    a,b = S*np.sqrt(2/N)
     angle = np.arctan2(U[0][1],U[0][0])
     if angle<0:
         angle = angle+np.pi

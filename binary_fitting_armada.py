@@ -23,7 +23,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib as mpl
 from tqdm import tqdm
 from matplotlib.patches import Ellipse
-from ellipse_fitting import ellipse_bound,ellipse_fitting,ellipse_hull_fit
+from ellipse_fitting import ellipse_bound,ellipse_fitting,ellipse_hull_fit,ellipse_fitting2
 
 ######################################################################
 ## DEFINE FITTING FUNCTIONS
@@ -243,11 +243,17 @@ pa_value=float(input('PA start (deg):'))
 grid_size = float(input('search grid size (mas): '))
 steps = int(input('steps in grid: '))
 a3 = float(input('flux ratio (f1/f2): '))
-a4 = float(input('UD1 (mas): '))
-a5 = float(input('UD2 (mas): '))
-a6 = float(input('bw smearing (1/R): '))
+
+#a4 = float(input('UD1 (mas): '))
+#a5 = float(input('UD2 (mas): '))
+#a6 = float(input('bw smearing (1/R): '))
+a4 = 0.5
+a5 = 0.5
+a6 = 0.005
+
 vary_ratio = input('vary fratio on grid? (y/n) ')
 plot_grid = input('plot grid (y/n)? ')
+bootstrap_errors = input('bootstrap errors? (y/n) ')
 
 dra = -sep_value*np.cos((90+pa_value)*np.pi/180)
 ddec = sep_value*np.sin((90+pa_value)*np.pi/180)
@@ -526,159 +532,165 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
     plt.close()
 
 ###########################################################
-### Now do error ellipses
-#print('Computing error ellipses')
-#size = 0.5
-#steps = 100
-#ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
-#dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
-#
-#chi_sq = []
-#ra_results = []
-#dec_results = []
-#
-### draw plot
-#if plot_grid=='y':
-#    fig = plt.figure()
-#    ax = fig.add_subplot(111)
-#    plt.ion()
-#    plt.show()
-#for ra_try in tqdm(ra_grid):
-#    for dec_try in dec_grid:
-#
-#        #create a set of Parameters
-#        params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
-#
-#        #do fit, minimizer uses LM for least square fitting of model to data
-#        chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-#        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
-#
-#        chi_sq.append(red_chi2)
-#        ra_results.append(ra_try)
-#        dec_results.append(dec_try)
-#    if plot_grid=='y':
-#        ax.cla()
-#        ax.set_xlim(min(ra_grid),max(ra_grid))
-#        ax.set_ylim(min(dec_grid),max(dec_grid))
-#        ax.set_xlabel('d_RA (mas)')
-#        ax.set_ylabel('d_DE (mas)')
-#        ax.scatter(ra_results,dec_results,c=chi_sq,cmap=cm.inferno_r)
-#        ax.invert_xaxis()
-#        #plt.colorbar()
-#        plt.draw()
-#        plt.pause(0.001)
-#if plot_grid=='y':
-#    plt.show()
-#    plt.close()
-#
-#ra_results = np.array(ra_results)
-#dec_results = np.array(dec_results)
-#chi_sq = np.array(chi_sq)
-#
-## write results
-##report_fit(result)
-#index = np.argmin(chi_sq)
-#
-#print('-----RESULTS-------')
-#print('ra12 = %s'%ra_results[index])
-#print('dec12 = %s'%dec_results[index])
-#print('redchi12 = %s'%chi_sq[index])
-#print('-------------------')
-#
-### plot chisq surface grid
-#plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
-#plt.colorbar()
-#plt.xlabel('d_RA (mas)')
-#plt.ylabel('d_DE (mas)')
-#plt.gca().invert_xaxis()
-#plt.axis('equal')
-#plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chisq.pdf"%(target_id,target_id,date))
-#plt.close()
-#
-### isolate region where delta_chisq < 1
-#index_err = np.where(chi_sq < (chi_sq[index]+1) )
-#chi_err = chi_sq[index_err]
-#ra_err = ra_results[index_err]
-#dec_err = dec_results[index_err]
-#
-### fit an ellipse to the data
-#a,b,angle = ellipse_fitting(ra_err,dec_err)
-#angle = angle*180/np.pi
-#ra_mean = np.mean(ra_err)
-#dec_mean = np.mean(dec_err)
-#
-### want to measure east of north (different than python)
-#angle_new = 90-angle
-#if angle_new<0:
-#    angle_new=360+angle_new
-#ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
-#
-#ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
-#plt.gca().add_patch(ell)
-#plt.scatter(ra_err, dec_err, c=chi_err, cmap=cm.inferno_r,zorder=2)
-#plt.colorbar()
-#plt.title('a,b,thet=%s'%ellipse_params)
-#plt.xlabel('d_RA (mas)')
-#plt.ylabel('d_DE (mas)')
-#plt.gca().invert_xaxis()
-#plt.axis('equal')
-#plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse.pdf"%(target_id,target_id,date))
-#plt.close()
+### Now do errors
+###########################################################
+if bootstrap_errors == 'y':
+    #####################
+    ## Split data by time
+    #####################
+    print('Computing errors with BOOTSTRAP')
+    print('Shape of t3phi = ',t3phi.shape)
+    print('Shape of vis2 = ',vis2.shape)
+    num = 20
+    num2 = 15
+    t3phi = t3phi.reshape(int(len(t3phi)/num),num,len(t3phi[0]))
+    t3phierr = t3phierr.reshape(int(len(t3phierr)/num),num,len(t3phierr[0]))
+    vis2 = vis2.reshape(int(len(vis2)/num2),num2,len(vis2[0]))
+    vis2err = vis2err.reshape(int(len(vis2err)/num2),num2,len(vis2err[0]))
+    visphi_new = visphi_new.reshape(int(len(visphi_new)/num2),num2,len(visphi_new[0]))
+    visphierr = visphierr.reshape(int(len(visphierr)/num2),num2,len(visphierr[0]))
+    tels = tels.reshape(int(len(tels)/num),num,len(tels[0]))
+    vistels = vistels.reshape(int(len(vistels)/num2),num2,len(vistels[0]))
+    u_coords = u_coords.reshape(int(len(u_coords)/num),num,len(u_coords[0]))
+    v_coords = v_coords.reshape(int(len(v_coords)/num),num,len(v_coords[0]))
+    ucoords = ucoords.reshape(int(len(ucoords)/num2),num2,1)
+    vcoords = vcoords.reshape(int(len(vcoords)/num2),num2,1)
+    print('New shape of t3phi = ',t3phi.shape)
+    print('New shape of vis2 = ',vis2.shape)
 
-#####################
-## Split data by time
-#####################
-print('Shape of t3phi = ',t3phi.shape)
-print('Shape of vis2 = ',vis2.shape)
-num = 20
-num2 = 15
-t3phi = t3phi.reshape(int(len(t3phi)/num),num,len(t3phi[0]))
-t3phierr = t3phierr.reshape(int(len(t3phierr)/num),num,len(t3phierr[0]))
-vis2 = vis2.reshape(int(len(vis2)/num2),num2,len(vis2[0]))
-vis2err = vis2err.reshape(int(len(vis2err)/num2),num2,len(vis2err[0]))
-visphi_new = visphi_new.reshape(int(len(visphi_new)/num2),num2,len(visphi_new[0]))
-visphierr = visphierr.reshape(int(len(visphierr)/num2),num2,len(visphierr[0]))
-tels = tels.reshape(int(len(tels)/num),num,len(tels[0]))
-vistels = vistels.reshape(int(len(vistels)/num2),num2,len(vistels[0]))
-u_coords = u_coords.reshape(int(len(u_coords)/num),num,len(u_coords[0]))
-v_coords = v_coords.reshape(int(len(v_coords)/num),num,len(v_coords[0]))
-ucoords = ucoords.reshape(int(len(ucoords)/num2),num2,1)
-vcoords = vcoords.reshape(int(len(vcoords)/num2),num2,1)
-print('New shape of t3phi = ',t3phi.shape)
-print('New shape of vis2 = ',vis2.shape)
+    params = Parameters()
+    params.add('ra',   value= ra_best)
+    params.add('dec', value= dec_best)
+    params.add('ratio', value= ratio_best, min=1.0)
+    params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=2.0)
+    params.add('ud2', value= ud2_best, vary=False)#min=0.0,max=2.0)
+    params.add('bw', value=bw_best, vary=False)#min=0.0, max=0.1)
 
-params = Parameters()
-params.add('ra',   value= ra_best)
-params.add('dec', value= dec_best)
-params.add('ratio', value= ratio_best, min=1.0)
-params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=2.0)
-params.add('ud2', value= ud2_best, vary=False)#min=0.0,max=2.0)
-params.add('bw', value=bw_best, vary=False)#min=0.0, max=0.1)
+    ra_boot,dec_boot = bootstrap_data(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
 
-print('Bootstrap ALL data')
-ra_boot,dec_boot = bootstrap_data(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+    ra_mean = np.mean(ra_boot)
+    dec_mean = np.mean(dec_boot)
+    a,b,theta = ellipse_hull_fit(ra_boot,dec_boot,ra_mean,dec_mean)
+    angle = theta*180/np.pi
 
-ra_mean = np.mean(ra_boot)
-dec_mean = np.mean(dec_boot)
-a,b,theta = ellipse_hull_fit(ra_boot,dec_boot,ra_mean,dec_mean)
-angle = theta*180/np.pi
+    ## want to measure east of north (different than python)
+    angle_new = 90-angle
+    if angle_new<0:
+        angle_new=360+angle_new
+    ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
 
-## want to measure east of north (different than python)
-angle_new = 90-angle
-if angle_new<0:
-    angle_new=360+angle_new
-ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
+    ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
+    plt.gca().add_patch(ell)
+    plt.scatter(ra_boot, dec_boot, zorder=2)
+    plt.title('a,b,thet=%s'%ellipse_params)
+    plt.xlabel('d_RA (mas)')
+    plt.ylabel('d_DE (mas)')
+    plt.gca().invert_xaxis()
+    plt.axis('equal')
+    plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse_boot.pdf"%(target_id,target_id,date))
+    plt.close()
 
-ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
-plt.gca().add_patch(ell)
-plt.scatter(ra_boot, dec_boot, zorder=2)
-plt.title('a,b,thet=%s'%ellipse_params)
-plt.xlabel('d_RA (mas)')
-plt.ylabel('d_DE (mas)')
-plt.gca().invert_xaxis()
-plt.axis('equal')
-plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse_boot.pdf"%(target_id,target_id,date))
-plt.close()
+else:
+    print('Computing errors from CHI2 SURFACE')
+    size = 0.5
+    steps = 100
+    ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
+    dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
+
+    chi_sq = []
+    ra_results = []
+    dec_results = []
+
+    ## draw plot
+    if plot_grid=='y':
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        plt.ion()
+        plt.show()
+    for ra_try in tqdm(ra_grid):
+        for dec_try in dec_grid:
+
+            #create a set of Parameters
+            params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
+
+            #do fit, minimizer uses LM for least square fitting of model to data
+            chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+            red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+
+            chi_sq.append(red_chi2)
+            ra_results.append(ra_try)
+            dec_results.append(dec_try)
+        if plot_grid=='y':
+            ax.cla()
+            ax.set_xlim(min(ra_grid),max(ra_grid))
+            ax.set_ylim(min(dec_grid),max(dec_grid))
+            ax.set_xlabel('d_RA (mas)')
+            ax.set_ylabel('d_DE (mas)')
+            ax.scatter(ra_results,dec_results,c=chi_sq,cmap=cm.inferno_r)
+            ax.invert_xaxis()
+            #plt.colorbar()
+            plt.draw()
+            plt.pause(0.001)
+    if plot_grid=='y':
+        plt.show()
+        plt.close()
+
+    ra_results = np.array(ra_results)
+    dec_results = np.array(dec_results)
+    chi_sq = np.array(chi_sq)
+
+    # write results
+    #report_fit(result)
+    index = np.argmin(chi_sq)
+
+    print('-----RESULTS-------')
+    print('ra12 = %s'%ra_results[index])
+    print('dec12 = %s'%dec_results[index])
+    print('redchi12 = %s'%chi_sq[index])
+    print('-------------------')
+
+    ## plot chisq surface grid
+    plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
+    plt.colorbar()
+    plt.xlabel('d_RA (mas)')
+    plt.ylabel('d_DE (mas)')
+    plt.gca().invert_xaxis()
+    plt.axis('equal')
+    plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chisq.pdf"%(target_id,target_id,date))
+    plt.close()
+
+    ## isolate region where delta_chisq < 1
+    index_err = np.where(chi_sq < (chi_sq[index]+1) )
+    chi_err = chi_sq[index_err]
+    ra_err = ra_results[index_err]
+    dec_err = dec_results[index_err]
+    ## save arrays
+    #np.save('ra_err',ra_err)
+    #np.save('dec_err',dec_err)
+
+    ## fit an ellipse to the data
+    ra_mean = np.mean(ra_err)
+    dec_mean = np.mean(dec_err)
+    a,b,theta = ellipse_hull_fit(ra_err,dec_err,ra_mean,dec_mean)
+    angle = theta*180/np.pi
+
+    ## want to measure east of north (different than python)
+    angle_new = 90-angle
+    if angle_new<0:
+        angle_new=360+angle_new
+    ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
+
+    ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
+    plt.gca().add_patch(ell)
+    plt.scatter(ra_err, dec_err, c=chi_err, cmap=cm.inferno_r,zorder=2)
+    plt.colorbar()
+    plt.title('a,b,thet=%s'%ellipse_params)
+    plt.xlabel('d_RA (mas)')
+    plt.ylabel('d_DE (mas)')
+    plt.gca().invert_xaxis()
+    plt.axis('equal')
+    plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse.pdf"%(target_id,target_id,date))
+    plt.close()
 
 ## write results to a txt file
 t = np.around(np.nanmedian(time_obs),4)
