@@ -30,10 +30,10 @@ def read_data(file,weight):
             error_maj.append(float(line.split()[4]))
             error_min.append(float(line.split()[5]))
             epa = float(line.split()[6])
-            if epa>0:
-                epa=90-epa
-            else:
-                epa=abs(epa)+90
+            #if epa>0:
+            #    epa=90-epa
+            #else:
+            #    epa=abs(epa)+90
             error_pa.append(epa)
     file.close()
     degrees=np.array(degrees)

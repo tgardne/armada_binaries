@@ -193,6 +193,31 @@ if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
 ########################################################
 
+## Split spectrum in half
+#side = input('red or blue? ')
+#if side=='blue':
+#    idx = int(eff_wave.shape[-1]/2)
+#    eff_wave = eff_wave[:,:idx]
+#    t3phi = t3phi[:,:idx]
+#    t3phierr = t3phierr[:,:idx]
+#    vis2 = vis2[:,:idx]
+#    vis2err = vis2err[:,:idx]
+#    visphi = visphi[:,:idx]
+#    visphierr = visphierr[:,:idx]
+#    visamp = visamp[:,:idx]
+#    visamperr = visamperr[:,:idx]
+#if side=='red':
+#    idx = int(eff_wave.shape[-1]/2)
+#    eff_wave = eff_wave[:,idx:]
+#    t3phi = t3phi[:,idx:]
+#    t3phierr = t3phierr[:,idx:]
+#    vis2 = vis2[:,idx:]
+#    vis2err = vis2err[:,idx:]
+#    visphi = visphi[:,idx:]
+#    visphierr = visphierr[:,idx:]
+#    visamp = visamp[:,idx:]
+#    visamperr = visamperr[:,idx:]
+
 ## do polynomial dispersion fit for each visphi measurement
 dispersion=[]
 for vis in visphi:
@@ -216,7 +241,7 @@ visphi_new = visphi-dispersion
 sep_value=float(input('sep start (mas):'))
 pa_value=float(input('PA start (deg):'))
 grid_size = float(input('search grid size (mas): '))
-steps = float(input('steps in grid: '))
+steps = int(input('steps in grid: '))
 a3 = float(input('flux ratio (f1/f2): '))
 a4 = float(input('UD1 (mas): '))
 a5 = float(input('UD2 (mas): '))
@@ -427,7 +452,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
             x=eff_wave[0]
             axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
             axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
-            axs[int(ind)].set_title(tri)
+            axs[int(ind)].set_title(str(tri))
 
         fig.suptitle('%s Closure Phase'%target_id)
         fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
@@ -454,7 +479,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
             x=eff_wave[0]
             axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
             axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
-            axs[int(ind)].set_title(tri)
+            axs[int(ind)].set_title(str(tri))
 
         fig.suptitle('%s VisPhi'%target_id)
         fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
@@ -481,7 +506,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
             x=eff_wave[0]
             axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
             axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
-            axs[int(ind)].set_title(tri)
+            axs[int(ind)].set_title(str(tri))
 
         fig.suptitle('%s Vis2'%target_id)
         fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')

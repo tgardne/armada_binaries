@@ -19,6 +19,7 @@ from read_data import read_data,read_wds,read_orb6
 from astrometry_model import astrometry_model,triple_model,lnlike,lnprior,lnpost,create_init
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
+from astropy.coordinates import SkyCoord
 
 ###########################################
 ## SETUP PATHS
@@ -45,6 +46,8 @@ target_hd = input('Target HD #: ')
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
+corrected = input('Corrected PA? (y/n)')
+
 query = Simbad.query_objectids('HD %s'%target_hd)
 for item in query:
     if 'HIP' in item[0]:
@@ -58,11 +61,22 @@ for item in query:
 ###########################################
 ## Read in ARMADA data
 ###########################################
-file=open('%s/HD_%s.txt'%(path,target_hd))
+if corrected == 'y':
+    print('reading corrected PAs')
+    file=open('%s/HD_%s_uvfix.txt'%(path,target_hd))
+else:
+    print('reading non-corrected PAs')
+    file=open('%s/HD_%s.txt'%(path,target_hd))
 weight=1
 
 t,p,theta,error_maj,error_min,error_pa,error_deg = read_data(file,weight)
 file.close()
+
+### correct PAs based on precession
+coord = SkyCoord.from_name("HD %s"%target_hd,parse=True)
+ra = coord.ra.value*np.pi/180
+dec = coord.dec.value*np.pi/180
+#theta -= (0.00557*np.sin(ra)/np.cos(dec)*((t-51544.5)/365.25))/180*np.pi
 
 #idx = np.where(t>58362)
 #t = t[idx]
@@ -92,6 +106,8 @@ f_etalon=np.array(f_etalon)
 etalon_factor=[]
 for i in t:
     idx = np.where(abs(i-mjd_etalon)==min(abs(i-mjd_etalon)))
+    if min(abs(i-mjd_etalon))>0.5:
+        print('Closest factor for %s is %s days away'%(i,min(abs(i-mjd_etalon))))
     f = f_etalon[idx][0]
     etalon_factor.append(f)
 etalon_factor=np.array(etalon_factor)
@@ -120,6 +136,9 @@ dtype = 'S'
 
 t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_wds(file,weight,dtype)
 print('Number of WDS data points = %s'%len(p_wds))
+
+## correct WDS for PA
+theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
 
 xpos_wds=p_wds*np.sin(theta_wds)
 ypos_wds=p_wds*np.cos(theta_wds)
@@ -199,18 +218,7 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
     # write error report
     print(report_fit(result))
 
-    resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
-                                 error_min,error_pa)
-    ndata_armada = 2*sum(~np.isnan(xpos))
-    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
-    print('-'*10)
-    print('chi2 armada = %s'%chi2_armada)
-    print('-'*10)
-
     ## plot fit
-    scale=1
-    if chi2_armada<1.0:
-        scale=1/np.sqrt(chi2_armada)
     a_start = result.params['a']
     P_start = result.params['P']
     e_start = result.params['e']
@@ -399,7 +407,10 @@ print('-'*10)
 print('chi2 armada = %s'%chi2_armada)
 print('-'*10)
 
-directory='%s/HD%s/'%(path,target_hd)
+if corrected == 'y':
+    directory='%s/HD%s_uvfix/'%(path,target_hd)
+else:
+    directory='%s/HD%s/'%(path,target_hd)
 if not os.path.exists(directory):
     os.makedirs(directory)
 
@@ -435,7 +446,7 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Outer Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s/HD%s_outer_leastsquares.pdf'%(path,target_hd,target_hd))
+plt.savefig('%s/HD%s_outer_leastsquares.pdf'%(directory,target_hd))
 plt.close()
 
 ## plot resids for ARMADA
@@ -456,7 +467,7 @@ ax.set_ylabel('milli-arcsec')
 ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Resids'%target_hd)
-plt.savefig('%s/HD%s/HD%s_resid_leastsquares.pdf'%(path,target_hd,target_hd))
+plt.savefig('%s/HD%s_resid_leastsquares.pdf'%(directory,target_hd))
 plt.close()
 
 ## residuals
@@ -467,7 +478,7 @@ print('Mean residual = %s micro-as'%resids_median)
 print('-'*10)
 
 ## Save txt file with best orbit
-f = open("%s/HD%s/%s_orbit_ls.txt"%(path,target_hd,target_hd),"w+")
+f = open("%s/%s_orbit_ls.txt"%(directory,target_hd),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
 f.write("%s %s %s %s %s %s %s %s"%(P_start.value,a_start.value,e_start.value,
                                    inc_start.value*180/np.pi,w_start.value*180/np.pi,
@@ -475,10 +486,18 @@ f.write("%s %s %s %s %s %s %s %s"%(P_start.value,a_start.value,e_start.value,
                                   resids_median))
 f.close()
 
+## Save txt file with wds orbit
+f = open("%s/%s_wds.txt"%(directory,target_hd),"w+")
+f.write("# date mjd sep pa err_maj err_min err_pa\r\n")
+for i,j,k,l,m,n in zip(t_wds,p_wds,theta_wds*180/np.pi,error_maj_wds,error_min_wds,error_deg_wds):
+    f.write("-- %s %s %s %s %s %s\r\n"%(i,j,k,l,m,n))
+f.write('#')
+f.close()
+
 ##########################################
 ## Grid Search for Additional Companions
 ##########################################
-P2 = np.linspace(1,300,1000)
+P2 = np.linspace(1,500,1000)
 w2 = w_start
 bigw2 = bigw_start
 inc2 = inc_start
@@ -524,15 +543,17 @@ params_inner=np.array(params_inner)
 params_outer=np.array(params_outer)
 chi2 = np.array(chi2)
 
+idx = np.where(chi2==min(chi2))
+period_best = params_inner[:,0][idx]
+
 plt.plot(params_inner[:,0],1/chi2,'o-')
 plt.xlabel('Period (d)')
 plt.ylabel('1/chi2')
-plt.savefig('%s/HD%s/HD%s_chi2_period.pdf'%(path,target_hd,target_hd))
+plt.title('Best Period = %s'%period_best[0])
+plt.savefig('%s/HD%s_chi2_period.pdf'%(directory,target_hd))
 plt.close()
 
-idx = np.where(chi2==min(chi2))
-period_best = params_inner[:,0][idx]
-print('Best inner period = %s'%period_best)
+print('Best inner period = %s'%period_best[0])
 
 ## Do a fit at best period
 params = Parameters()
@@ -548,7 +569,7 @@ params.add('bigw2', value= bigw2, min=0, max=2*np.pi)
 params.add('inc2', value= inc2, min=0, max=2*np.pi)
 params.add('e2', value= 0, vary=False)#0.1, min=0,max=0.99)
 params.add('a2', value= a2, min=0)
-params.add('P2', value= period_best, min=0)
+params.add('P2', value= period_best[0], min=0)
 params.add('T2', value= T2, min=0)
 
 #params.add('pscale', value=1)
@@ -568,7 +589,7 @@ report_fit(result)
 ############################
 ## Grid Search on a/i 
 ############################
-a_grid = np.linspace(0.1,3,50)
+a_grid = np.linspace(0.01,3,50)
 i_grid = np.linspace(0,180,50)
 
 params_inner=[]
@@ -609,9 +630,9 @@ chi2 = np.array(chi2)
 
 a_inner = params_inner[:,1]
 i_inner = params_inner[:,5]
-plt.scatter(a_inner,i_inner,c=chi2,cmap=cm.inferno_r,vmax=min(chi2)*10)
-plt.colorbar(label='reduced $\chi^2$')
+plt.scatter(a_inner,i_inner,c=1/chi2,cmap=cm.inferno)
+plt.colorbar(label='1 / $\chi^2$')
 plt.xlabel('semi-major (mas)')
 plt.ylabel('inclination (deg)')
-plt.savefig('%s/HD%s/HD%s_semi_inc_grid.pdf'%(path,target_hd,target_hd))
+plt.savefig('%s/HD%s_semi_inc_grid.pdf'%(directory,target_hd))
 plt.close()

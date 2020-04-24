@@ -10,7 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 eachindex = lambda lst: range(len(lst))
 import os
-import numpy_indexed as npi
 import matplotlib as mpl
 from astropy.io import fits
 import pidly

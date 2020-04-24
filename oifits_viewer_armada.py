@@ -10,7 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 eachindex = lambda lst: range(len(lst))
 import os
-import numpy_indexed as npi
 import matplotlib as mpl
 from read_oifits import read_chara,read_vlti
 from astropy.io import fits
@@ -60,7 +59,7 @@ for ind in index:
     for y,yerr in zip(t3data,t3errdata):
         x=eff_wave[0]
         axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-')
-    axs[int(ind)].set_title(tels[int(ind)])
+    axs[int(ind)].set_title(str(tels[int(ind)]))
 
 fig.suptitle('%s Closure Phase'%target_id)
 fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
@@ -99,7 +98,7 @@ for ind in index:
         #x=np.sqrt(u**2+v**2)/eff_wave[0]
         x=eff_wave[0]
         axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-')
-    axs[int(ind)].set_title(vistels[int(ind)])
+    axs[int(ind)].set_title(str(vistels[int(ind)]))
 
 fig.suptitle('%s Vis2'%target_id)
 fig.text(0.5, 0.05, 'B/$\lambda$', ha='center')
@@ -138,7 +137,7 @@ for ind in index:
         #x=np.sqrt(u**2+v**2)/eff_wave[0]
         x=eff_wave[0]
         axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-')
-    axs[int(ind)].set_title(vistels[int(ind)])
+    axs[int(ind)].set_title(str(vistels[int(ind)]))
 fig.suptitle('%s Diff Phase'%target_id)
 fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
 fig.text(0.05, 0.5, 'Diff Phase', va='center', rotation='vertical')
