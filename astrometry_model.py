@@ -23,7 +23,7 @@ def astrometry_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
         a= params[4]
         P = params[5]
         T= params[6]
-        #pscale = params[7]
+        mirc_scale = params[7]
     except:
         w = params['w']
         bigw = params['bigw']
@@ -32,7 +32,7 @@ def astrometry_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
         a= params['a']
         P = params['P']
         T= params['T']
-        #pscale=params['pscale']
+        mirc_scale= params['mirc_scale']
 
     #Thiele-Innes elements:
     A=a*(np.cos(bigw)*np.cos(w)-np.sin(bigw)*np.cos(inc)*np.sin(w))
@@ -64,10 +64,10 @@ def astrometry_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     
     model_y=A*X+F*Y
     model_x=B*X+G*Y
-    
-    #idx = np.where(t<57997)
-    #model_y[idx]/=pscale
-    #model_x[idx]/=pscale
+
+    idx = np.where((t<58362) & (t>57997))
+    model_y[idx]/=mirc_scale
+    model_x[idx]/=mirc_scale
     
     major_vector_x=np.sin(error_pa)
     major_vector_y=np.cos(error_pa)
@@ -102,8 +102,8 @@ def triple_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     a2 = params['a2']
     P2 = params['P2']
     T2 = params['T2']
+    mirc_scale = params['mirc_scale']
     #mratio = params['mratio']
-    #pscale = params['pscale']
 
     ###############################################################
     #Thiele-Innes elements for secondary
@@ -167,12 +167,9 @@ def triple_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     model_y = A*X+F*Y + A2*X2+F2*Y2
     model_x = B*X+G*Y + B2*X2+G2*Y2
     
-    #idx = np.where(t<57997)
-    #idx = np.where((t<58380) & (t>57997))
-    #model_y[idx]/=pscale
-    #model_x[idx]/=pscale
-    #model_y[idx2]/=pscale2
-    #model_x[idx2]/=pscale2
+    idx = np.where((t<58362) & (t>57997))
+    model_y[idx]/=mirc_scale
+    model_x[idx]/=mirc_scale
     
     major_vector_x=np.sin(error_pa)
     major_vector_y=np.cos(error_pa)

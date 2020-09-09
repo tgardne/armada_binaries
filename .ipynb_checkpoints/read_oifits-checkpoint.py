@@ -269,11 +269,11 @@ def read_vlti(dir,interact='n',exclude=''):
         if file.endswith("singlescivis.fits"):
             filename = os.path.join(dir, file)
             oifile = fits.open(filename,quiet=True)
-            oi_t3 = oifile['OI_T3',10].data
-            oi_vis2 = oifile['OI_VIS2',10].data
-            oi_vis = oifile['OI_VIS',10].data
+            oi_t3 = oifile['OI_T3',11].data
+            oi_vis2 = oifile['OI_VIS2',11].data
+            oi_vis = oifile['OI_VIS',11].data
 
-            eff_wave.append(oifile['OI_WAVELENGTH',10].data.field('EFF_WAVE'))
+            eff_wave.append(oifile['OI_WAVELENGTH',11].data.field('EFF_WAVE'))
             time_obs.append(oifile[0].header['MJD-OBS'])
 
             for i in eachindex(oi_t3):
