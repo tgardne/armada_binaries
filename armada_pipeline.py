@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
-from read_data import read_data,read_wds,read_orb6
+from read_data import read_data,read_wds,read_orb6,get_types
 from astrometry_model import astrometry_model,triple_model,lnlike,lnprior,lnpost,create_init
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
@@ -34,6 +34,62 @@ def cart2pol(x,y):
     if np.isnan(theta):
         theta_new=theta
     return(r,theta_new)
+    
+def plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx):
+    x=[]
+    y=[]
+    t=[]
+
+    wdt = make_plotable(xpos_wds,ypos_wds,types)
+
+    for i in range(0,len(wdt)):
+        plt.plot(wdt[i][0],wdt[i][1],'o',label=wdt[i][2])
+            
+    for i in wdt:
+        for j in i[0]:
+            x.append(j)
+            t.append(i[2])
+        for k in i[1]:
+            y.append(k)
+            
+    plt.plot(xpos_wds[0],ypos_wds[0],'*')
+    plt.plot(xpos[idx],ypos[idx],'*')
+    plt.plot(xpos,ypos,'+',label='ARMADA')
+    plt.plot(0,0,'*')
+    plt.gca().invert_xaxis()
+    plt.title('All Data')
+    plt.xlabel('dra (mas)')
+    plt.ylabel('ddec (mas)')
+    plt.legend()
+    plt.show()
+    
+    return x, y, t
+    
+def make_plotable(x, y, t):
+    tList = []
+    data_tot = []
+    repeats = 0
+        
+    for i in t:
+        if i in tList:
+            ++repeats # 'if i not in tList' did not work so need soemthing here/
+        else:
+            tList.append(i)
+            
+    for i in tList:
+        xType = []
+        yType = []
+        data = []
+        for j in range(0,len(x)):
+            if t[j] == i:
+                xType.append(x[j])
+                yType.append(y[j])
+        data.append(xType)
+        data.append(yType)
+        data.append(i)
+        data_tot.append(data)
+        
+    return data_tot
 
 ###########################################
 ## SETUP PATHS
@@ -48,10 +104,10 @@ if os.getcwd()[7:14] == 'tgardne':
     
 elif os.getcwd()[7:19] == 'adam.scovera':
     ## Adam's path
-    path = '/Users/adam.scovera/Documents/UofM/BEPResearch_Data/ARMADA_orbits'
-    path_etalon = '/Users/adam.scovera/Documents/UofM/BEPResearch_Data/etalon_factors_fit.txt'
-    path_wds = '/Users/adam.scovera/Documents/UofM/BEPResearch_Data/wds_targets'
-    path_orb6 = '/Users/adam.scovera/Documents/UofM/BEPResearch_Data/orb6orbits.sql.txt'
+    path = '/Users/adam.scovera/Documents/Astro/BEPResearch_Data/ARMADA_orbits'
+    path_etalon = '/Users/adam.scovera/Documents/Astro/BEPResearch_Data/etalon_factors_fit.txt'
+    path_wds = '/Users/adam.scovera/Documents/AStro/BEPResearch_Data/wds_targets'
+    path_orb6 = '/Users/adam.scovera/Documents/Astro/BEPResearch_Data/orb6orbits.sql.txt'
 
 ###########################################
 ## Specify Target
@@ -161,12 +217,18 @@ ypos=p*np.cos(theta)
 ###########################################
 ## Read in WDS data - and plot to check
 ###########################################
-try:
-    file=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
-    weight = 10
-    dtype = input('dtype for wds (e.g. S, leave blank for ALL data): ')
+wds_data_tot = []
+xWDS = []
+yWDS = []
+WDStype = []
 
-    t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_wds(file,weight,dtype)
+try:
+    file1=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+    target_types = get_types(file1)
+    file2=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+    weight = 10
+
+    t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds,types = read_wds(file2,weight,target_types)
     print('Number of WDS data points = %s'%len(p_wds))
 
     ## correct WDS for PA
@@ -175,39 +237,23 @@ try:
     xpos_wds=p_wds*np.sin(theta_wds)
     ypos_wds=p_wds*np.cos(theta_wds)
     idx = np.argmin(t)
-
-    plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
-    plt.plot(xpos_wds[0],ypos_wds[0],'*')
-    plt.plot(xpos[idx],ypos[idx],'*')
-    plt.plot(xpos,ypos,'+',label='ARMADA')
-    plt.plot(0,0,'*')
-    plt.gca().invert_xaxis()
-    plt.title('All Data')
-    plt.xlabel('dra (mas)')
-    plt.ylabel('ddec (mas)')
-    plt.legend()
-    plt.show()
-
+    
+    xWDS, yWDS, WDStype = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx)
+    
     flip = input('Flip WDS data? (y/n): ')
     if flip=='y':
         xpos_wds=-p_wds*np.sin(theta_wds)
         ypos_wds=-p_wds*np.cos(theta_wds)
-        plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
-        plt.plot(xpos_wds[0],ypos_wds[0],'*')
-        plt.plot(xpos[idx],ypos[idx],'*')
-        plt.plot(xpos,ypos,'+',label='ARMADA')
-        plt.plot(0,0,'*')
-        plt.gca().invert_xaxis()
-        plt.title('All Data')
-        plt.xlabel('dra (mas)')
-        plt.ylabel('ddec (mas)')
-        plt.legend()
-        plt.show()
-
+        xWDS, yWDS, WDStype = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx)
+        
         better = input('Flip data back to original? (y/n): ')
         if better=='y':
             xpos_wds=p_wds*np.sin(theta_wds)
             ypos_wds=p_wds*np.cos(theta_wds)
+            xWDS, yWDS, WDStype = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx)
+            
+    wds_data_tot = make_plotable(xWDS,yWDS,WDStype)
+
 except:
     t_wds = np.array([np.nan])
     p_wds = np.array([np.nan])
@@ -252,7 +298,7 @@ error_deg_all = np.concatenate([error_deg,error_deg_wds])
 ##########################################
 ## Function for fitting/plotting data
 #########################################
-def ls_fit(params,xp,yp,tp,emaj,emin,epa):
+def ls_fit(params,xp,yp,tp,emaj,emin,epa,wds):
     #do fit, minimizer uses LM for least square fitting of model to data
     minner = Minimizer(astrometry_model, params, fcn_args=(xp,yp,tp,
                                                        emaj,emin,epa),
@@ -274,7 +320,10 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
                                             w_start,bigw_start,P_start,
                                             T_start,t_all)
     fig,ax=plt.subplots()
-    ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
+    
+    for i in range(0,len(wds)):
+        ax.plot(wds[i][0], wds[i][1], 'o', label=wds[i][2])
+    # ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
@@ -311,7 +360,7 @@ if mirc_scale == 'y':
 else:
     params.add('mirc_scale', value= 1.0, vary=False)
 
-result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
+result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all,wds_data_tot)
 
 #############################################
 ## Filter through bad WDS points
@@ -320,12 +369,27 @@ def on_click_remove(event):
     bad_x = event.xdata
     bad_y = event.ydata
     diff = np.sqrt((xpos_all-bad_x)**2+(ypos_all-bad_y)**2)
+    diffA = np.sqrt((xpos-bad_x)**2+(ypos-bad_y)**2)
+    diffW = np.sqrt((xWDS-bad_x)**2+(yWDS-bad_y)**2)
     idx = np.nanargmin(diff)
+    idxA = np.nanargmin(diffA)
+    idxW = np.nanargmin(diffW)
     xpos_all[idx] = np.nan
     ypos_all[idx] = np.nan
+    if diffA[idxA] < diffW[idxW]:
+        xpos[idxA] = np.nan
+        ypos[idxA] = np.nan
+    else:
+        xWDS[idxW] = np.nan
+        yWDS[idxW] = np.nan
+        WDStype[idxW] = ''
+        wds_data_tot = make_plotable(xWDS, yWDS, WDStype)
+        
 
     ax.cla()
-    ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
+    for i in range(0,len(wds_data_tot)):
+        ax.plot(wds_data_tot[i][0], wds_data_tot[i][1], 'o', label=wds_data_tot[i][2])
+    # ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
@@ -348,12 +412,25 @@ def on_click_flip(event):
     bad_x = event.xdata
     bad_y = event.ydata
     diff = np.sqrt((xpos_all-bad_x)**2+(ypos_all-bad_y)**2)
+    diffA = np.sqrt((xpos-bad_x)**2+(ypos-bad_y)**2)
+    diffW = np.sqrt((xWDS-bad_x)**2+(yWDS-bad_y)**2)
     idx = np.nanargmin(diff)
+    idxA = np.nanargmin(diffA)
+    idxW = np.nanargmin(diffW)
     xpos_all[idx] = -xpos_all[idx]
     ypos_all[idx] = -ypos_all[idx]
+    if diffA[idxA] < diffW[idxW]:
+        xpos[idxA] = -xpos[idxA]
+        ypos[idxA] = -ypos[idxA]
+    else:
+        xWDS[idxW] = -xWDS[idxW]
+        yWDS[idxW] = -yWDS[idxW]
+        wds_data_tot = make_plotable(xWDS, yWDS, WDStype)
 
     ax.cla()
-    ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
+    for i in range(0,len(wds_data_tot)):
+        ax.plot(wds_data_tot[i][0], wds_data_tot[i][1], 'o', label=wds_data_tot[i][2])
+    # ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
@@ -385,7 +462,9 @@ while filter_wds == 'y':
                                         w_start,bigw_start,P_start,
                                         T_start,t_all)
     fig,ax=plt.subplots()
-    ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
+    for i in range(0,len(wds_data_tot)):
+        ax.plot(wds_data_tot[i][0], wds_data_tot[i][1], 'o', label=wds_data_tot[i][2])
+    #ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
@@ -406,9 +485,11 @@ while filter_wds == 'y':
     plt.show()
     fig.canvas.mpl_disconnect(cid)
     plt.close()
-
+    
     fig,ax=plt.subplots()
-    ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
+    for i in range(0,len(wds_data_tot)):
+        ax.plot(wds_data_tot[i][0], wds_data_tot[i][1], 'o', label=wds_data_tot[i][2])
+    #ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
@@ -429,7 +510,8 @@ while filter_wds == 'y':
     plt.show()
     fig.canvas.mpl_disconnect(cid)
     plt.close()
-
+    
+    wds_data_tot = make_plotable(xWDS, yWDS, WDStype)
 
     params = Parameters()
     params.add('w',   value= omega, min=0, max=2*np.pi)
@@ -444,7 +526,7 @@ while filter_wds == 'y':
     else:
         params.add('mirc_scale', value= 1.0, vary=False)
 
-    result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
+    result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all,wds_data_tot)
     filter_wds = input('Remove more data? (y/n)')
 
 ##########################################
@@ -486,7 +568,9 @@ ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
                                         w_start,bigw_start,P_start,
                                         T_start,t_all)
 fig,ax=plt.subplots()
-ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
+for i in range(0,len(wds_data_tot)):
+    ax.plot(wds_data_tot[i][0], wds_data_tot[i][1], 'o', label=wds_data_tot[i][2])
+#ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
 ax.plot(xpos,ypos,'o', label='ARMADA')
 ax.plot(0,0,'*')
 ax.plot(ra, dec, '--',color='g')

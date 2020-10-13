@@ -49,26 +49,38 @@ def read_data(file,weight):
     
     return(t,p,theta,error_maj,error_min,error_pa,error_deg)
 
-def read_wds(file,weight,dtype):
+def read_wds(file,weight,fileTypes):
     p_wds=[]
     degrees_wds=[]  #text file is in degrees
     t_wds=[]
     error_maj_wds=[]
     error_min_wds=[]
     error_pa_wds=[]
+    type=[]
+            
+    print()
+    print('Select which collection types to use.')
+    print('Put nothing to use all.')
+    print('To select only some, list the ones you want with spaces between them. e.g. \'M S I\' for the types of M, S, and I.')
+    print('Coillection types for this target:')
+    print(fileTypes)
+    dtypes = input('Input: ')
+    
     for line in file.readlines():
         if line.startswith('#'):
             continue
+
         #if float(line.split()[0])<1985:
         #    continue
         #if line.split()[4]=='.':
         #    continue
-    
         #print(line.split('\s+')[0][111:113])
-        if dtype=='':
+
+        if dtypes=='':
             p_wds.append(float(line.split()[3]))
             degrees_wds.append(float(line.split()[1]))
             t_wds.append(float(line.split()[0]))
+            type.append(line.split('\s+')[0][111])
 
             if line.split('\s+')[0][111]=='S':
                 error_maj_wds.append(1)
@@ -79,16 +91,19 @@ def read_wds(file,weight,dtype):
                 error_min_wds.append(5)
                 error_pa_wds.append(0)
         else:
-            if line.split('\s+')[0][111]==dtype:
-                p_wds.append(float(line.split()[3]))
-                degrees_wds.append(float(line.split()[1]))
-                t_wds.append(float(line.split()[0]))
+            types = dtypes.split()
+            for t in types:
+                if line.split('\s+')[0][111]==t:
+                    p_wds.append(float(line.split()[3]))
+                    degrees_wds.append(float(line.split()[1]))
+                    t_wds.append(float(line.split()[0]))
+                    type.append(t)
     
-                error_maj_wds.append(1)
-                error_min_wds.append(1)
-                error_pa_wds.append(0)
-            else:
-                continue
+                    error_maj_wds.append(1)
+                    error_min_wds.append(1)
+                    error_pa_wds.append(0)
+                else:
+                    continue
     file.close()
 
     degrees_wds=np.asarray(degrees_wds)
@@ -102,7 +117,7 @@ def read_wds(file,weight,dtype):
     error_deg_wds=np.asarray(error_pa_wds)
     error_pa_wds=error_deg_wds*np.pi/180.
     
-    return(t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds)
+    return(t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds,type)
 
 def read_orb6(target,file):
 
@@ -167,3 +182,16 @@ def read_orb6(target,file):
     print('--------------------------')
     
     return(a,P,e,inc,omega,bigomega,T)
+    
+def get_types(file):
+    targetTypes = []
+    for line in file.readlines():
+        if line.startswith('#'):
+            continue
+        t = line.split('\s+')[0][111]
+        if t in targetTypes:
+            continue
+        else:
+            targetTypes.append(t)
+    file.close()
+    return targetTypes
