@@ -207,37 +207,41 @@ save_dir="/Users/tgardne/ARMADA_epochs/%s/"%target_id
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
+## Test dropping long baselines
+bl_drop = input('Drop long baselines? (y/n): ')
+
 ## get information from fits file
 if dtype=='chara':
-    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara(dir,target_id,interact,exclude)
+    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara(dir,target_id,interact,exclude,bl_drop)
 if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
 ########################################################
 
 ## Split spectrum in half
 #side = input('red or blue? ')
-#if side=='blue':
-#    idx = int(eff_wave.shape[-1]/2)
-#    eff_wave = eff_wave[:,:idx]
-#    t3phi = t3phi[:,:idx]
-#    t3phierr = t3phierr[:,:idx]
-#    vis2 = vis2[:,:idx]
-#    vis2err = vis2err[:,:idx]
-#    visphi = visphi[:,:idx]
-#    visphierr = visphierr[:,:idx]
-#    visamp = visamp[:,:idx]
-#    visamperr = visamperr[:,:idx]
-#if side=='red':
-#    idx = int(eff_wave.shape[-1]/2)
-#    eff_wave = eff_wave[:,idx:]
-#    t3phi = t3phi[:,idx:]
-#    t3phierr = t3phierr[:,idx:]
-#    vis2 = vis2[:,idx:]
-#    vis2err = vis2err[:,idx:]
-#    visphi = visphi[:,idx:]
-#    visphierr = visphierr[:,idx:]
-#    visamp = visamp[:,idx:]
-#    visamperr = visamperr[:,idx:]
+side = ''
+if side=='blue':
+    idx = int(eff_wave.shape[-1]/2)
+    eff_wave = eff_wave[:,:idx]
+    t3phi = t3phi[:,:idx]
+    t3phierr = t3phierr[:,:idx]
+    vis2 = vis2[:,:idx]
+    vis2err = vis2err[:,:idx]
+    visphi = visphi[:,:idx]
+    visphierr = visphierr[:,:idx]
+    visamp = visamp[:,:idx]
+    visamperr = visamperr[:,:idx]
+if side=='red':
+    idx = int(eff_wave.shape[-1]/2)
+    eff_wave = eff_wave[:,idx:]
+    t3phi = t3phi[:,idx:]
+    t3phierr = t3phierr[:,idx:]
+    vis2 = vis2[:,idx:]
+    vis2err = vis2err[:,idx:]
+    visphi = visphi[:,idx:]
+    visphierr = visphierr[:,idx:]
+    visamp = visamp[:,idx:]
+    visamperr = visamperr[:,idx:]
 
 ## do polynomial dispersion fit for each visphi measurement
 dispersion=[]

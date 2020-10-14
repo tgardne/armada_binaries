@@ -531,16 +531,23 @@ plt.close()
 resids = np.sqrt(xresid**2 + yresid**2)
 resids_median = np.around(np.median(resids)*1000,2)
 print('-'*10)
-print('Mean residual = %s micro-as'%resids_median)
+print('Median residual = %s micro-as'%resids_median)
 print('-'*10)
 
 ## Save txt file with best orbit
 f = open("%s/%s_orbit_ls.txt"%(directory,target_hd),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
-f.write("%s %s %s %s %s %s %s %s"%(P_start.value,a_start.value,e_start.value,
+f.write("# Perr(d) aerr(mas) eerr ierr(deg) werr(deg) Werr(deg) Terr(mjd)\r\n")
+f.write("%s %s %s %s %s %s %s %s\r\n"%(P_start.value,a_start.value,e_start.value,
                                    inc_start.value*180/np.pi,w_start.value*180/np.pi,
                                    bigw_start.value*180/np.pi,T_start.value,
                                   resids_median))
+try:
+    f.write("%s %s %s %s %s %s %s"%(P_start.stderr,a_start.stderr,e_start.stderr,
+                                       inc_start.stderr*180/np.pi,w_start.stderr*180/np.pi,
+                                       bigw_start.stderr*180/np.pi,T_start.stderr))
+except:
+    f.write("Errors not estimated")
 f.close()
 
 ## Save txt file with wds orbit

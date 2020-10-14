@@ -12,7 +12,7 @@ import os
 import matplotlib.pyplot as plt
 import astropy.io.fits as fits
 
-def read_chara(dir,target_id,interact='n',exclude=''):
+def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
 
     beam_map = {1:'S1',2:'S2',3:'E1',4:'E2',5:'W1',6:'W2'}
 
@@ -35,7 +35,7 @@ def read_chara(dir,target_id,interact='n',exclude=''):
     vcoords=[]
 
     for file in os.listdir(dir):
-        if file.endswith("_oifits.fits") or file.endswith("_viscal.fits"):
+        if file.endswith("_oifits.fits") or file.endswith("_viscal.fits") or file.endswith("_uvfix.fits"):
 
             filename = os.path.join(dir, file)
             hdu = fits.open(filename)
@@ -69,6 +69,33 @@ def read_chara(dir,target_id,interact='n',exclude=''):
                         u_coords.append([u1coord,u2coord,u3coord])
                         v_coords.append([v1coord,v2coord,v3coord])
                         continue
+                    u1coord = oi_t3[i]['U1COORD']
+                    v1coord = oi_t3[i]['V1COORD']
+                    u2coord = oi_t3[i]['U2COORD']
+                    v2coord = oi_t3[i]['V2COORD']
+                    u3coord = -u1coord - u2coord
+                    v3coord = -v1coord - v2coord
+                    ## drop baselines beyond given length:
+                    if bl_drop=='y':
+                        bl = max(np.sqrt(u1coord**2+v1coord**2),
+                                    np.sqrt(u2coord**2+v2coord**2),
+                                    np.sqrt(u3coord**2+v2coord**2))
+                        if bl>250:
+                            phases_empty = np.empty(oi_t3[i]['T3PHI'].shape)
+                            phases_empty[:] = np.nan
+                            t3phi.append(phases_empty[1:-1])
+                            t3phierr.append(phases_empty[1:-1])
+                            tels.append([beam_map[a] for a in oi_t3[i]['STA_INDEX']])
+                            u1coord = np.nan
+                            v1coord = np.nan
+                            u2coord = np.nan
+                            v2coord = np.nan
+                            u3coord = np.nan
+                            v3coord = np.nan
+                            u_coords.append([u1coord,u2coord,u3coord])
+                            v_coords.append([v1coord,v2coord,v3coord])
+                            continue
+
                     t3 = oi_t3[i]['T3PHI']
                     t3err = oi_t3[i]['T3PHIERR']
                     t3flag = np.where(oi_t3[i].field('FLAG')==True)
@@ -77,12 +104,6 @@ def read_chara(dir,target_id,interact='n',exclude=''):
                     t3phi.append(t3[1:-1])
                     t3phierr.append(t3err[1:-1])
                     tels.append([beam_map[a] for a in oi_t3[i]['STA_INDEX']])
-                    u1coord = oi_t3[i]['U1COORD']
-                    v1coord = oi_t3[i]['V1COORD']
-                    u2coord = oi_t3[i]['U2COORD']
-                    v2coord = oi_t3[i]['V2COORD']
-                    u3coord = -u1coord - u2coord
-                    v3coord = -v1coord - v2coord
                     u_coords.append([u1coord,u2coord,u3coord])
                     v_coords.append([v1coord,v2coord,v3coord])
 
@@ -95,6 +116,15 @@ def read_chara(dir,target_id,interact='n',exclude=''):
                         vis2.append(phases_empty[1:-1])
                         vis2err.append(phases_empty[1:-1])
                         continue
+                    if bl_drop=='y':
+                        uc = oi_vis2[i]['UCOORD']
+                        vc = oi_vis2[i]['VCOORD']
+                        if np.sqrt(uc**2+vc**2)>250:
+                            phases_empty = np.empty(oi_vis2[i]['VIS2DATA'].shape)
+                            phases_empty[:] = np.nan
+                            vis2.append(phases_empty[1:-1])
+                            vis2err.append(phases_empty[1:-1])
+                            continue
                     v2 = oi_vis2[i]['VIS2DATA']
                     v2err = oi_vis2[i]['VIS2ERR']
                     v2flag = np.where(oi_vis2[i].field('FLAG')==True)
@@ -117,6 +147,20 @@ def read_chara(dir,target_id,interact='n',exclude=''):
                         ucoords.append(np.nan)
                         vcoords.append(np.nan)
                         continue
+                    if bl_drop=='y':
+                        uc = oi_vis[i]['UCOORD']
+                        vc = oi_vis[i]['VCOORD']
+                        if np.sqrt(uc**2+vc**2)>250:
+                            phases_empty = np.empty(oi_vis[i]['VISPHI'].shape)
+                            phases_empty[:] = np.nan
+                            visphi.append(phases_empty[1:-1])
+                            visphierr.append(phases_empty[1:-1])
+                            visamp.append(phases_empty[1:-1])
+                            visamperr.append(phases_empty[1:-1])
+                            vistels.append([beam_map[a] for a in oi_vis[i]['STA_INDEX']])
+                            ucoords.append(np.nan)
+                            vcoords.append(np.nan)
+                            continue
                     vis = oi_vis[i]['VISPHI']
                     viserr = oi_vis[i]['VISPHIERR']
                     vamp = oi_vis[i]['VISAMP']

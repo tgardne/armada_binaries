@@ -175,3 +175,43 @@ class binary_disks_vector:
         complex_vis = (f1*v1 + vis_bw12*f2*v2*np.exp(-2*np.pi*1j*(u*delta_ra12+v*delta_dec12)) + vis_bw13*f3*v3*np.exp(-2*np.pi*1j*(u*delta_ra13+v*delta_dec13)))/(f1+f2+f3)
                    
         return(complex_vis)
+
+    def quad2(self,u,v,delta_ra12,delta_dec12,delta_ra13,delta_dec13,delta_ra14,delta_dec14,ratio12,ratio13,ratio14,ud1,ud2,ud3,ud4,bw):
+    
+        f1 = 1/(1+1/ratio12+1/ratio13+1/ratio14)
+        f2 = 1/(1+ratio12+ratio12/ratio13+ratio12/ratio14)
+        f3 = 1/(1+ratio13+ratio13/ratio12+ratio13/ratio14)
+        f4 = 1-f1-f2-f3
+
+        delta_dec12=self.mas2rad(delta_dec12)
+        delta_ra12=self.mas2rad(delta_ra12)
+    
+        delta_dec13=self.mas2rad(delta_dec13)
+        delta_ra13=self.mas2rad(delta_ra13)
+
+        delta_dec14=self.mas2rad(delta_dec14)
+        delta_ra14=self.mas2rad(delta_ra14)
+    
+        diameter1 = self.mas2rad(ud1)
+        diameter2 = self.mas2rad(ud2)
+        diameter3 = self.mas2rad(ud3)
+        diameter4 = self.mas2rad(ud4)
+        x1 = np.pi*diameter1*np.sqrt(u**2+v**2)
+        x2 = np.pi*diameter2*np.sqrt(u**2+v**2)
+        x3 = np.pi*diameter3*np.sqrt(u**2+v**2)
+        x4 = np.pi*diameter4*np.sqrt(u**2+v**2)
+    
+        ## bessel 1st order
+        v1 = 2*special.jn(1,x1)/x1
+        v2 = 2*special.jn(1,x2)/x2
+        v3 = 2*special.jn(1,x3)/x3
+        v4 = 2*special.jn(1,x4)/x4
+
+        ## bandwidth smearing
+        vis_bw12 = np.sinc(bw*(u*delta_ra12+v*delta_dec12))
+        vis_bw13 = np.sinc(bw*(u*delta_ra13+v*delta_dec13))
+        vis_bw14 = np.sinc(bw*(u*delta_ra14+v*delta_dec14))
+    
+        complex_vis = (f1*v1 + vis_bw12*f2*v2*np.exp(-2*np.pi*1j*(u*delta_ra12+v*delta_dec12)) + vis_bw13*f3*v3*np.exp(-2*np.pi*1j*(u*delta_ra13+v*delta_dec13)) + vis_bw14*f4*v4*np.exp(-2*np.pi*1j*(u*delta_ra14+v*delta_dec14)))/(f1+f2+f3+f4)
+                   
+        return(complex_vis)

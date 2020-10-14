@@ -273,6 +273,7 @@ params.add('e', value= e, min=0, max=0.99)
 params.add('a', value= a, min=0)
 params.add('P', value= P, min=0)
 params.add('T', value= T, min=0)
+params.add('mirc_scale', value=1, vary=False)
 
 result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
 
@@ -402,6 +403,7 @@ while filter_wds == 'y':
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
     params.add('T', value= T, min=0)
+    params.add('mirc_scale', value=1, vary=False)
 
     result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
     filter_wds = input('Remove more data? (y/n)')
@@ -527,6 +529,7 @@ params.add('inc2', value= inc2, min=0, max=np.pi)
 params.add('a2', value= a2, min=0)
 params.add('P2', value= P2, min=0)
 params.add('T2', value= T2, min=0)
+params.add('mirc_scale', value=1, vary=False)
 
 #do fit, minimizer uses LM for least square fitting of model to data
 minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
@@ -534,7 +537,7 @@ minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
                                                     error_pa_all),
                     nan_policy='omit')
 result = minner.minimize()
-#print(report_fit(result))
+print(report_fit(result))
 
 P2_best = result.params['P2']
 a2_best = result.params['a2']
@@ -598,6 +601,7 @@ plt.savefig('%s/HD%s_outer_triple.pdf'%(directory,target_hd))
 plt.close()
 
 ## plot inner wobble
+idx = np.where(error_maj/scale<0.05)
 ra_inner = ra - ra2
 dec_inner = dec - dec2
 rapoints_inner = rapoints - rapoints2
@@ -607,21 +611,22 @@ xpos_inner = xpos_all - rapoints2
 ypos_inner = ypos_all - decpoints2
 
 fig,ax=plt.subplots()
-ax.plot(xpos_inner[:len(xpos)], ypos_inner[:len(xpos)], '+')
+ax.plot(xpos_inner[:len(xpos)][idx], ypos_inner[:len(xpos)][idx], '+')
 ax.plot(0,0,'*')
 ax.plot(ra_inner[-100:], dec_inner[-100:], '--',color='g')
 
 #need to measure error ellipse angle east of north
 for ras, decs, w, h, angle in zip(xpos_inner[:len(xpos)],ypos_inner[:len(xpos)],error_maj/scale,error_min/scale,error_deg):
-    ellipse = Ellipse(xy=(ras, decs), width=2*w, height=2*h, 
-                      angle=90-angle, facecolor='none', edgecolor='black')
-    ax.add_patch(ellipse)
+    if w<0.05:
+        ellipse = Ellipse(xy=(ras, decs), width=2*w, height=2*h, 
+                          angle=90-angle, facecolor='none', edgecolor='black')
+        ax.add_patch(ellipse)
 
 #plot lines from data to best fit orbit
 i=0
-while i<len(decpoints_inner[:len(xpos)]):
-    x=[xpos_inner[:len(xpos)][i],rapoints_inner[:len(xpos)][i]]
-    y=[ypos_inner[:len(xpos)][i],decpoints_inner[:len(xpos)][i]]
+while i<len(decpoints_inner[:len(xpos)][idx]):
+    x=[xpos_inner[:len(xpos)][idx][i],rapoints_inner[:len(xpos)][idx][i]]
+    y=[ypos_inner[:len(xpos)][idx][i],decpoints_inner[:len(xpos)][idx][i]]
     ax.plot(x,y,color="black")
     i+=1
 ax.set_xlabel('milli-arcsec')
