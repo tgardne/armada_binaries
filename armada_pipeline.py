@@ -486,6 +486,8 @@ while filter_wds == 'y':
     fig.canvas.mpl_disconnect(cid)
     plt.close()
     
+    wds_data_tot = make_plotable(xWDS, yWDS, WDStype)
+    
     fig,ax=plt.subplots()
     for i in range(0,len(wds_data_tot)):
         ax.plot(wds_data_tot[i][0], wds_data_tot[i][1], 'o', label=wds_data_tot[i][2])
