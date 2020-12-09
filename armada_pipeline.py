@@ -57,6 +57,7 @@ elif os.getcwd()[7:19] == 'adam.scovera':
 ## Specify Target
 ###########################################
 target_hd = input('Target HD #: ')
+date = input('Date for savefile: ')
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
@@ -73,6 +74,12 @@ for item in query:
     if 'WDS' in item[0]:
         target_wds = item[0][5:15]
         print('WDS %s'%target_wds)
+
+try:
+    print(target_wds)
+except:
+    print('No WDS number queried')
+    target_wds = input('Enter WDS: ')
 
 
 ###########################################
@@ -161,37 +168,23 @@ ypos=p*np.cos(theta)
 ###########################################
 ## Read in WDS data - and plot to check
 ###########################################
-try:
-    file=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
-    weight = 10
-    dtype = input('dtype for wds (e.g. S, leave blank for ALL data): ')
+input_wds = input('Include WDS? (y/n): ')
+if input_wds == 'y':
+    try:
+        file=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+        weight = 10
+        dtype = input('dtype for wds (e.g. S, leave blank for ALL data): ')
 
-    t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_wds(file,weight,dtype)
-    print('Number of WDS data points = %s'%len(p_wds))
+        t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_wds(file,weight,dtype)
+        print('Number of WDS data points = %s'%len(p_wds))
 
-    ## correct WDS for PA
-    theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
+        ## correct WDS for PA
+        theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
 
-    xpos_wds=p_wds*np.sin(theta_wds)
-    ypos_wds=p_wds*np.cos(theta_wds)
-    idx = np.argmin(t)
+        xpos_wds=p_wds*np.sin(theta_wds)
+        ypos_wds=p_wds*np.cos(theta_wds)
+        idx = np.argmin(t)
 
-    plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
-    plt.plot(xpos_wds[0],ypos_wds[0],'*')
-    plt.plot(xpos[idx],ypos[idx],'*')
-    plt.plot(xpos,ypos,'+',label='ARMADA')
-    plt.plot(0,0,'*')
-    plt.gca().invert_xaxis()
-    plt.title('All Data')
-    plt.xlabel('dra (mas)')
-    plt.ylabel('ddec (mas)')
-    plt.legend()
-    plt.show()
-
-    flip = input('Flip WDS data? (y/n): ')
-    if flip=='y':
-        xpos_wds=-p_wds*np.sin(theta_wds)
-        ypos_wds=-p_wds*np.cos(theta_wds)
         plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
         plt.plot(xpos_wds[0],ypos_wds[0],'*')
         plt.plot(xpos[idx],ypos[idx],'*')
@@ -204,11 +197,38 @@ try:
         plt.legend()
         plt.show()
 
-        better = input('Flip data back to original? (y/n): ')
-        if better=='y':
-            xpos_wds=p_wds*np.sin(theta_wds)
-            ypos_wds=p_wds*np.cos(theta_wds)
-except:
+        flip = input('Flip WDS data? (y/n): ')
+        if flip=='y':
+            xpos_wds=-p_wds*np.sin(theta_wds)
+            ypos_wds=-p_wds*np.cos(theta_wds)
+            plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
+            plt.plot(xpos_wds[0],ypos_wds[0],'*')
+            plt.plot(xpos[idx],ypos[idx],'*')
+            plt.plot(xpos,ypos,'+',label='ARMADA')
+            plt.plot(0,0,'*')
+            plt.gca().invert_xaxis()
+            plt.title('All Data')
+            plt.xlabel('dra (mas)')
+            plt.ylabel('ddec (mas)')
+            plt.legend()
+            plt.show()
+
+            better = input('Flip data back to original? (y/n): ')
+            if better=='y':
+                xpos_wds=p_wds*np.sin(theta_wds)
+                ypos_wds=p_wds*np.cos(theta_wds)
+    except:
+        t_wds = np.array([np.nan])
+        p_wds = np.array([np.nan])
+        theta_wds = np.array([np.nan])
+        error_maj_wds = np.array([np.nan])
+        error_min_wds = np.array([np.nan])
+        error_pa_wds = np.array([np.nan])
+        error_deg_wds = np.array([np.nan])
+        xpos_wds=p_wds*np.sin(theta_wds)
+        ypos_wds=p_wds*np.cos(theta_wds)
+        print('NO WDS NUMBER')
+else:
     t_wds = np.array([np.nan])
     p_wds = np.array([np.nan])
     theta_wds = np.array([np.nan])
@@ -218,7 +238,7 @@ except:
     error_deg_wds = np.array([np.nan])
     xpos_wds=p_wds*np.sin(theta_wds)
     ypos_wds=p_wds*np.cos(theta_wds)
-    print('NO WDS NUMBER')
+    print('NO WDS DATA')
 
 ###########################################
 ## Get an estimate of the orbital parameters
@@ -503,7 +523,7 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Outer Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_outer_leastsquares.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_outer_leastsquares.pdf'%(directory,target_hd,date))
 plt.close()
 
 ## plot resids for ARMADA
@@ -524,7 +544,7 @@ ax.set_ylabel('milli-arcsec')
 ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Resids'%target_hd)
-plt.savefig('%s/HD%s_resid_leastsquares.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_resid_leastsquares.pdf'%(directory,target_hd,date))
 plt.close()
 
 ## residuals
@@ -535,7 +555,7 @@ print('Median residual = %s micro-as'%resids_median)
 print('-'*10)
 
 ## Save txt file with best orbit
-f = open("%s/%s_orbit_ls.txt"%(directory,target_hd),"w+")
+f = open("%s/%s_%s_orbit_ls.txt"%(directory,target_hd,date),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
 f.write("# Perr(d) aerr(mas) eerr ierr(deg) werr(deg) Werr(deg) Terr(mjd)\r\n")
 f.write("%s %s %s %s %s %s %s %s\r\n"%(P_start.value,a_start.value,e_start.value,
@@ -578,6 +598,7 @@ pe = float(input('period search end (days): '))
 ss = float(input('semi search start (mas): '))
 se = float(input('semi search end (mas): '))
 P2 = np.linspace(ps,pe,1000)
+#P2 = np.logspace(np.log10(ps),np.log10(pe),1000)
 w2 = w_start
 #bigw2 = bigw_start
 #inc2 = inc_start
@@ -595,7 +616,7 @@ for period in tqdm(P2):
     params_outer_n=[]
     chi2_n = []
 
-    for i in np.arange(10):
+    for i in np.arange(20):
         ## randomize orbital elements
         bigw2 = np.random.uniform(0,2*np.pi)
         inc2 = np.random.uniform(0,np.pi)
@@ -633,7 +654,12 @@ for period in tqdm(P2):
                             ,result.params['bigw2'],result.params['inc2'],result.params['T2']])
         params_outer_n.append([result.params['P'],result.params['a'],result.params['e'],result.params['w']
                             ,result.params['bigw'],result.params['inc'],result.params['T']])
-        chi2_n.append(result.redchi)
+        #chi2_n.append(result.redchi)
+        resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
+                            error_min,error_pa)
+        ndata_armada = 2*sum(~np.isnan(xpos))
+        chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-12)
+        chi2_n.append(chi2_armada)
 
     params_inner_n=np.array(params_inner_n)
     params_outer_n=np.array(params_outer_n)
@@ -656,7 +682,7 @@ plt.plot(params_inner[:,0],1/chi2,'o-')
 plt.xlabel('Period (d)')
 plt.ylabel('1/chi2')
 plt.title('Best Period = %s'%period_best)
-plt.savefig('%s/HD%s_chi2_period.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_chi2_period.pdf'%(directory,target_hd,date))
 plt.close()
 
 print('Best inner period = %s'%period_best)
@@ -753,5 +779,5 @@ plt.scatter(a_inner,i_inner,c=1/chi2,cmap=cm.inferno)
 plt.colorbar(label='1 / $\chi^2$')
 plt.xlabel('semi-major (mas)')
 plt.ylabel('inclination (deg)')
-plt.savefig('%s/HD%s_semi_inc_grid.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_semi_inc_grid.pdf'%(directory,target_hd,date))
 plt.close()

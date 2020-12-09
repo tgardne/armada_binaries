@@ -129,36 +129,22 @@ ypos=p*np.cos(theta)
 ###########################################
 ## Read in WDS data - and plot to check
 ###########################################
-file=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
-weight = 10
-dtype = input('dtype for wds (e.g. S): ')
+input_wds = input('Include WDS? (y/n)')
+if input_wds == 'y':
+    file=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+    weight = 10
+    dtype = input('dtype for wds (e.g. S): ')
 
-t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_wds(file,weight,dtype)
-print('Number of WDS data points = %s'%len(p_wds))
+    t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_wds(file,weight,dtype)
+    print('Number of WDS data points = %s'%len(p_wds))
 
-## correct WDS for PA
-theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
+    ## correct WDS for PA
+    theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
 
-xpos_wds=p_wds*np.sin(theta_wds)
-ypos_wds=p_wds*np.cos(theta_wds)
-idx = np.argmin(t)
+    xpos_wds=p_wds*np.sin(theta_wds)
+    ypos_wds=p_wds*np.cos(theta_wds)
+    idx = np.argmin(t)
 
-plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
-plt.plot(xpos_wds[0],ypos_wds[0],'*')
-plt.plot(xpos[idx],ypos[idx],'*')
-plt.plot(xpos,ypos,'+',label='ARMADA')
-plt.plot(0,0,'*')
-plt.gca().invert_xaxis()
-plt.title('All Data')
-plt.xlabel('dra (mas)')
-plt.ylabel('ddec (mas)')
-plt.legend()
-plt.show()
-
-flip = input('Flip WDS data? (y/n): ')
-if flip=='y':
-    xpos_wds=-p_wds*np.sin(theta_wds)
-    ypos_wds=-p_wds*np.cos(theta_wds)
     plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
     plt.plot(xpos_wds[0],ypos_wds[0],'*')
     plt.plot(xpos[idx],ypos[idx],'*')
@@ -171,10 +157,37 @@ if flip=='y':
     plt.legend()
     plt.show()
 
-    better = input('Flip data back to original? (y/n): ')
-    if better=='y':
-        xpos_wds=p_wds*np.sin(theta_wds)
-        ypos_wds=p_wds*np.cos(theta_wds)
+    flip = input('Flip WDS data? (y/n): ')
+    if flip=='y':
+        xpos_wds=-p_wds*np.sin(theta_wds)
+        ypos_wds=-p_wds*np.cos(theta_wds)
+        plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
+        plt.plot(xpos_wds[0],ypos_wds[0],'*')
+        plt.plot(xpos[idx],ypos[idx],'*')
+        plt.plot(xpos,ypos,'+',label='ARMADA')
+        plt.plot(0,0,'*')
+        plt.gca().invert_xaxis()
+        plt.title('All Data')
+        plt.xlabel('dra (mas)')
+        plt.ylabel('ddec (mas)')
+        plt.legend()
+        plt.show()
+
+        better = input('Flip data back to original? (y/n): ')
+        if better=='y':
+            xpos_wds=p_wds*np.sin(theta_wds)
+            ypos_wds=p_wds*np.cos(theta_wds)
+else:
+    t_wds = np.array([np.nan])
+    p_wds = np.array([np.nan])
+    theta_wds = np.array([np.nan])
+    error_maj_wds = np.array([np.nan])
+    error_min_wds = np.array([np.nan])
+    error_pa_wds = np.array([np.nan])
+    error_deg_wds = np.array([np.nan])
+    xpos_wds=p_wds*np.sin(theta_wds)
+    ypos_wds=p_wds*np.cos(theta_wds)
+    print('NO WDS DATA')
 
 ###########################################
 ## Get an estimate of the orbital parameters
@@ -220,7 +233,7 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
     resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
                                  error_min,error_pa)
     ndata_armada = 2*sum(~np.isnan(xpos))
-    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
+    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-7)
     print('-'*10)
     print('chi2 armada = %s'%chi2_armada)
     print('-'*10)
@@ -414,7 +427,7 @@ while filter_wds == 'y':
 resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
                             error_min,error_pa)
 ndata_armada = 2*sum(~np.isnan(xpos))
-chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
+chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-7)
 print('-'*10)
 print('chi2 armada = %s'%chi2_armada)
 print('-'*10)
@@ -537,7 +550,10 @@ minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
                                                     error_pa_all),
                     nan_policy='omit')
 result = minner.minimize()
-print(report_fit(result))
+try:
+    print(report_fit(result))
+except:
+    print('No fit report')
 
 P2_best = result.params['P2']
 a2_best = result.params['a2']
@@ -560,7 +576,12 @@ T_best = result.params['T']
 resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
                             error_min,error_pa)
 ndata_armada = 2*sum(~np.isnan(xpos))
-chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
+if circular=='y':
+    print(ndata_armada)
+    print(len(result.params))
+    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-12)
+else:
+    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-14)
 print('-'*10)
 print('chi2 armada = %s'%chi2_armada)
 print('-'*10)
@@ -601,7 +622,7 @@ plt.savefig('%s/HD%s_outer_triple.pdf'%(directory,target_hd))
 plt.close()
 
 ## plot inner wobble
-idx = np.where(error_maj/scale<0.05)
+idx = np.where(error_maj/scale<1)
 ra_inner = ra - ra2
 dec_inner = dec - dec2
 rapoints_inner = rapoints - rapoints2
@@ -613,14 +634,14 @@ ypos_inner = ypos_all - decpoints2
 fig,ax=plt.subplots()
 ax.plot(xpos_inner[:len(xpos)][idx], ypos_inner[:len(xpos)][idx], '+')
 ax.plot(0,0,'*')
-ax.plot(ra_inner[-100:], dec_inner[-100:], '--',color='g')
+ax.plot(ra_inner, dec_inner, '--',color='g')
 
 #need to measure error ellipse angle east of north
 for ras, decs, w, h, angle in zip(xpos_inner[:len(xpos)],ypos_inner[:len(xpos)],error_maj/scale,error_min/scale,error_deg):
-    if w<0.05:
-        ellipse = Ellipse(xy=(ras, decs), width=2*w, height=2*h, 
-                          angle=90-angle, facecolor='none', edgecolor='black')
-        ax.add_patch(ellipse)
+    #if w<0.05:
+    ellipse = Ellipse(xy=(ras, decs), width=2*w, height=2*h, 
+                        angle=90-angle, facecolor='none', edgecolor='black')
+    ax.add_patch(ellipse)
 
 #plot lines from data to best fit orbit
 i=0

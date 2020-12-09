@@ -491,7 +491,7 @@ def read_vlti(dir,interact='n',exclude=''):
     ########################################################
     return t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs
 
-def read_chara_old(dir,interact='n',exclude=''):
+def read_chara_old(file,interact='n',exclude=''):
 
     beam_map = {1:'S1',2:'S2',3:'E1',4:'E2',5:'W1',6:'W2'}
 
@@ -513,26 +513,22 @@ def read_chara_old(dir,interact='n',exclude=''):
     ucoords=[]
     vcoords=[]
 
-    for file in os.listdir(dir):
-        if file.endswith("fits"):
+    print(file)
+    hdu = fits.open(file)
+    for table in hdu:
 
-            filename = os.path.join(dir, file)
-            print(filename)
-            hdu = fits.open(filename)
-            #oi_mjd = hdu[0].header['MJD-OBS']
-            oi_t3 = hdu['OI_T3'].data
-            oi_vis2 = hdu['OI_VIS2'].data
-            eff_wave.append(hdu['OI_WAVELENGTH'].data['EFF_WAVE'][1:-1])
-            #time_obs.append(oi_mjd)
-            for i in eachindex(oi_t3):
+        #print(table.name)
+        wl_i=1
+        if table.name=='OI_T3':
+            for i in eachindex(table.data):
                 ## use this to exclude a telescope
-                stations = ['none']#[beam_map[a] for a in oi_t3[i]['STA_INDEX']]
+                stations = [beam_map[a] for a in table.data[i]['STA_INDEX']]
                 if exclude in stations:
-                    phases_empty = np.empty(oi_t3[i]['T3PHI'].shape)
+                    phases_empty = np.empty(table.data[i]['T3PHI'].shape)
                     phases_empty[:] = np.nan
                     t3phi.append(phases_empty[1:-1])
                     t3phierr.append(phases_empty[1:-1])
-                    tels.append([beam_map[a] for a in oi_t3[i]['STA_INDEX']])
+                    tels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
                     u1coord = np.nan
                     v1coord = np.nan
                     u2coord = np.nan
@@ -542,51 +538,78 @@ def read_chara_old(dir,interact='n',exclude=''):
                     u_coords.append([u1coord,u2coord,u3coord])
                     v_coords.append([v1coord,v2coord,v3coord])
                     continue
-                t3 = oi_t3[i]['T3PHI']
-                t3err = oi_t3[i]['T3PHIERR']
-                t3flag = np.where(oi_t3[i].field('FLAG')==True)
+                t3 = table.data[i]['T3PHI']
+                t3err = table.data[i]['T3PHIERR']
+                t3flag = np.where(table.data[i].field('FLAG')==True)
                 t3[t3flag] = np.nan
                 t3err[t3flag] = np.nan
                 t3phi.append(t3[1:-1])
                 t3phierr.append(t3err[1:-1])
-                tels.append([beam_map[a] for a in oi_t3[i]['STA_INDEX']])
-                u1coord = oi_t3[i]['U1COORD']
-                v1coord = oi_t3[i]['V1COORD']
-                u2coord = oi_t3[i]['U2COORD']
-                v2coord = oi_t3[i]['V2COORD']
+                tels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
+                u1coord = table.data[i]['U1COORD']
+                v1coord = table.data[i]['V1COORD']
+                u2coord = table.data[i]['U2COORD']
+                v2coord = table.data[i]['V2COORD']
                 u3coord = -u1coord - u2coord
                 v3coord = -v1coord - v2coord
                 u_coords.append([u1coord,u2coord,u3coord])
                 v_coords.append([v1coord,v2coord,v3coord])
-            for i in eachindex(oi_vis2):
+                time_obs.append(table.data[i]['MJD'])
+                eff_wave.append(hdu['OI_WAVELENGTH',wl_i].data['EFF_WAVE'][1:-1])
+            wl_i+=1
+
+        if table.name=='OI_VIS2':
+            for i in eachindex(table.data):
                 ## use this to exclude a telescope
-                stations = ['none']#[beam_map[a] for a in oi_vis2[i]['STA_INDEX']]
+                stations = [beam_map[a] for a in table.data[i]['STA_INDEX']]
                 if exclude in stations:
-                    phases_empty = np.empty(oi_vis2[i]['VIS2DATA'].shape)
+                    phases_empty = np.empty(table.data[i]['VIS2DATA'].shape)
                     phases_empty[:] = np.nan
                     vis2.append(phases_empty[1:-1])
                     vis2err.append(phases_empty[1:-1])
                     continue
-                v2 = oi_vis2[i]['VIS2DATA']
-                v2err = oi_vis2[i]['VIS2ERR']
-                v2flag = np.where(oi_vis2[i].field('FLAG')==True)
+                v2 = table.data[i]['VIS2DATA']
+                v2err = table.data[i]['VIS2ERR']
+                v2flag = np.where(table.data[i].field('FLAG')==True)
                 v2[v2flag] = np.nan
                 v2err[v2flag] = np.nan
                 vis2.append(v2[1:-1])
                 vis2err.append(v2err[1:-1])
-            for i in eachindex(oi_vis2):
+
+        if table.name=='OI_VIS':
+            for i in eachindex(table.data):
                 ## use this to exclude a telescope
-                stations = ['none']#[beam_map[a] for a in oi_vis[i]['STA_INDEX']]
-                phases_empty = np.empty(oi_vis[i]['VISPHI'].shape)
-                phases_empty[:] = np.nan
-                visphi.append(phases_empty[1:-1])
-                visphierr.append(phases_empty[1:-1])
-                visamp.append(phases_empty[1:-1])
-                visamperr.append(phases_empty[1:-1])
-                vistels.append([beam_map[a] for a in oi_vis[i]['STA_INDEX']])
-                ucoords.append(np.nan)
-                vcoords.append(np.nan)
-        hdu.close()
+                stations = [beam_map[a] for a in table.data[i]['STA_INDEX']]
+                if exclude in stations:
+                    phases_empty = np.empty(table.data[i]['VISPHI'].shape)
+                    phases_empty[:] = np.nan
+                    visphi.append(phases_empty[1:-1])
+                    visphierr.append(phases_empty[1:-1])
+                    visamp.append(phases_empty[1:-1])
+                    visamperr.append(phases_empty[1:-1])
+                    vistels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
+                    ucoords.append(np.nan)
+                    vcoords.append(np.nan)
+                    continue
+
+                vis = table.data[i]['VISPHI']
+                viserr = table.data[i]['VISPHIERR']
+                vamp = table.data[i]['VISAMP']
+                vamperr = table.data[i]['VISAMPERR']
+                visflag = np.where(table.data[i].field('FLAG')==True)
+                vis[visflag] = np.nan
+                viserr[visflag] = np.nan
+                vamp[visflag] = np.nan
+                vamperr[visflag] = np.nan
+                visphi.append(vis[1:-1])
+                visphierr.append(viserr[1:-1])
+                visamp.append(vamp[1:-1])
+                visamperr.append(vamperr[1:-1])
+                vistels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
+                ucoords.append(table.data[i]['UCOORD'])
+                vcoords.append(table.data[i]['VCOORD'])
+
+    hdu.close()
 
     t3phi = np.array(t3phi)
     t3phierr = np.array(t3phierr)

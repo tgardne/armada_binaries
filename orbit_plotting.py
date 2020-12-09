@@ -14,7 +14,7 @@ def orbit_model(a,e,inc,w,bigw,P,T,t):
     G=a*(-np.sin(bigw)*np.sin(w)+np.cos(bigw)*np.cos(inc)*np.cos(w))
 
     #Calculate the mean anamoly for each t in model:
-    t0=np.linspace(t[0],t[0]+P,1000)
+    t0=np.linspace(t[0],t[0]+P,10000)
     M=[]
     for i in t0:
         m_anom=2*np.pi/P*(i-T)
@@ -79,7 +79,7 @@ def triple_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,t):
     G2=a2*(-np.sin(bigw2)*np.sin(w2)+np.cos(bigw2)*np.cos(inc2)*np.cos(w2))
 
     #Calculate the mean anamoly for each t in model:
-    t0=np.linspace(t[0],t[0]+P,1000)
+    t0=np.linspace(t[0],t[0]+P,10000)
     M=[]
     for i in t0:
         m_anom=2*np.pi/P*(i-T)

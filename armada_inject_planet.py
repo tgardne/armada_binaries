@@ -98,6 +98,7 @@ elif os.getcwd()[7:19] == 'adam.scovera':
 target_hd = input('Target HD #: ')
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
+date = input('note for savefiles: ')
 
 emethod = input('bootstrap errors? (y/n) ')
 
@@ -272,10 +273,12 @@ error_deg_all = np.concatenate([error_deg,error_deg_wds])
 ############################################
 ## ADD A FAKE PLANET
 ############################################
-print('ADDING FAKE PLANET WITH 50day period, 100 micro-as wobble')
-planet_xy = add_planet(50,0.1,100,10,57715,t)
-planet_xy_wds = add_planet(50,0.1,100,10,57715,t_wds)
-planet_xy_all = add_planet(50,0.1,100,10,57715,t_all)
+print('ADDING FAKE PLANET')
+pper = float(input('Planet period (d): '))
+psem = float(input('Planet wobble semi-major (uas): '))/1000
+planet_xy = add_planet(pper,psem,100,10,57715,t)
+planet_xy_wds = add_planet(pper,psem,100,10,57715,t_wds)
+planet_xy_all = add_planet(pper,psem,100,10,57715,t_all)
 xpos += planet_xy[0]
 ypos += planet_xy[1]
 xpos_wds += planet_xy_wds[0]
@@ -340,6 +343,7 @@ params.add('e', value= e, min=0, max=0.99)
 params.add('a', value= a, min=0)
 params.add('P', value= P, min=0)
 params.add('T', value= T, min=0)
+params.add('mirc_scale', value= 1.0, vary=False)
 
 result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
 
@@ -469,6 +473,7 @@ while filter_wds == 'y':
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
     params.add('T', value= T, min=0)
+    params.add('mirc_scale', value= 1.0, vary=False)
 
     result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
     filter_wds = input('Remove more data? (y/n)')
@@ -529,7 +534,7 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Outer Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_outer_leastsquares.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_outer_leastsquares.pdf'%(directory,target_hd,date))
 plt.close()
 
 ## plot resids for ARMADA
@@ -550,7 +555,7 @@ ax.set_ylabel('milli-arcsec')
 ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Resids'%target_hd)
-plt.savefig('%s/HD%s_resid_leastsquares.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_resid_leastsquares.pdf'%(directory,target_hd,date))
 plt.close()
 
 ## residuals
@@ -612,9 +617,10 @@ for period in tqdm(P2):
 
     for i in np.arange(10):
         ## randomize orbital elements
-        bigw2 = np.random.uniform(0,2*np.pi)
-        inc2 = np.random.uniform(0,np.pi)
-        T2 = np.random.uniform(58000,58700)
+        ## 100,10,57715
+        bigw2 = np.random.uniform(90,110)*np.pi/180
+        inc2 = np.random.uniform(5,15)*np.pi/180
+        T2 = np.random.uniform(57710,57720)
 
         params = Parameters()
         params.add('w',   value= w_start, min=0, max=2*np.pi)
@@ -631,6 +637,7 @@ for period in tqdm(P2):
         params.add('a2', value= a2, min=0)
         params.add('P2', value= period, vary=False)
         params.add('T2', value= T2, min=0)
+        params.add('mirc_scale', value= 1.0, vary=False)
 
         #params.add('pscale', value=1)
 
@@ -667,7 +674,7 @@ plt.plot(params_inner[:,0],1/chi2,'o-')
 plt.xlabel('Period (d)')
 plt.ylabel('1/chi2')
 plt.title('Best Period = %s'%period_best)
-plt.savefig('%s/HD%s_chi2_period.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_chi2_period.pdf'%(directory,target_hd,date))
 plt.close()
 
 print('Best inner period = %s'%period_best)
@@ -688,6 +695,7 @@ params.add('e2', value= 0, vary=False)#0.1, min=0,max=0.99)
 params.add('a2', value= a2, min=0)
 params.add('P2', value= period_best, min=0)
 params.add('T2', value= params_inner[:,6][idx], min=0)
+params.add('mirc_scale', value= 1.0, vary=False)
 
 #params.add('pscale', value=1)
 
@@ -734,6 +742,7 @@ for semi in tqdm(a_grid):
         params.add('a2', value= semi, vary=False)#a2, min=0)
         params.add('P2', value= best_inner[0], min=0)
         params.add('T2', value= best_inner[6], min=0)
+        params.add('mirc_scale', value= 1.0, vary=False)
 
         #do fit, minimizer uses LM for least square fitting of model to data
         minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
@@ -756,5 +765,5 @@ plt.scatter(a_inner,i_inner,c=1/chi2,cmap=cm.inferno)
 plt.colorbar(label='1 / $\chi^2$')
 plt.xlabel('semi-major (mas)')
 plt.ylabel('inclination (deg)')
-plt.savefig('%s/HD%s_semi_inc_grid.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_semi_inc_grid.pdf'%(directory,target_hd,date))
 plt.close()

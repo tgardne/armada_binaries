@@ -11,7 +11,7 @@
 
 from chara_uvcalc import uv_calc
 from binary_disks_vector import binary_disks_vector
-from read_oifits import read_chara,read_vlti
+from read_oifits import read_chara,read_vlti,read_chara_old
 import numpy as np
 import matplotlib.pyplot as plt
 from lmfit import minimize, Minimizer, Parameters, Parameter, report_fit
@@ -183,16 +183,16 @@ def bootstrap_data(params,t3,t3err,vp,vperr,v2,v2err,vamp,vamperr,ucc,vcc,uc,vc,
 ######################################################################
 
 ## Ask the user which file contains the closure phases
-dtype = input('chara/vlti? ')
+dtype = input('chara/vlti/chara_old? ')
 date=input('Date for saved files (e.g. 2018Jul19):')
 dir=input('Path to oifits directory:')
 target_id=input('Target ID (e.g. HD_206901): ')
 
-#method=input('VISPHI METHOD (dphase or visphi): ')
-if dtype=='chara':
-    method = 'dphase'
-else:
-    method = 'visphi'
+method=input('VISPHI METHOD (dphase or visphi): ')
+#if dtype=='chara' or dtype==:
+#    method = 'dphase'
+#else:
+#    method = 'visphi'
 
 interact = input('interactive session with data? (y/n): ')
 exclude = input('exclude a telescope (e.g. E1): ')
@@ -215,6 +215,8 @@ if dtype=='chara':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara(dir,target_id,interact,exclude,bl_drop)
 if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
+if dtype=='chara_old':
+    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
 ########################################################
 
 ## Split spectrum in half
@@ -269,12 +271,12 @@ grid_size = float(input('search grid size (mas): '))
 steps = int(input('steps in grid: '))
 a3 = float(input('flux ratio (f1/f2): '))
 
-#a4 = float(input('UD1 (mas): '))
-#a5 = float(input('UD2 (mas): '))
-#a6 = float(input('bw smearing (1/R): '))
-a4 = 0.5
-a5 = 0.5
-a6 = 0.005
+a4 = float(input('UD1 (mas): '))
+a5 = float(input('UD2 (mas): '))
+a6 = float(input('bw smearing (1/R): '))
+#a4 = 0.5
+#a5 = 0.5
+#a6 = 0.005
 
 vary_ratio = input('vary fratio on grid? (y/n) ')
 plot_grid = input('plot grid (y/n)? ')
@@ -450,7 +452,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
     plt.close()
 
     ## regroup data by measurements
-    if dtype=='chara':
+    if dtype=='chara' or dtype=='chara_old':
         ntri=20
         nbl=15
     if dtype=='vlti':
@@ -481,7 +483,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         mpl.rcParams['xtick.labelsize'] = label_size
         mpl.rcParams['ytick.labelsize'] = label_size
 
-        if dtype=='chara':
+        if dtype=='chara' or dtype=='chara_old':
             fig,axs = plt.subplots(4,5,figsize=(10,7),facecolor='w',edgecolor='k')
         if dtype=='vlti':
             fig,axs = plt.subplots(2,2,figsize=(10,7),facecolor='w',edgecolor='k')
@@ -508,7 +510,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         mpl.rcParams['xtick.labelsize'] = label_size
         mpl.rcParams['ytick.labelsize'] = label_size
 
-        if dtype=='chara':
+        if dtype=='chara' or dtype=='chara_old':
             fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
         if dtype=='vlti':
             fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
@@ -535,7 +537,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         mpl.rcParams['xtick.labelsize'] = label_size
         mpl.rcParams['ytick.labelsize'] = label_size
 
-        if dtype=='chara':
+        if dtype=='chara' or dtype=='chara_old':
             fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
         if dtype=='vlti':
             fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
@@ -562,7 +564,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         mpl.rcParams['xtick.labelsize'] = label_size
         mpl.rcParams['ytick.labelsize'] = label_size
 
-        if dtype=='chara':
+        if dtype=='chara' or dtype=='chara_old':
             fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
         if dtype=='vlti':
             fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')

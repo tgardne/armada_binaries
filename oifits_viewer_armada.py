@@ -17,7 +17,7 @@ from astropy.io import fits
 ## select night, target
 dir=input('Path to oifits directory: ')
 
-dtype = input('chara / vlti? ')
+dtype = input('chara / vlti / chara_old? ')
 target_id=input('Target (e.g. HD_206901): ')
 
 if dtype=='chara' or dtype=='chara_old':
@@ -32,13 +32,14 @@ if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
 if dtype=='chara_old':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
-
+print(t3phi.shape)
+print(eff_wave.shape)
 ## plot t3phi data
 label_size = 4
 mpl.rcParams['xtick.labelsize'] = label_size
 mpl.rcParams['ytick.labelsize'] = label_size
 
-if dtype=='chara':
+if dtype=='chara' or dtype=='chara_old':
     fig,axs = plt.subplots(4,5,figsize=(10,7),facecolor='w',edgecolor='k')
     index = np.arange(20)
 if dtype=='vlti':
@@ -70,7 +71,7 @@ fig.text(0.05, 0.5, 'CP (deg)', va='center', rotation='vertical')
 plt.show()
 
 ## plot vis2 data
-if dtype=='chara':
+if dtype=='chara' or dtype=='chara_old':
     fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
     index = np.arange(15)
 if dtype=='vlti':
@@ -109,7 +110,7 @@ plt.show()
 #plt.savefig('%s_vis2.pdf'%target_id)
 
 ## plot dphase data
-if dtype=='chara':
+if dtype=='chara' or dtype=='chara_old':
     fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
     index = np.arange(15)
 if dtype=='vlti':
@@ -147,7 +148,7 @@ plt.show()
 #plt.savefig('%s_dphase.pdf'%target_id)
 
 ## plot visamp data
-if dtype=='chara':
+if dtype=='chara' or dtype=='chara_old':
     fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
     index = np.arange(15)
 if dtype=='vlti':
