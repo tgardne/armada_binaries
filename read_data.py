@@ -118,6 +118,35 @@ def read_wds(file,weight,fileTypes):
     error_pa_wds=error_deg_wds*np.pi/180.
     
     return(t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds,type)
+    
+def read_idealWDS(file, weight):
+    x_vals=[]
+    y_vals=[]
+    p_wds=[]
+    t_wds=[]
+    theta_wds=[]
+    error_maj_wds=[]
+    error_min_wds=[]
+    error_pa_wds=[]
+    error_deg_wds=[]
+    type=[]
+    
+    for line in file.readlines():
+        thisLine = line.split()
+        if (thisLine[0] == '#' or thisLine[1] == 'nan'):
+            continue
+        x_vals.append(float(thisLine[1]))
+        y_vals.append(float(thisLine[2]))
+        type.append(thisLine[3])
+        error_maj_wds.append(float(thisLine[4]))
+        error_min_wds.append(float(thisLine[5]))
+        error_pa_wds.append(float(thisLine[6]))
+        t_wds.append(float(thisLine[7]))
+        p_wds.append(float(thisLine[8]))
+        theta_wds.append(float(thisLine[9]))
+    
+    error_deg_wds = [0] * len(x_vals)
+    return x_vals, y_vals, t_wds, p_wds, theta_wds, error_maj_wds, error_min_wds, error_pa_wds, error_deg_wds, type
 
 def read_orb6(target,file):
 

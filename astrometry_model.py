@@ -65,9 +65,9 @@ def astrometry_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     model_y=A*X+F*Y
     model_x=B*X+G*Y
 
-    idx = np.where((t<58362) & (t>57997))
-    model_y[idx]/=mirc_scale
-    model_x[idx]/=mirc_scale
+    #idx = np.where((t<58362) & (t>57997))
+    #model_y[idx]/=mirc_scale
+    #model_x[idx]/=mirc_scale
     
     major_vector_x=np.sin(error_pa)
     major_vector_y=np.cos(error_pa)

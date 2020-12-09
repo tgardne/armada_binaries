@@ -11,11 +11,12 @@
 from lmfit import minimize, Minimizer, Parameters, Parameter, report_fit
 import numpy as np
 import os
+import os.path
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
-from read_data import read_data,read_wds,read_orb6,get_types
+from read_data import read_data,read_wds,read_orb6,get_types,read_idealWDS
 from astrometry_model import astrometry_model,triple_model,lnlike,lnprior,lnpost,create_init
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
@@ -35,13 +36,16 @@ def cart2pol(x,y):
         theta_new=theta
     return(r,theta_new)
     
-def plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx):
+def plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx,err_maj,err_min,err_pa,t_wds):
     x=[]
     y=[]
     t=[]
-
-    wdt = make_plotable(xpos_wds,ypos_wds,types)
-
+    emx=[]
+    emn=[]
+    epa=[]
+    twds=[]
+    wdt = make_plotable(xpos_wds,ypos_wds,types,err_maj,err_min,err_pa,t_wds)
+    
     for i in range(0,len(wdt)):
         plt.plot(wdt[i][0],wdt[i][1],'o',label=wdt[i][2])
             
@@ -51,7 +55,15 @@ def plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx):
             t.append(i[2])
         for k in i[1]:
             y.append(k)
-            
+        for l in i[3]:
+            emx.append(l)
+        for m in i[4]:
+            emn.append(m)
+        for n in i[5]:
+            epa.append(n)
+        for o in i[6]:
+            twds.append(o)
+
     plt.plot(xpos_wds[0],ypos_wds[0],'*')
     plt.plot(xpos[idx],ypos[idx],'*')
     plt.plot(xpos,ypos,'+',label='ARMADA')
@@ -62,33 +74,45 @@ def plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx):
     plt.ylabel('ddec (mas)')
     plt.legend()
     plt.show()
+
+    return x, y, t, emx, emn, epa, twds
     
-    return x, y, t
-    
-def make_plotable(x, y, t):
+def make_plotable(x, y, ty, e_maj, e_min, e_pa, t_w):
     tList = []
     data_tot = []
     repeats = 0
-        
-    for i in t:
+
+    for i in ty:
         if i in tList:
             ++repeats # 'if i not in tList' did not work so need soemthing here/
         else:
             tList.append(i)
-            
     for i in tList:
         xType = []
         yType = []
+        majType = []
+        minType = []
+        tType = []
+        paType = []
         data = []
         for j in range(0,len(x)):
-            if t[j] == i:
+            if ty[j] == i:
                 xType.append(x[j])
                 yType.append(y[j])
+                majType.append(e_maj[j])
+                minType.append(e_min[j])
+                paType.append(e_pa[j])
+                tType.append(t_w[j])
         data.append(xType)
         data.append(yType)
         data.append(i)
+        data.append(majType)
+        data.append(minType)
+        data.append(paType)
+        data.append(tType)
         data_tot.append(data)
         
+    # Returns an array of [[x, y, type, error_major, error_minor, error_pa, t],...]
     return data_tot
 
 ###########################################
@@ -221,39 +245,66 @@ wds_data_tot = []
 xWDS = []
 yWDS = []
 WDStype = []
+errMajWDS = []
+errMinWDS = []
+errPa = []
+tWDS = []
+idealExists = False
 
 try:
-    file1=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
-    target_types = get_types(file1)
-    file2=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
-    weight = 10
+    idealFile = "%s/HD%s_chi2err/HD_%s_wds_ideal.txt"%(path,target_hd,target_hd)
+    if os.path.isfile(idealFile):
+        idealExists = True
+        ans = input('Would you like to use the ideal data available? y/n? ')
+        if (ans == 'y' or ans == 'Y'):
+            file = open(os.path.expanduser("%s/HD%s_chi2err/HD_%s_wds_ideal.txt"%(path,target_hd,target_hd)))
+            xpos_wds,ypos_wds,t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds,types = read_idealWDS(file,10)
+        else:
+            file1=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+            target_types = get_types(file1)
+            file2=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+            weight = 10
+            t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds,types = read_wds(file2,weight,target_types)
+            ## correct WDS for PA
+            theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
 
-    t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds,types = read_wds(file2,weight,target_types)
+            xpos_wds=p_wds*np.sin(theta_wds)
+            ypos_wds=p_wds*np.cos(theta_wds)
+            
+    else:
+        file1=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+        target_types = get_types(file1)
+        file2=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+        weight = 10
+        t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds,types = read_wds(file2,weight,target_types)
+        ## correct WDS for PA
+        theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
+
+        xpos_wds=p_wds*np.sin(theta_wds)
+        ypos_wds=p_wds*np.cos(theta_wds)
+    
     print('Number of WDS data points = %s'%len(p_wds))
-
-    ## correct WDS for PA
-    theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
-
-    xpos_wds=p_wds*np.sin(theta_wds)
-    ypos_wds=p_wds*np.cos(theta_wds)
     idx = np.argmin(t)
     
-    xWDS, yWDS, WDStype = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx)
+    xWDS, yWDS, WDStype, errMajWDS, errMinWDS, errPa, tWDS = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx,error_maj_wds,error_min_wds,error_pa_wds,t_wds)
     
-    flip = input('Flip WDS data? (y/n): ')
+    if idealExists:
+        flip = 'n'
+    else:
+        flip = input('Flip WDS data? (y/n): ')
     if flip=='y':
         xpos_wds=-p_wds*np.sin(theta_wds)
         ypos_wds=-p_wds*np.cos(theta_wds)
-        xWDS, yWDS, WDStype = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx)
+        xWDS, yWDS, WDStype, errMajWDS, errMinWDS, errPa, tWDS = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx,error_maj_wds,error_min_wds,error_pa_wds,t_wds)
         
         better = input('Flip data back to original? (y/n): ')
         if better=='y':
             xpos_wds=p_wds*np.sin(theta_wds)
             ypos_wds=p_wds*np.cos(theta_wds)
-            xWDS, yWDS, WDStype = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx)
-            
-    wds_data_tot = make_plotable(xWDS,yWDS,WDStype)
-
+            xWDS, yWDS, WDStype, errMajWDS, errMinWDS, errPa, tWDS = plot_data(xpos_wds,ypos_wds,types,xpos,ypos,idx,error_maj_wds,error_min_wds,error_pa_wds,t_wds)
+   
+    wds_data_tot = make_plotable(xWDS,yWDS,WDStype,errMajWDS,errMinWDS,errPa,tWDS)
+    
 except:
     t_wds = np.array([np.nan])
     p_wds = np.array([np.nan])
@@ -382,9 +433,15 @@ def on_click_remove(event):
     else:
         xWDS[idxW] = np.nan
         yWDS[idxW] = np.nan
-        WDStype[idxW] = ''
-        wds_data_tot = make_plotable(xWDS, yWDS, WDStype)
-        
+        WDStype[idxW] = np.nan
+        errMajWDS[idxW] = np.nan
+        errMinWDS[idxW] = np.nan
+        errPa[idxW] = np.nan
+        tWDS[idxW] = np.nan
+        theta_wds[idxW] = np.nan
+        p_wds[idxW]=np.nan
+        #error_deg_wds.pop(idxW)
+        wds_data_tot = make_plotable(xWDS, yWDS, WDStype,errMajWDS,errMinWDS,errPa,tWDS)
 
     ax.cla()
     for i in range(0,len(wds_data_tot)):
@@ -425,7 +482,7 @@ def on_click_flip(event):
     else:
         xWDS[idxW] = -xWDS[idxW]
         yWDS[idxW] = -yWDS[idxW]
-        wds_data_tot = make_plotable(xWDS, yWDS, WDStype)
+        wds_data_tot = make_plotable(xWDS, yWDS, WDStype,errMajWDS,errMinWDS,errPa,tWDS)
 
     ax.cla()
     for i in range(0,len(wds_data_tot)):
@@ -486,7 +543,7 @@ while filter_wds == 'y':
     fig.canvas.mpl_disconnect(cid)
     plt.close()
     
-    wds_data_tot = make_plotable(xWDS, yWDS, WDStype)
+    wds_data_tot = make_plotable(xWDS, yWDS, WDStype,errMajWDS,errMinWDS,errPa,tWDS)
     
     fig,ax=plt.subplots()
     for i in range(0,len(wds_data_tot)):
@@ -513,7 +570,7 @@ while filter_wds == 'y':
     fig.canvas.mpl_disconnect(cid)
     plt.close()
     
-    wds_data_tot = make_plotable(xWDS, yWDS, WDStype)
+    wds_data_tot = make_plotable(xWDS, yWDS, WDStype,errMajWDS,errMinWDS,errPa,tWDS)
 
     params = Parameters()
     params.add('w',   value= omega, min=0, max=2*np.pi)
@@ -534,13 +591,25 @@ while filter_wds == 'y':
 ##########################################
 ## Save Plots
 ##########################################
+chi2Types = []
+
 resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
                             error_min,error_pa)
 ndata_armada = 2*sum(~np.isnan(xpos))
-chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
+chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-7) # 7 ~ len(result.params)
 print('-'*10)
 print('chi2 armada = %s'%chi2_armada)
 print('-'*10)
+
+for i in wds_data_tot:
+    resid = astrometry_model(result.params,i[0],i[1],i[6],i[3],i[4],i[5])
+    ndata = 2*sum(~np.isnan(i[0]))
+    chi2 = np.nansum(resid**2)/(ndata-len(result.params))
+    chi2Types.append([i[2], chi2])
+    print('Collection Type: ', i[2], '-'*5)
+    print('chi2 = %s'%chi2)
+    print('-'*10)
+
 
 if emethod == 'y':
     directory='%s/HD%s_bootstrap/'%(path,target_hd)
@@ -641,9 +710,28 @@ theta_wds_new = np.array(theta_wds_new)
 f = open("%s/HD_%s_wds.txt"%(directory,target_hd),"w+")
 f.write("# date mjd sep pa err_maj err_min err_pa\r\n")
 for i,j,k,l,m,n in zip(t_wds,p_wds_new,theta_wds_new,error_maj_wds,error_min_wds,error_deg_wds):
-    f.write("-- %s %s %s %s %s %s\r\n"%(i,j,k,l,m,n))
+    if (i != np.nan):
+        f.write("-- %s %s %s %s %s %s\r\n"%(i,j,k,l,m,n))
+for i in chi2Types:
+    f.write("Data Collection Type: %s, Chi2: %s\r\n"%(i[0], i[1]))
 f.write('#')
 f.close()
+
+overwrite = 's'
+
+if idealExists:
+    overwrite = input('Would you like to overwrite the existing ideal file? y/n? ')
+else:
+    overwrite = 'y'
+
+
+## Save txt file with ideal wds elements
+if (overwrite == 'y') or (overwrite == 'Y'):
+    ## Save txt file with adjusted orbit
+    f = open("%s/HD_%s_wds_ideal.txt"%(directory,target_hd),"w+")
+    f.write("# x y Type MajorError MinorError PaError t p Theta\r\n")
+    for i,j,k,l,m,n,o,p,q in zip(xWDS,yWDS,WDStype,errMajWDS,errMinWDS,errPa,tWDS,p_wds,theta_wds):
+        f.write("-- %s %s %s %s %s %s %s %s %s\r\n"%(i,j,k,l,m,n,o,p,q))
 
 search_triple = input('Search for triple? (y/n): ')
 if search_triple=='n':
