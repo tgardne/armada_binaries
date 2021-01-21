@@ -20,7 +20,6 @@ from astrometry_model import astrometry_model,triple_model,lnlike,lnprior,lnpost
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
-import random
 
 def cart2pol(x,y):
     x=-x
@@ -59,15 +58,13 @@ elif os.getcwd()[7:19] == 'adam.scovera':
 ###########################################
 target_hd = input('Target HD #: ')
 date = input('Date for savefile: ')
-distance = float(input('Distance (pc): '))
-mass_star = float(input('Mass Star (Msun): '))
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
 #emethod = input('bootstrap errors? (y/n) ')
 emethod = 'n'
-mirc_scale = input('Scale OLD MIRCX data? (y/n) ')
-#mirc_scale = 'n'
+#mirc_scale = input('Scale OLD MIRCX data? (y/n) ')
+mirc_scale = 'n'
 
 query = Simbad.query_objectids('HD %s'%target_hd)
 for item in query:
@@ -186,15 +183,12 @@ if input_wds == 'y':
 
         xpos_wds=p_wds*np.sin(theta_wds)
         ypos_wds=p_wds*np.cos(theta_wds)
+        idx = np.argmin(t)
 
         plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
         plt.plot(xpos_wds[0],ypos_wds[0],'*')
-        try:
-            idx = np.argmin(t)
-            plt.plot(xpos[idx],ypos[idx],'*')
-            plt.plot(xpos,ypos,'+',label='ARMADA')
-        except:
-            pass
+        plt.plot(xpos[idx],ypos[idx],'*')
+        plt.plot(xpos,ypos,'+',label='ARMADA')
         plt.plot(0,0,'*')
         plt.gca().invert_xaxis()
         plt.title('All Data')
@@ -209,11 +203,8 @@ if input_wds == 'y':
             ypos_wds=-p_wds*np.cos(theta_wds)
             plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
             plt.plot(xpos_wds[0],ypos_wds[0],'*')
-            try:
-                plt.plot(xpos[idx],ypos[idx],'*')
-                plt.plot(xpos,ypos,'+',label='ARMADA')
-            except:
-                pass
+            plt.plot(xpos[idx],ypos[idx],'*')
+            plt.plot(xpos,ypos,'+',label='ARMADA')
             plt.plot(0,0,'*')
             plt.gca().invert_xaxis()
             plt.title('All Data')
@@ -336,7 +327,7 @@ params.add('a', value= a, min=0)
 params.add('P', value= P, min=0)
 params.add('T', value= T, min=0)
 if mirc_scale == 'y':
-    params.add('mirc_scale', value= 1.0,vary=False)
+    params.add('mirc_scale', value= 1.0)
 else:
     params.add('mirc_scale', value= 1.0, vary=False)
 
@@ -469,7 +460,7 @@ while filter_wds == 'y':
     params.add('P', value= P, min=0)
     params.add('T', value= T, min=0)
     if mirc_scale == 'y':
-        params.add('mirc_scale', value= 1.0, vary=False)
+        params.add('mirc_scale', value= 1.0)
     else:
         params.add('mirc_scale', value= 1.0, vary=False)
 
@@ -617,15 +608,11 @@ a2 = resids_median/1000
 
 print('Grid Searching over period')
 params_inner=[]
-params_outer=[]
 chi2 = []
-#chi2_noise = []
 for period in tqdm(P2):
 
     params_inner_n=[]
-    params_outer_n=[]
     chi2_n = []
-    #chi2_noise_n = []
 
     for i in np.arange(20):
         ## randomize orbital elements
@@ -634,20 +621,20 @@ for period in tqdm(P2):
         T2 = np.random.uniform(58000,60000)
 
         params = Parameters()
-        params.add('w',   value= w_start, min=0, max=2*np.pi)
-        params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
-        params.add('inc', value= inc_start, min=0, max=2*np.pi)
-        params.add('e', value= e_start, min=0, max=0.99)
-        params.add('a', value= a_start, min=0)
-        params.add('P', value= P_start, min=0)
-        params.add('T', value= T_start, min=0)
-        params.add('w2',   value= 0, vary=False)
-        params.add('bigw2', value= bigw2, min=0, max=2*np.pi)
-        params.add('inc2', value= inc2, min=0, max=2*np.pi)
-        params.add('e2', value= 0, vary=False)
-        params.add('a2', value= a2, min=0)
-        params.add('P2', value= period, vary=False)
-        params.add('T2', value= T2, min=0)
+        #params.add('w',   value= w_start, min=0, max=2*np.pi)
+        #params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
+        #params.add('inc', value= inc_start, min=0, max=2*np.pi)
+        #params.add('e', value= e_start, min=0, max=0.99)
+        #params.add('a', value= a_start, min=0)
+        #params.add('P', value= P_start, min=0)
+        #params.add('T', value= T_start, min=0)
+        params.add('w',   value= 0, vary=False)
+        params.add('bigw', value= bigw2, min=0, max=2*np.pi)
+        params.add('inc', value= inc2, min=0, max=2*np.pi)
+        params.add('e', value= 0, vary=False)
+        params.add('a', value= a2, min=0)
+        params.add('P', value= period, vary=False)
+        params.add('T', value= T2, min=0)
         if mirc_scale == 'y':
             params.add('mirc_scale', value= 1.0)
         else:
@@ -656,14 +643,14 @@ for period in tqdm(P2):
         #params.add('pscale', value=1)
 
         #do fit, minimizer uses LM for least square fitting of model to data
-        minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
-                                                           error_maj_all,error_min_all,
-                                                           error_pa_all),
+        minner = Minimizer(astrometry_model, params, fcn_args=(xresid,yresid,t,
+                                                           error_maj,error_min,
+                                                           error_pa),
                           nan_policy='omit')
         result = minner.leastsq(xtol=1e-5,ftol=1e-5)
-        params_inner_n.append([period,result.params['a2'],result.params['e2'],result.params['w2']
-                            ,result.params['bigw2'],result.params['inc2'],result.params['T2']])
-        params_outer_n.append([result.params['P'],result.params['a'],result.params['e'],result.params['w']
+        #params_inner_n.append([period,result.params['a2'],result.params['e2'],result.params['w2']
+        #                    ,result.params['bigw2'],result.params['inc2'],result.params['T2']])
+        params_inner_n.append([result.params['P'],result.params['a'],result.params['e'],result.params['w']
                             ,result.params['bigw'],result.params['inc'],result.params['T']])
         chi2_n.append(result.redchi)
         #resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
@@ -672,64 +659,20 @@ for period in tqdm(P2):
         #chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-12)
         #chi2_n.append(chi2_armada)
 
-        ### noise for period search
-        #ra,dec,rapoints,decpoints = orbit_model(result.params['a'],result.params['e'],
-        #                                result.params['inc'],result.params['w'],
-        #                                result.params['bigw'],result.params['P'],
-        #                                result.params['T'],t)
-        #xresid = xpos - rapoints
-        #yresid = ypos - decpoints
-
-        #params = Parameters()
-        #params.add('w',   value= 0, vary=False)
-        #params.add('bigw', value= bigw2, min=0, max=2*np.pi)
-        #params.add('inc', value= inc2, min=0, max=2*np.pi)
-        #params.add('e', value= 0, vary=False)
-        #params.add('a', value= a2, min=0)
-        #params.add('P', value= period, vary=False)
-        #params.add('T', value= T2, min=0)
-        #if mirc_scale == 'y':
-        #    params.add('mirc_scale', value= 1.0)
-        #else:
-        #    params.add('mirc_scale', value= 1.0, vary=False)
-        ##params.add('pscale', value=1)
-
-        ##do fit, minimizer uses LM for least square fitting of model to data
-        ##print(np.array(random.sample(list(t), len(t))))
-        #tshuffle = np.array(random.sample(list(t), len(t)))
-        #minner = Minimizer(astrometry_model, params, fcn_args=(xresid,yresid,tshuffle,
-        #                                                   error_maj,error_min,
-        #                                                   error_pa),nan_policy='omit')
-        #result = minner.leastsq(xtol=1e-5,ftol=1e-5)
-        #chi2_noise_n.append(result.redchi)
-        ##resids_armada = astrometry_model(result.params,xresid,yresid,tshuffle,error_maj,
-        ##                    error_min,error_pa)
-        ##ndata_armada = 2*sum(~np.isnan(xresid))
-        ##chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-12)
-        ##chi2_noise_n.append(chi2_armada)
-
     params_inner_n=np.array(params_inner_n)
-    params_outer_n=np.array(params_outer_n)
     chi2_n = np.array(chi2_n)
-    #chi2_noise_n = np.array(chi2_noise_n)
 
     idx = np.argmin(chi2_n)
-    #idx_n = np.argmin(chi2_noise_n)
     chi2.append(chi2_n[idx])
-    #chi2_noise.append(chi2_noise_n[idx_n])
     params_inner.append(params_inner_n[idx])
-    params_outer.append(params_outer_n[idx])
     
 
 params_inner=np.array(params_inner)
-params_outer=np.array(params_outer)
 chi2 = np.array(chi2)
-#chi2_noise = np.array(chi2_noise)
 
 idx = np.argmin(chi2)
 period_best = params_inner[:,0][idx]
 
-#plt.plot(params_inner[:,0],1/chi2_noise,'.--')
 plt.plot(params_inner[:,0],1/chi2,'o-')
 plt.xlabel('Period (d)')
 plt.ylabel('1/chi2')
@@ -737,27 +680,17 @@ plt.title('Best Period = %s'%period_best)
 plt.savefig('%s/HD%s_%s_chi2_period.pdf'%(directory,target_hd,date))
 plt.close()
 
-abin = ((params_inner[:,0]/365.25)**2*mass_star)**(1/3)
-mass_planet = mass_star/(abin-params_inner[:,1]*distance/1000)*(params_inner[:,1]*distance/1000)/0.0009546
-idx2 = np.where(params_inner[:,0]>20)
-plt.plot(params_inner[:,0][idx2],mass_planet[idx2],'o-')
-plt.xlabel('Period (d)')
-plt.ylabel('Mass (MJ)')
-plt.title('Best Period = %s'%period_best)
-plt.savefig('%s/HD%s_%s_mass_period.pdf'%(directory,target_hd,date))
-plt.close()
-
 print('Best inner period = %s'%period_best)
 
 ## Do a fit at best period
 params = Parameters()
-params.add('w',   value= params_outer[:,3][idx], min=0, max=2*np.pi)
-params.add('bigw', value= params_outer[:,4][idx], min=0, max=2*np.pi)
-params.add('inc', value= params_outer[:,5][idx], min=0, max=np.pi)
-params.add('e', value= params_outer[:,2][idx], min=0, max=0.99)
-params.add('a', value=params_outer[:,1][idx], min=0)
-params.add('P', value= params_outer[:,0][idx], min=0)
-params.add('T', value= params_outer[:,6][idx], min=0)
+params.add('w',   value= w_start, min=0, max=2*np.pi)
+params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
+params.add('inc', value= inc_start, min=0, max=np.pi)
+params.add('e', value= e_start, min=0, max=0.99)
+params.add('a', value= a_start, min=0)
+params.add('P', value= P_start, min=0)
+params.add('T', value= T_start, min=0)
 params.add('w2',   value= 0, vary=False)#w2, min=0, max=2*np.pi)
 params.add('bigw2', value= params_inner[:,4][idx], min=0, max=2*np.pi)
 params.add('inc2', value= params_inner[:,5][idx], min=0, max=np.pi)
@@ -821,9 +754,9 @@ for semi in tqdm(a_grid):
             params.add('mirc_scale', value= 1.0, vary=False)
 
         #do fit, minimizer uses LM for least square fitting of model to data
-        minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
-                                                           error_maj_all,error_min_all,
-                                                           error_pa_all),
+        minner = Minimizer(triple_model, params, fcn_args=(xpos,ypos,t,
+                                                           error_maj,error_min,
+                                                           error_pa),
                                             nan_policy='omit')
         result = minner.leastsq(xtol=1e-5,ftol=1e-5)
         params_inner.append([result.params['P2'],semi,result.params['e2'],result.params['w2']

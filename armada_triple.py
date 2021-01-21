@@ -569,10 +569,18 @@ w_best = result.params['w']
 bigw_best = result.params['bigw']
 inc_best = result.params['inc']
 T_best = result.params['T']
+mirc_scale_best = result.params['mirc_scale']
 
 ##########################################
 ## Save Plots for Triple
 ##########################################
+idx = np.where(t<58757)
+xpos[idx]/=mirc_scale_best
+ypos[idx]/=mirc_scale_best
+idx = np.where(t_all<58757)
+xpos_all[idx]/=mirc_scale_best
+ypos_all[idx]/=mirc_scale_best
+
 resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
                             error_min,error_pa)
 ndata_armada = 2*sum(~np.isnan(xpos))

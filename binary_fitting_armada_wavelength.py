@@ -24,6 +24,7 @@ import matplotlib as mpl
 from tqdm import tqdm
 from matplotlib.patches import Ellipse
 from ellipse_fitting import ellipse_hull_fit
+from glob import glob
 
 ######################################################################
 ## DEFINE FITTING FUNCTIONS
@@ -50,7 +51,7 @@ def cvis_model(params, u, v, wl):
         ratio = params['ratio']
         ud1 = params['ud1']
         ud2 = params['ud2']
-        bw = params['bw']  
+        bw = params['bw']
     except: 
         ra = params[0]
         dec = params[1]
@@ -203,7 +204,7 @@ absolute = input('use absolute phase value (y/n)?')
 #absolute='n'
 
 ## check directory exists for save files
-save_dir="/Users/tgardne/ARMADA_epochs/%s/"%target_id
+save_dir="/Users/tgardne/ARMADA_epochs/wavelength_fit/%s/"%target_id
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
@@ -219,38 +220,22 @@ if dtype=='chara_old':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
 ########################################################
 
-## Split spectrum in half
-#side = input('red or blue? ')
-side = ''
-if side=='blue':
-    idx = int(eff_wave.shape[-1]/2)
-    eff_wave = eff_wave[:,:idx]
-    t3phi = t3phi[:,:idx]
-    t3phierr = t3phierr[:,:idx]
-    vis2 = vis2[:,:idx]
-    vis2err = vis2err[:,:idx]
-    visphi = visphi[:,:idx]
-    visphierr = visphierr[:,:idx]
-    visamp = visamp[:,:idx]
-    visamperr = visamperr[:,:idx]
-if side=='red':
-    idx = int(eff_wave.shape[-1]/2)
-    eff_wave = eff_wave[:,idx:]
-    t3phi = t3phi[:,idx:]
-    t3phierr = t3phierr[:,idx:]
-    vis2 = vis2[:,idx:]
-    vis2err = vis2err[:,idx:]
-    visphi = visphi[:,idx:]
-    visphierr = visphierr[:,idx:]
-    visamp = visamp[:,idx:]
-    visamperr = visamperr[:,idx:]
+###########################
+## READ IN NEW WAVELENGTHS
+###########################
+wl_file=open(glob('/Users/tgardne/etalon_epochs/wavelength_fit/%s_*.txt'%date)[0])
+eff_wave_new = np.array(wl_file.readlines()[5].split()).astype(np.float)
+#print(eff_wave[0])
+#print(eff_wave_new)
+#plt.plot(eff_wave[0]-eff_wave_new,'o')
+#plt.show()
 
 ## do polynomial dispersion fit for each visphi measurement
 dispersion=[]
 for vis in visphi:
     if np.count_nonzero(~np.isnan(vis))>0:
         y=vis
-        x=eff_wave[0]
+        x=eff_wave_new
         idx = np.isfinite(x) & np.isfinite(y)
         z=np.polyfit(x[idx],y[idx],2)
         p = np.poly1d(z)
@@ -319,7 +304,7 @@ for ra_try in tqdm(ra_grid):
             params.add('ud1',   value= a4, min=0.0,max=3.0)
             params.add('ud2', value= a5, vary=False)
             params.add('bw', value=a6, vary=False)#min=0.0, max=0.1)
-            minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+            minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave_new),nan_policy='omit')
             result = minner.minimize()
             chi2 = result.chisqr
             ra_result = result.params['ra'].value
@@ -331,7 +316,7 @@ for ra_try in tqdm(ra_grid):
         else:
             ## fixed params (faster)
             params = [ra_try,dec_try,a3,a4,a5,a6]
-            chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+            chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave_new)
             chi2 = np.nansum(chi**2)
             ra_result = ra_try
             dec_result = dec_try
@@ -387,7 +372,7 @@ params.add('ud1',   value= best_params[3], vary=False)#min=0.0,max=2.0)
 params.add('ud2', value= best_params[4], vary=False)#min=0.0,max=2.0)
 params.add('bw', value=best_params[5], min=0.0, max=0.1)
 
-minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave_new),nan_policy='omit')
 result = minner.minimize()
 report_fit(result)
 
@@ -413,21 +398,11 @@ best_params.add('bw',value=bw_best)
 
 best_fit = np.around(np.array([ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best,chi_sq_best]),decimals=4)
 
-##### Just a grid plot ######
-#plt.scatter(ra_results, dec_results, c=1/chi_sq, cmap=cm.inferno)
-#plt.colorbar()
-#plt.xlabel('d_RA (mas)')
-#plt.ylabel('d_DE (mas)')
-#plt.title('Best Fit - %s'%np.around(np.array([ra_results[index],dec_results[index]]),decimals=4))
-#plt.gca().invert_xaxis()
-#plt.axis('equal')
-#plt.savefig("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_gridsearch.pdf"%{"1":target_id,"2":date})
-
-complex_vis = cvis_model(best_params,u_coords,v_coords, eff_wave[0])
+complex_vis = cvis_model(best_params,u_coords,v_coords, eff_wave_new)
 cp_model = (np.angle(complex_vis[:,:,0])+np.angle(complex_vis[:,:,1])+np.angle(complex_vis[:,:,2]))*180/np.pi
 cp_model = np.swapaxes(cp_model,0,1)
 
-complex_vis = cvis_model(best_params,ucoords,vcoords, eff_wave[0])
+complex_vis = cvis_model(best_params,ucoords,vcoords, eff_wave_new)
 visibility = np.angle(complex_vis)*180/np.pi
 visibility_amp = np.absolute(complex_vis)
 if method=='dphase':
@@ -442,13 +417,13 @@ vamp = visibility_amp
 visphi_model = np.swapaxes(dphase,0,1)
 visamp_model = np.swapaxes(vamp,0,1)
 
-complex_vis2 = cvis_model(best_params,ucoords,vcoords,eff_wave[0])
+complex_vis2 = cvis_model(best_params,ucoords,vcoords,eff_wave_new)
 visibility2 = complex_vis2*np.conj(complex_vis2)
 vis2_model = visibility2.real
 vis2_model = np.swapaxes(vis2_model,0,1)
 
 ## plot results
-with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":target_id,"2":date}) as pdf:
+with PdfPages("/Users/tgardne/ARMADA_epochs/wavelength_fit/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":target_id,"2":date}) as pdf:
     
     ## first page - chisq grid
     plt.scatter(ra_results, dec_results, c=1/chi_sq, cmap=cm.inferno)
@@ -501,7 +476,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         axs=axs.ravel()
 
         for ind,y,yerr,m,tri in zip(index,t3data,t3errdata,modeldata,tels[:ntri]):
-            x=eff_wave[0]
+            x=eff_wave_new
             axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
             axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
             axs[int(ind)].set_title(str(tri))
@@ -528,7 +503,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         axs=axs.ravel()
 
         for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
-            x=eff_wave[0]
+            x=eff_wave_new
             axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
             axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
             axs[int(ind)].set_title(str(tri))
@@ -555,7 +530,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         axs=axs.ravel()
 
         for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
-            x=eff_wave[0]
+            x=eff_wave_new
             axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
             axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
             axs[int(ind)].set_title(str(tri))
@@ -582,7 +557,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         axs=axs.ravel()
 
         for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
-            x=eff_wave[0]
+            x=eff_wave_new
             axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
             axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
             axs[int(ind)].set_title(str(tri))
@@ -608,8 +583,8 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
 ### Now do errors
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
-size = 0.3
-steps = 300
+size = 0.5
+steps = 500
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
 chi_sq = []
@@ -626,7 +601,7 @@ for ra_try in tqdm(ra_grid):
         #create a set of Parameters
         params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
         #do fit, minimizer uses LM for least square fitting of model to data
-        chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+        chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave_new)
         red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
         chi_sq.append(red_chi2)
         ra_results.append(ra_try)
@@ -655,11 +630,11 @@ plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.gca().invert_xaxis()
 plt.axis('equal')
-plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chisq.pdf"%(target_id,target_id,date))
+plt.savefig("/Users/tgardne/ARMADA_epochs/wavelength_fit/%s/%s_%s_chisq.pdf"%(target_id,target_id,date))
 plt.close()
 ## isolate region where delta_chisq < 1
 params = [ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best]
-chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave_new)
 chi2_best = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
 
 index_err = np.where(chi_sq < (chi2_best+1) )
@@ -688,13 +663,13 @@ plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.gca().invert_xaxis()
 plt.axis('equal')
-plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse.pdf"%(target_id,target_id,date))
+plt.savefig("/Users/tgardne/ARMADA_epochs/wavelength_fit/%s/%s_%s_ellipse.pdf"%(target_id,target_id,date))
 plt.close()
 
 ## write results to a txt file
 t = np.around(np.nanmedian(time_obs),4)
 sep,pa = np.around(cart2pol(best_fit[0],best_fit[1]),decimals=4)
-f = open("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chi2err.txt"%(target_id,target_id,date),"w+")
+f = open("/Users/tgardne/ARMADA_epochs/wavelength_fit/%s/%s_%s_chi2err.txt"%(target_id,target_id,date),"w+")
 f.write("# date mjd sep(mas) pa(Deg) err_maj(mas) err_min(mas) err_pa(deg)\r\n")
 f.write("%s %s %s %s %s %s %s"%(date,t,sep,pa,ellipse_params[0],ellipse_params[1],ellipse_params[2]))
 f.close()
@@ -731,7 +706,7 @@ params.add('ratio', value= ratio_best, min=1.0)
 params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=2.0)
 params.add('ud2', value= ud2_best, vary=False)#min=0.0,max=2.0)
 params.add('bw', value=bw_best, vary=False)#min=0.0, max=0.1)
-ra_boot,dec_boot = bootstrap_data(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+ra_boot,dec_boot = bootstrap_data(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave_new)
 ra_mean = np.mean(ra_boot)
 dec_mean = np.mean(dec_boot)
 a,b,theta = ellipse_hull_fit(ra_boot,dec_boot,ra_mean,dec_mean)
@@ -749,13 +724,13 @@ plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.gca().invert_xaxis()
 plt.axis('equal')
-plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ellipse_boot.pdf"%(target_id,target_id,date))
+plt.savefig("/Users/tgardne/ARMADA_epochs/wavelength_fit/%s/%s_%s_ellipse_boot.pdf"%(target_id,target_id,date))
 plt.close()
 
 ## write results to a txt file
 t = np.around(np.nanmedian(time_obs),4)
 sep,pa = np.around(cart2pol(best_fit[0],best_fit[1]),decimals=4)
-f = open("/Users/tgardne/ARMADA_epochs/%s/%s_%s_bootstrap.txt"%(target_id,target_id,date),"w+")
+f = open("/Users/tgardne/ARMADA_epochs/wavelength_fit/%s/%s_%s_bootstrap.txt"%(target_id,target_id,date),"w+")
 f.write("# date mjd sep(mas) pa(Deg) err_maj(mas) err_min(mas) err_pa(deg)\r\n")
 f.write("%s %s %s %s %s %s %s"%(date,t,sep,pa,ellipse_params[0],ellipse_params[1],ellipse_params[2]))
 f.close()

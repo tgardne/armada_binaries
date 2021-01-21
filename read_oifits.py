@@ -15,6 +15,7 @@ import astropy.io.fits as fits
 def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
 
     beam_map = {1:'S1',2:'S2',3:'E1',4:'E2',5:'W1',6:'W2'}
+    #beam_map = {0:'S1',1:'S2',2:'E1',3:'E2',4:'W1',5:'W2'}
 
     ## get information from fits file
     t3phi=[]
@@ -493,7 +494,8 @@ def read_vlti(dir,interact='n',exclude=''):
 
 def read_chara_old(file,interact='n',exclude=''):
 
-    beam_map = {1:'S1',2:'S2',3:'E1',4:'E2',5:'W1',6:'W2'}
+    #beam_map = {1:'S1',2:'S2',3:'E1',4:'E2',5:'W1',6:'W2'}
+    beam_map = {0:'S1',1:'S2',2:'E1',3:'E2',4:'W1',5:'W2'}
 
     ## get information from fits file
     t3phi=[]
@@ -567,6 +569,9 @@ def read_chara_old(file,interact='n',exclude=''):
                     phases_empty[:] = np.nan
                     vis2.append(phases_empty[1:-1])
                     vis2err.append(phases_empty[1:-1])
+                    vistels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
+                    ucoords.append(np.nan)
+                    vcoords.append(np.nan)
                     continue
                 v2 = table.data[i]['VIS2DATA']
                 v2err = table.data[i]['VIS2ERR']
@@ -575,6 +580,9 @@ def read_chara_old(file,interact='n',exclude=''):
                 v2err[v2flag] = np.nan
                 vis2.append(v2[1:-1])
                 vis2err.append(v2err[1:-1])
+                vistels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
+                ucoords.append(table.data[i]['UCOORD'])
+                vcoords.append(table.data[i]['VCOORD'])
 
         if table.name=='OI_VIS':
             for i in eachindex(table.data):
@@ -587,9 +595,6 @@ def read_chara_old(file,interact='n',exclude=''):
                     visphierr.append(phases_empty[1:-1])
                     visamp.append(phases_empty[1:-1])
                     visamperr.append(phases_empty[1:-1])
-                    vistels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
-                    ucoords.append(np.nan)
-                    vcoords.append(np.nan)
                     continue
 
                 vis = table.data[i]['VISPHI']
@@ -605,9 +610,6 @@ def read_chara_old(file,interact='n',exclude=''):
                 visphierr.append(viserr[1:-1])
                 visamp.append(vamp[1:-1])
                 visamperr.append(vamperr[1:-1])
-                vistels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
-                ucoords.append(table.data[i]['UCOORD'])
-                vcoords.append(table.data[i]['VCOORD'])
 
     hdu.close()
 

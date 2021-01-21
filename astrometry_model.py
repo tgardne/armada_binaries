@@ -65,7 +65,8 @@ def astrometry_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     model_y=A*X+F*Y
     model_x=B*X+G*Y
 
-    idx = np.where((t<58362) & (t>57997))
+    #idx = np.where((t<58362) & (t>57997))
+    idx = np.where(t<58757)
     model_y[idx]/=mirc_scale
     model_x[idx]/=mirc_scale
     
@@ -167,7 +168,8 @@ def triple_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     model_y = A*X+F*Y + A2*X2+F2*Y2
     model_x = B*X+G*Y + B2*X2+G2*Y2
     
-    idx = np.where((t<58362) & (t>57997))
+    #idx = np.where((t<58362) & (t>57997))
+    idx = np.where(t<58757)
     model_y[idx]/=mirc_scale
     model_x[idx]/=mirc_scale
     
