@@ -481,11 +481,63 @@ while filter_wds == 'y':
 ##########################################
 resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
                             error_min,error_pa)
+resids_wds = astrometry_model(result.params,xpos_all[len(xpos):],ypos_all[len(xpos):],t_all[len(xpos):],
+                            error_maj_all[len(xpos):],error_min_all[len(xpos):],error_pa_all[len(xpos):])
 ndata_armada = 2*sum(~np.isnan(xpos))
+ndata_wds = 2*sum(~np.isnan(xpos_all[len(xpos):]))
 chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
+chi2_wds = np.nansum(resids_wds**2)/(ndata_wds-len(result.params))
 print('-'*10)
 print('chi2 armada = %s'%chi2_armada)
+print('chi2 WDS = %s'%chi2_wds)
 print('-'*10)
+
+rescale = input('Rescale errors based off chi2? (y/n): ')
+while rescale=='y':
+
+    ## we don't want to raise armada errors
+    if chi2_armada>1:
+        chi2_armada=1.0
+
+    error_maj*=np.sqrt(chi2_armada)
+    error_min*=np.sqrt(chi2_armada)
+
+    error_maj_all[:len(xpos)]*=np.sqrt(chi2_armada)
+    error_maj_all[len(xpos):]*=np.sqrt(chi2_wds)
+    error_min_all[:len(xpos)]*=np.sqrt(chi2_armada)
+    error_min_all[len(xpos):]*=np.sqrt(chi2_wds)
+
+    ###########################################
+    ## Do a least-squares fit
+    ###########################################
+    params = Parameters()
+    params.add('w',   value= omega, min=0, max=2*np.pi)
+    params.add('bigw', value= bigomega, min=0, max=2*np.pi)
+    params.add('inc', value= inc, min=0, max=2*np.pi)
+    params.add('e', value= e, min=0, max=0.99)
+    params.add('a', value= a, min=0)
+    params.add('P', value= P, min=0)
+    params.add('T', value= T, min=0)
+    if mirc_scale == 'y':
+        params.add('mirc_scale', value= 1.0,vary=False)
+    else:
+        params.add('mirc_scale', value= 1.0, vary=False)
+
+    result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
+
+    resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
+                                error_min,error_pa)
+    resids_wds = astrometry_model(result.params,xpos_all[len(xpos):],ypos_all[len(xpos):],t_all[len(xpos):],
+                                error_maj_all[len(xpos):],error_min_all[len(xpos):],error_pa_all[len(xpos):])
+    ndata_armada = 2*sum(~np.isnan(xpos))
+    ndata_wds = 2*sum(~np.isnan(xpos_all[len(xpos):]))
+    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
+    chi2_wds = np.nansum(resids_wds**2)/(ndata_wds-len(result.params))
+    print('-'*10)
+    print('chi2 armada = %s'%chi2_armada)
+    print('chi2 WDS = %s'%chi2_wds)
+    print('-'*10)
+    rescale = input('Rescale errors based off chi2? (y/n): ')
 
 if emethod == 'y':
     directory='%s/HD%s_bootstrap/'%(path,target_hd)
@@ -541,9 +593,10 @@ xresid = xpos - rapoints[:len(xpos)]
 yresid = ypos - decpoints[:len(ypos)]
 
 #need to measure error ellipse angle east of north
-for ras, decs, w, h, angle in zip(xresid,yresid,error_maj/scale,error_min/scale,error_deg):
+for ras, decs, w, h, angle, d in zip(xresid,yresid,error_maj/scale,error_min/scale,error_deg,t):
     ellipse = Ellipse(xy=(ras, decs), width=2*w, height=2*h, 
                       angle=90-angle, facecolor='none', edgecolor='black')
+    ax.annotate(d,xy=(ras,decs))
     ax.add_patch(ellipse)
 
 ax.plot(xresid, yresid, 'o')
@@ -590,7 +643,7 @@ p_wds_new = np.array(p_wds_new)
 theta_wds_new = np.array(theta_wds_new)
 f = open("%s/HD_%s_wds.txt"%(directory,target_hd),"w+")
 f.write("# date mjd sep pa err_maj err_min err_pa\r\n")
-for i,j,k,l,m,n in zip(t_wds,p_wds_new,theta_wds_new,error_maj_wds,error_min_wds,error_deg_wds):
+for i,j,k,l,m,n in zip(t_wds,p_wds_new,theta_wds_new,error_maj_all[len(xpos):],error_min_all[len(xpos):],error_deg_all[len(xpos):]):
     f.write("-- %s %s %s %s %s %s\r\n"%(i,j,k,l,m,n))
 f.write('#')
 f.close()
@@ -632,6 +685,8 @@ for period in tqdm(P2):
         bigw2 = np.random.uniform(0,2*np.pi)
         inc2 = np.random.uniform(0,np.pi)
         T2 = np.random.uniform(58000,60000)
+        #w2 = np.random.uniform(0,2*np.pi)
+        #e2 = np.random.uniform(0,0.9)
 
         params = Parameters()
         params.add('w',   value= w_start, min=0, max=2*np.pi)
