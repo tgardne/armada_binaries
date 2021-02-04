@@ -327,10 +327,85 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
 ###########################################
 ## Do a least-squares fit
 ###########################################
+guess_params = input('Randomize outer elements? (y/n)')
+if guess_params=='y':
+
+    astart = float(input('semi start (mas): '))
+    aend = float(input('semi end (mas): '))
+    Pstart = float(input('P start (year): '))*365
+    Pend = float(input('P end (year): '))*365
+
+    w_results = []
+    bigw_results = []
+    inc_results = []
+    e_results = []
+    a_results = []
+    P_results = []
+    T_results = []
+    chi2_results = []
+
+    for s in tqdm(np.arange(100)):
+        x1 = random.uniform(0,2*np.pi)
+        x2 = random.uniform(0,2*np.pi)
+        x3 = random.uniform(0,np.pi)
+        x4 = random.uniform(0,0.9)
+        x5 = random.uniform(astart,aend)
+        x6 = random.uniform(Pstart,Pend)
+        x7 = random.uniform(30000,80000)
+
+        params = Parameters()
+        params.add('w',   value= x1, min=0, max=2*np.pi)
+        params.add('bigw', value= x2, min=0, max=2*np.pi)
+        params.add('inc', value= x3, min=0, max=np.pi)
+        params.add('e', value= x4, min=0, max=0.99)
+        params.add('a', value= x5, min=0)
+        params.add('P', value= x6, min=0)
+        params.add('T', value= x7, min=0)
+        if mirc_scale == 'y':
+            params.add('mirc_scale', value= 1.0,vary=False)
+        else:
+            params.add('mirc_scale', value= 1.0, vary=False)
+
+        #do fit, minimizer uses LM for least square fitting of model to data
+        minner = Minimizer(astrometry_model, params, fcn_args=(xpos_all,ypos_all,t_all,
+                                error_maj_all,error_min_all,error_pa_all),
+                                nan_policy='omit')
+        result = minner.minimize()
+
+        w_results.append(result.params['w'].value)
+        bigw_results.append(result.params['bigw'].value)
+        inc_results.append(result.params['inc'].value)
+        e_results.append(result.params['e'].value)
+        a_results.append(result.params['a'].value)
+        P_results.append(result.params['P'].value)
+        T_results.append(result.params['T'].value)
+        chi2_results.append(result.redchi)
+
+    w_results = np.array(w_results)
+    bigw_results = np.array(bigw_results)
+    inc_results = np.array(inc_results)
+    e_results = np.array(e_results)
+    a_results = np.array(a_results)
+    P_results = np.array(P_results)
+    T_results = np.array(T_results)
+    chi2_results = np.array(chi2_results)
+
+    idx = np.argmin(chi2_results)
+    omega = w_results[idx]
+    bigomega = bigw_results[idx]
+    inc = inc_results[idx]
+    e = e_results[idx]
+    a = a_results[idx]
+    P = P_results[idx]
+    T = T_results[idx]
+
+    print('P, a, e, inc, w, bigw, T: ')
+    print(P/365, a, e, inc, omega*180/np.pi, bigomega*180/np.pi, T)
+
 params = Parameters()
 params.add('w',   value= omega, min=0, max=2*np.pi)
 params.add('bigw', value= bigomega, min=0, max=2*np.pi)
-params.add('inc', value= inc, min=0, max=2*np.pi)
+params.add('inc', value= inc, min=0, max=np.pi)
 params.add('e', value= e, min=0, max=0.99)
 params.add('a', value= a, min=0)
 params.add('P', value= P, min=0)
@@ -463,7 +538,7 @@ while filter_wds == 'y':
     params = Parameters()
     params.add('w',   value= omega, min=0, max=2*np.pi)
     params.add('bigw', value= bigomega, min=0, max=2*np.pi)
-    params.add('inc', value= inc, min=0, max=2*np.pi)
+    params.add('inc', value= inc, min=0, max=np.pi)
     params.add('e', value= e, min=0, max=0.99)
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
@@ -513,7 +588,7 @@ while rescale=='y':
     params = Parameters()
     params.add('w',   value= omega, min=0, max=2*np.pi)
     params.add('bigw', value= bigomega, min=0, max=2*np.pi)
-    params.add('inc', value= inc, min=0, max=2*np.pi)
+    params.add('inc', value= inc, min=0, max=np.pi)
     params.add('e', value= e, min=0, max=0.99)
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
@@ -657,15 +732,18 @@ if search_triple=='n':
 ##########################################
 ps = float(input('period search start (days): '))
 pe = float(input('period search end (days): '))
+steps = int(input('steps: '))
 ss = float(input('semi search start (mas): '))
 se = float(input('semi search end (mas): '))
-P2 = np.linspace(ps,pe,1000)
+P2 = np.linspace(ps,pe,steps)
 #P2 = np.logspace(np.log10(ps),np.log10(pe),1000)
 w2 = w_start
 #bigw2 = bigw_start
 #inc2 = inc_start
 e2 = 0.01
 a2 = resids_median/1000
+if np.isnan(a2):
+    a2=1
 #T2 = 55075
 
 print('Grid Searching over period')
@@ -691,14 +769,14 @@ for period in tqdm(P2):
         params = Parameters()
         params.add('w',   value= w_start, min=0, max=2*np.pi)
         params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
-        params.add('inc', value= inc_start, min=0, max=2*np.pi)
+        params.add('inc', value= inc_start, min=0, max=np.pi)
         params.add('e', value= e_start, min=0, max=0.99)
         params.add('a', value= a_start, min=0)
         params.add('P', value= P_start, min=0)
         params.add('T', value= T_start, min=0)
         params.add('w2',   value= 0, vary=False)
         params.add('bigw2', value= bigw2, min=0, max=2*np.pi)
-        params.add('inc2', value= inc2, min=0, max=2*np.pi)
+        params.add('inc2', value= inc2, min=0, max=np.pi)
         params.add('e2', value= 0, vary=False)
         params.add('a2', value= a2, min=0)
         params.add('P2', value= period, vary=False)
@@ -738,7 +816,7 @@ for period in tqdm(P2):
         #params = Parameters()
         #params.add('w',   value= 0, vary=False)
         #params.add('bigw', value= bigw2, min=0, max=2*np.pi)
-        #params.add('inc', value= inc2, min=0, max=2*np.pi)
+        #params.add('inc', value= inc2, min=0, max=np.pi)
         #params.add('e', value= 0, vary=False)
         #params.add('a', value= a2, min=0)
         #params.add('P', value= period, vary=False)
@@ -858,14 +936,14 @@ for semi in tqdm(a_grid):
         params = Parameters()
         params.add('w',   value= best_outer[3], vary=False)#min=0, max=2*np.pi)
         params.add('bigw', value= best_outer[4], vary=False)#min=0, max=2*np.pi)
-        params.add('inc', value= best_outer[5], vary=False)#min=0, max=2*np.pi)
+        params.add('inc', value= best_outer[5], vary=False)#min=0, max=np.pi)
         params.add('e', value= best_outer[2], vary=False)#min=0, max=0.99)
         params.add('a', value= best_outer[1], vary=False)#min=0)
         params.add('P', value= best_outer[0], vary=False)#min=0)
         params.add('T', value= best_outer[6], vary=False)#min=0)
         params.add('w2',   value= 0, vary=False)
         params.add('bigw2', value= best_inner[4], min=0, max=2*np.pi)
-        params.add('inc2', value= angle*np.pi/180, vary=False)#min=0, max=2*np.pi)
+        params.add('inc2', value= angle*np.pi/180, vary=False)#min=0, max=np.pi)
         params.add('e2', value= 0, vary=False)
         params.add('a2', value= semi, vary=False)#a2, min=0)
         params.add('P2', value= best_inner[0], min=0)

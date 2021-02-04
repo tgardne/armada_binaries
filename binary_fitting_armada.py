@@ -608,7 +608,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
 ### Now do errors
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
-size = 0.3
+size = 0.5
 steps = 300
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
