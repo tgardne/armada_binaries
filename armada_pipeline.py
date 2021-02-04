@@ -149,6 +149,7 @@ query = Simbad.query_objectids('HD %s'%target_hd)
 for item in query:
     if 'HIP' in item[0]:
         target = item[0].split()[1]
+        hipNum = target;
         print('HIP %s'%target)
     if 'WDS' in item[0]:
         target_wds = item[0][5:15]
@@ -697,6 +698,18 @@ f.write("%s %s %s %s %s %s %s %s"%(P_start.value,a_start.value,e_start.value,
                                    bigw_start.value*180/np.pi,T_start.value,
                                   resids_median))
 f.close()
+
+## Print Values Needed for Spreadsheet
+print('\nFor Spreadsheet')
+print('HIP:', hipNum)
+print('Resid (mas):', resids_median)
+print('P(yr):', P_start.value/365.25)
+print('a(mas):', a_start.value)
+print('e:', e_start.value)
+print('i(deg):', inc_start.value*180/np.pi)
+print('w(deg):', w_start.value*180/np.pi)
+print('bigw(deg):', bigw_start.value*180/np.pi)
+print('T (mjd):', T_start.value, '\n')
 
 ## Save txt file with wds orbit
 p_wds_new=[]
