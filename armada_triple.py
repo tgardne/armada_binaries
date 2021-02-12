@@ -19,6 +19,7 @@ from astrometry_model import astrometry_model,triple_model,lnlike,lnprior,lnpost
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
+import random
 
 ###########################################
 ## SETUP PATHS
@@ -518,58 +519,112 @@ P2 = float(input('P2 (d): '))
 a2 = float(input('a2 (mas): '))
 inc2 = float(input('i2 (deg): '))*np.pi/180
 circular = input('circular orbit? (y/n): ')
-bigw2 = bigw_start
-w2 = w_start
-e2 = 0.1
-T2 = 55075
 
-params = Parameters()
-if circular=='y':
-    params.add('e2',value=0,vary=False)
-    params.add('w2',value=0,vary=False)
-else:
-    params.add('e2',value=e2,min=0,max=0.99)
-    params.add('w2',value=w2,min=0,max=2*np.pi)
-params.add('w',   value= w_start, min=0, max=2*np.pi)
-params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
-params.add('inc', value= inc_start, min=0, max=np.pi)
-params.add('e', value= e_start, min=0, max=0.99)
-params.add('a', value= a_start, min=0)
-params.add('P', value= P_start, min=0)
-params.add('T', value= T_start, min=0)
-params.add('bigw2', value= bigw2, min=0, max=2*np.pi)
-params.add('inc2', value= inc2, min=0, max=np.pi)
-params.add('a2', value= a2, min=0)
-params.add('P2', value= P2, min=0)
-params.add('T2', value= T2, min=0)
-params.add('mirc_scale', value=1, vary=False)
+P2_best = []
+a2_best = []
+e2_best = []
+w2_best = []
+bigw2_best = []
+inc2_best = []
+T2_best = []
+P_best = []
+a_best = []
+e_best = []
+w_best = []
+bigw_best = []
+inc_best = []
+T_best = []
+mirc_scale_best = []
+chi2_results = []
 
-#do fit, minimizer uses LM for least square fitting of model to data
-minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
-                                                    error_maj_all,error_min_all,
-                                                    error_pa_all),
-                    nan_policy='omit')
-result = minner.minimize()
-try:
-    print(report_fit(result))
-except:
-    print('No fit report')
+for i in tqdm(np.arange(20)):
+    bigw2 = random.uniform(0,2*np.pi)
+    T2 = random.uniform(57000,59000)
+    if circular!='y':
+        e2 = random.uniform(0,0.99)
+        w2 = random.uniform(0,2*np.pi)
 
-P2_best = result.params['P2']
-a2_best = result.params['a2']
-e2_best = result.params['e2']
-w2_best = result.params['w2']
-bigw2_best = result.params['bigw2']
-inc2_best = result.params['inc2']
-T2_best = result.params['T2']
-P_best = result.params['P']
-a_best = result.params['a']
-e_best = result.params['e']
-w_best = result.params['w']
-bigw_best = result.params['bigw']
-inc_best = result.params['inc']
-T_best = result.params['T']
-mirc_scale_best = result.params['mirc_scale']
+    params = Parameters()
+    if circular=='y':
+        params.add('e2',value=0,vary=False)
+        params.add('w2',value=0,vary=False)
+    else:
+        params.add('e2',value=e2,min=0,max=0.99)
+        params.add('w2',value=w2,min=0,max=2*np.pi)
+    params.add('w',   value= w_start, min=0, max=2*np.pi)
+    params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
+    params.add('inc', value= inc_start, min=0, max=np.pi)
+    params.add('e', value= e_start, min=0, max=0.99)
+    params.add('a', value= a_start, min=0)
+    params.add('P', value= P_start, min=0)
+    params.add('T', value= T_start, min=0)
+    params.add('bigw2', value= bigw2, min=0, max=2*np.pi)
+    params.add('inc2', value= inc2, min=0, max=np.pi)
+    params.add('a2', value= a2, min=0)
+    params.add('P2', value= P2, min=0)
+    params.add('T2', value= T2, min=0)
+    params.add('mirc_scale', value=1, vary=False)
+
+    #do fit, minimizer uses LM for least square fitting of model to data
+    minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
+                                                        error_maj_all,error_min_all,
+                                                        error_pa_all),
+                        nan_policy='omit')
+    result = minner.minimize()
+    #try:
+    #    print(report_fit(result))
+    #except:
+    #    print('No fit report')
+
+    P2_best.append(result.params['P2'])
+    a2_best.append(result.params['a2'])
+    e2_best.append(result.params['e2'])
+    w2_best.append(result.params['w2'])
+    bigw2_best.append(result.params['bigw2'])
+    inc2_best.append(result.params['inc2'])
+    T2_best.append(result.params['T2'])
+    P_best.append(result.params['P'])
+    a_best.append(result.params['a'])
+    e_best.append(result.params['e'])
+    w_best.append(result.params['w'])
+    bigw_best.append(result.params['bigw'])
+    inc_best.append(result.params['inc'])
+    T_best.append(result.params['T'])
+    mirc_scale_best.append(result.params['mirc_scale'])
+    chi2_results.append(result.redchi)
+P2_best = np.array(P2_best)
+a2_best = np.array(a2_best)
+e2_best = np.array(e2_best)
+w2_best = np.array(w2_best)
+bigw2_best = np.array(bigw2_best)
+inc2_best = np.array(inc2_best)
+T2_best = np.array(T2_best)
+P_best = np.array(P_best)
+a_best = np.array(a_best)
+e_best = np.array(e_best)
+w_best = np.array(w_best)
+bigw_best = np.array(bigw_best)
+inc_best = np.array(inc_best)
+T_best = np.array(T_best)
+mirc_scale_best = np.array(mirc_scale_best)
+chi2_results = np.array(chi2_results)
+
+idx = np.argmin(chi2_results)
+P2_best = P2_best[idx]
+a2_best = a2_best[idx]
+e2_best = e2_best[idx]
+w2_best = w2_best[idx]
+bigw2_best = bigw2_best[idx]
+inc2_best = inc2_best[idx]
+T2_best = T2_best[idx]
+P_best = P_best[idx]
+a_best = a_best[idx]
+e_best = e_best[idx]
+w_best = w_best[idx]
+bigw_best = bigw_best[idx]
+inc_best = inc_best[idx]
+T_best = T_best[idx]
+mirc_scale_best = mirc_scale_best[idx]
 
 ##########################################
 ## Save Plots for Triple
@@ -698,12 +753,12 @@ print('-'*10)
 ## Save txt file with best orbit
 f = open("%s/%s_orbit_triple.txt"%(directory,target_hd),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) P2 a2 e2 i2 w2 W2 T2 mean_resid(mu-as)\r\n")
-f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_best.value,
-                                    a_best.value,e_best.value,
-                                   inc_best.value*180/np.pi,w_best.value*180/np.pi,
-                                   bigw_best.value*180/np.pi,T_best.value,
-                                   P2_best.value,a2_best.value,e2_best.value,
-                                   inc2_best.value*180/np.pi,w2_best.value*180/np.pi,
-                                   bigw2_best.value*180/np.pi,T2_best.value,
+f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_best,
+                                    a_best,e_best,
+                                   inc_best*180/np.pi,w_best*180/np.pi,
+                                   bigw_best*180/np.pi,T_best,
+                                   P2_best,a2_best,e2_best,
+                                   inc2_best*180/np.pi,w2_best*180/np.pi,
+                                   bigw2_best*180/np.pi,T2_best,
                                   resids_median))
 f.close()

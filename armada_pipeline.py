@@ -256,7 +256,7 @@ try:
     a,P,e,inc,omega,bigomega,T = read_orb6(target,path_orb6)
 except:
     print('No elements found in ORB6. Will need to enter your own.')
-    
+
 self_params = input('Input own params? (y/n)')
 if self_params=='y':
     a = float(input('a (mas): '))
@@ -862,6 +862,11 @@ chi2 = np.array(chi2)
 idx = np.argmin(chi2)
 period_best = params_inner[:,0][idx]
 
+## save parameter arrays
+np.save('%s/HD%s_%s_params_inner.npy'%(directory,target_hd,date),params_inner)
+np.save('%s/HD%s_%s_params_outer.npy'%(directory,target_hd,date),params_outer)
+np.save('%s/HD%s_%s_chi2.npy'%(directory,target_hd,date),chi2)
+
 #plt.plot(params_inner[:,0],1/chi2_noise,'.--')
 plt.plot(params_inner[:,0],1/chi2,'o-')
 plt.xlabel('Period (d)')
@@ -970,7 +975,13 @@ chi2 = np.array(chi2)
 
 a_inner = params_inner[:,1]
 i_inner = params_inner[:,5]
-plt.scatter(a_inner,i_inner,c=1/chi2,cmap=cm.inferno)
+#plt.scatter(a_inner,i_inner,c=1/chi2,cmap=cm.inferno)
+x=np.unique(a_inner)
+y=np.unique(i_inner)
+X,Y=np.meshgrid(x,y)
+Z=chi2.reshape(len(y),len(x))
+plt.pcolormesh(X,Y,1/Z)
+
 plt.colorbar(label='1 / $\chi^2$')
 plt.xlabel('semi-major (mas)')
 plt.ylabel('inclination (deg)')
