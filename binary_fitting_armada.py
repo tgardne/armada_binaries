@@ -608,8 +608,8 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
 ### Now do errors
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
-size = 0.5
-steps = 300
+size = 0.3
+steps = 200
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
 chi_sq = []
@@ -623,14 +623,27 @@ if plot_grid=='y':
     plt.show()
 for ra_try in tqdm(ra_grid):
     for dec_try in dec_grid:
-        #create a set of Parameters
-        params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
-        #do fit, minimizer uses LM for least square fitting of model to data
-        chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+        ##create a set of Parameters
+        #params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
+        ##do fit, minimizer uses LM for least square fitting of model to data
+        #chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+        #red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+        
+        params = Parameters()
+        params.add('ra',   value= ra_try, vary=False)
+        params.add('dec', value= dec_try, vary=False)
+        params.add('ratio', value= ratio_best, vary=False)#min=1.0)
+        params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=3.0)
+        params.add('ud2', value= ud2_best, vary=False)
+        params.add('bw', value=bw_best, vary=False)#min=0.0, max=0.1)
+        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+        result = minner.minimize()
+        red_chi2 = result.redchi
+        
         chi_sq.append(red_chi2)
         ra_results.append(ra_try)
         dec_results.append(dec_try)
+
     if plot_grid=='y':
         ax.cla()
         ax.set_xlim(min(ra_grid),max(ra_grid))
@@ -658,9 +671,10 @@ plt.axis('equal')
 plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chisq.pdf"%(target_id,target_id,date))
 plt.close()
 ## isolate region where delta_chisq < 1
-params = [ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best]
-chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-chi2_best = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+#params = [ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best]
+#chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+#chi2_best = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+chi2_best = chi_sq_best
 
 index_err = np.where(chi_sq < (chi2_best+1) )
 chi_err = chi_sq[index_err]
