@@ -64,8 +64,8 @@ mass_star = float(input('Mass Star (Msun): '))
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
-#emethod = input('bootstrap errors? (y/n) ')
-emethod = 'n'
+emethod = input('bootstrap errors? (y/n) ')
+#emethod = 'n'
 mirc_scale = input('Scale OLD MIRCX data? (y/n) ')
 #mirc_scale = 'n'
 
@@ -947,12 +947,12 @@ for semi in tqdm(a_grid):
         params.add('P', value= best_outer[0], vary=False)#min=0)
         params.add('T', value= best_outer[6], vary=False)#min=0)
         params.add('w2',   value= 0, vary=False)
-        params.add('bigw2', value= best_inner[4], min=0, max=2*np.pi)
+        params.add('bigw2', value= best_inner[4], vary=False)#min=0, max=2*np.pi)
         params.add('inc2', value= angle*np.pi/180, vary=False)#min=0, max=np.pi)
         params.add('e2', value= 0, vary=False)
         params.add('a2', value= semi, vary=False)#a2, min=0)
-        params.add('P2', value= best_inner[0], min=0)
-        params.add('T2', value= best_inner[6], min=0)
+        params.add('P2', value= best_inner[0], vary=False)#min=0)
+        params.add('T2', value= best_inner[6], vary=False)#min=0)
         if mirc_scale == 'y':
             params.add('mirc_scale', value= 1.0)
         else:
@@ -975,12 +975,12 @@ chi2 = np.array(chi2)
 
 a_inner = params_inner[:,1]
 i_inner = params_inner[:,5]
-#plt.scatter(a_inner,i_inner,c=1/chi2,cmap=cm.inferno)
-x=np.unique(a_inner)
-y=np.unique(i_inner)
-X,Y=np.meshgrid(x,y)
-Z=chi2.reshape(len(y),len(x))
-plt.pcolormesh(X,Y,1/Z)
+plt.scatter(a_inner,i_inner,c=1/chi2,cmap=cm.inferno)
+#x=np.unique(a_inner)
+#y=np.unique(i_inner)
+#X,Y=np.meshgrid(x,y)
+#Z=chi2.reshape(len(y),len(x))
+#plt.pcolormesh(X,Y,1/Z)
 
 plt.colorbar(label='1 / $\chi^2$')
 plt.xlabel('semi-major (mas)')
