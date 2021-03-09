@@ -203,9 +203,9 @@ if self_params=='y':
     a = float(input('a (mas): '))
     P = float(input('P (year): '))*365.25
     e = float(input('ecc : '))
-    inc = float(input('inc (deg): '))*np.pi/180
-    omega = float(input('omega (deg): '))*np.pi/180
-    bigomega = float(input('bigomega (deg): '))*np.pi/180
+    inc = float(input('inc (deg): '))
+    omega = float(input('omega (deg): '))
+    bigomega = float(input('bigomega (deg): '))
     T = float(input('T (mjd): '))
 
 ###########################################
@@ -280,9 +280,9 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
 ## Do a least-squares fit
 ###########################################
 params = Parameters()
-params.add('w',   value= omega, min=0, max=2*np.pi)
-params.add('bigw', value= bigomega, min=0, max=2*np.pi)
-params.add('inc', value= inc, min=0, max=np.pi)
+params.add('w',   value= omega, min=0, max=360)
+params.add('bigw', value= bigomega, min=0, max=360)
+params.add('inc', value= inc, min=0, max=180)
 params.add('e', value= e, min=0, max=0.99)
 params.add('a', value= a, min=0)
 params.add('P', value= P, min=0)
@@ -410,9 +410,9 @@ while filter_wds == 'y':
 
 
     params = Parameters()
-    params.add('w',   value= omega, min=0, max=2*np.pi)
-    params.add('bigw', value= bigomega, min=0, max=2*np.pi)
-    params.add('inc', value= inc, min=0, max=np.pi)
+    params.add('w',   value= omega, min=0, max=360)
+    params.add('bigw', value= bigomega, min=0, max=360)
+    params.add('inc', value= inc, min=0, max=180)
     params.add('e', value= e, min=0, max=0.99)
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
@@ -517,7 +517,7 @@ f.close()
 ##########################################
 P2 = float(input('P2 (d): '))
 a2 = float(input('a2 (mas): '))
-inc2 = float(input('i2 (deg): '))*np.pi/180
+inc2 = float(input('i2 (deg): '))
 circular = input('circular orbit? (y/n): ')
 
 P2_best = []
@@ -538,11 +538,11 @@ mirc_scale_best = []
 chi2_results = []
 
 for i in tqdm(np.arange(20)):
-    bigw2 = random.uniform(0,2*np.pi)
+    bigw2 = random.uniform(0,360)
     T2 = random.uniform(57000,59000)
     if circular!='y':
         e2 = random.uniform(0,0.99)
-        w2 = random.uniform(0,2*np.pi)
+        w2 = random.uniform(0,360)
 
     params = Parameters()
     if circular=='y':
@@ -550,16 +550,16 @@ for i in tqdm(np.arange(20)):
         params.add('w2',value=0,vary=False)
     else:
         params.add('e2',value=e2,min=0,max=0.99)
-        params.add('w2',value=w2,min=0,max=2*np.pi)
-    params.add('w',   value= w_start, min=0, max=2*np.pi)
-    params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
-    params.add('inc', value= inc_start, min=0, max=np.pi)
+        params.add('w2',value=w2,min=0,max=360)
+    params.add('w',   value= w_start, min=0, max=360)
+    params.add('bigw', value= bigw_start, min=0, max=360)
+    params.add('inc', value= inc_start, min=0, max=180)
     params.add('e', value= e_start, min=0, max=0.99)
     params.add('a', value= a_start, min=0)
     params.add('P', value= P_start, min=0)
     params.add('T', value= T_start, min=0)
-    params.add('bigw2', value= bigw2, min=0, max=2*np.pi)
-    params.add('inc2', value= inc2, min=0, max=np.pi)
+    params.add('bigw2', value= bigw2, min=0, max=360)
+    params.add('inc2', value= inc2, min=0, max=180)
     params.add('a2', value= a2, min=0)
     params.add('P2', value= P2, min=0)
     params.add('T2', value= T2, min=0)
@@ -755,10 +755,10 @@ f = open("%s/%s_orbit_triple.txt"%(directory,target_hd),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) P2 a2 e2 i2 w2 W2 T2 mean_resid(mu-as)\r\n")
 f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_best,
                                     a_best,e_best,
-                                   inc_best*180/np.pi,w_best*180/np.pi,
-                                   bigw_best*180/np.pi,T_best,
+                                   inc_best,w_best,
+                                   bigw_best,T_best,
                                    P2_best,a2_best,e2_best,
-                                   inc2_best*180/np.pi,w2_best*180/np.pi,
-                                   bigw2_best*180/np.pi,T2_best,
+                                   inc2_best,w2_best,
+                                   bigw2_best,T2_best,
                                   resids_median))
 f.close()

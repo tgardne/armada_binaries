@@ -34,36 +34,11 @@ def astrometry_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
         T= params['T']
         mirc_scale= params['mirc_scale']
 
-    #Thiele-Innes elements:
-    A=a*(np.cos(bigw)*np.cos(w)-np.sin(bigw)*np.cos(inc)*np.sin(w))
-    B=a*(np.sin(bigw)*np.cos(w)+np.cos(bigw)*np.cos(inc)*np.sin(w))
-    F=a*(-np.cos(bigw)*np.sin(w)-np.sin(bigw)*np.cos(inc)*np.cos(w))
-    G=a*(-np.sin(bigw)*np.sin(w)+np.cos(bigw)*np.cos(inc)*np.cos(w))
-    #Calculate the mean anamoly for each t in dataset:
-    M=[]
-    for i in t:
-        m_anom=2*np.pi/P*(i-T)
-        M.append(m_anom)
-    M=np.asarray(M)
-    #eccentric anamoly calculated for each t (using kepler function):
-    E=[]
-    for j in M:
-        e_anom=ks.getE(j,e)
-        E.append(e_anom)
-    E=np.asarray(E)
-    #Find sep&pa for model, compare to data:
-    X=[]
-    Y=[]
-    for k in E:
-        Xk=np.cos(k)-e
-        Yk=np.sqrt(1-e**2)*np.sin(k)
-        X.append(Xk)
-        Y.append(Yk)
-    X=np.asarray(X)
-    Y=np.asarray(Y)
-    
-    model_y=A*X+F*Y
-    model_x=B*X+G*Y
+    ## other method:
+    ke = pyasl.KeplerEllipse(a,P,e=e,Omega=bigw,i=inc,w=w,tau=T)
+    pos = ke.xyzPos(t)
+    model_x = pos[::,1]
+    model_y = pos[::,0]
 
     #idx = np.where((t<58362) & (t>57997))
     idx = np.where(t<58757)
@@ -106,67 +81,13 @@ def triple_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     mirc_scale = params['mirc_scale']
     #mratio = params['mratio']
 
-    ###############################################################
-    #Thiele-Innes elements for secondary
-    A = a*(np.cos(bigw)*np.cos(w)-np.sin(bigw)*np.cos(inc)*np.sin(w))
-    B = a*(np.sin(bigw)*np.cos(w)+np.cos(bigw)*np.cos(inc)*np.sin(w))
-    F = a*(-np.cos(bigw)*np.sin(w)-np.sin(bigw)*np.cos(inc)*np.cos(w))
-    G = a*(-np.sin(bigw)*np.sin(w)+np.cos(bigw)*np.cos(inc)*np.cos(w))
-    #Calculate the mean anamoly for each t in dataset:
-    M = []
-    for i in t:
-        m_anom=2*np.pi/P*(i-T)
-        M.append(m_anom)
-    M=np.asarray(M)
-    #eccentric anamoly calculated for each t (using kepler function):
-    E=[]
-    for j in M:
-        e_anom=ks.getE(j,e)
-        E.append(e_anom)
-    E=np.asarray(E)
-    #Find sep&pa for model, compare to data:
-    X=[]
-    Y=[]
-    for k in E:
-        Xk=np.cos(k)-e
-        Yk=np.sqrt(1-e**2)*np.sin(k)
-        X.append(Xk)
-        Y.append(Yk)
-    X=np.asarray(X)
-    Y=np.asarray(Y)
-    ###############################################################
-    
-    #Thiele-Innes elements for tertiary
-    A2 = a2*(np.cos(bigw2)*np.cos(w2)-np.sin(bigw2)*np.cos(inc2)*np.sin(w2))
-    B2 = a2*(np.sin(bigw2)*np.cos(w2)+np.cos(bigw2)*np.cos(inc2)*np.sin(w2))
-    F2 = a2*(-np.cos(bigw2)*np.sin(w2)-np.sin(bigw2)*np.cos(inc2)*np.cos(w2))
-    G2 = a2*(-np.sin(bigw2)*np.sin(w2)+np.cos(bigw2)*np.cos(inc2)*np.cos(w2))
-    #Calculate the mean anamoly for each t in dataset:
-    M = []
-    for i in t:
-        m_anom=2*np.pi/P2*(i-T2)
-        M.append(m_anom)
-    M=np.asarray(M)
-    #eccentric anamoly calculated for each t (using kepler function):
-    E=[]
-    for j in M:
-        e_anom=ks.getE(j,e2)
-        E.append(e_anom)
-    E=np.asarray(E)
-    #Find sep&pa for model, compare to data:
-    X2=[]
-    Y2=[]
-    for k in E:
-        Xk=np.cos(k)-e2
-        Yk=np.sqrt(1-e2**2)*np.sin(k)
-        X2.append(Xk)
-        Y2.append(Yk)
-    X2=np.asarray(X2)
-    Y2=np.asarray(Y2)
-    ###############################################################
-    
-    model_y = A*X+F*Y + A2*X2+F2*Y2
-    model_x = B*X+G*Y + B2*X2+G2*Y2
+    ## other method:
+    ke = pyasl.KeplerEllipse(a,P,e=e,Omega=bigw,i=inc,w=w,tau=T)
+    ke2 = pyasl.KeplerEllipse(a2,P2,e=e2,Omega=bigw2,i=inc2,w=w2,tau=T2)
+    pos = ke.xyzPos(t)
+    pos2 = ke2.xyzPos(t)
+    model_x = pos[::,1] + pos2[::,1]
+    model_y = pos[::,0] + pos2[::,0]
     
     #idx = np.where((t<58362) & (t>57997))
     idx = np.where(t<58757)
@@ -203,7 +124,7 @@ def lnprior(params):
             
     for i in range(nPars):
         if 0 < P[i] and 0 < T[i] and 0. <= e[i] < 1. \
-        and 0. <= w[i] <= 2*np.pi and 0. <= bigw[i] <= 2*np.pi and 0. <= inc[i] <= 2*np.pi \
+        and 0. <= w[i] <= 360 and 0. <= bigw[i] <= 360 and 0. <= inc[i] <= 180 \
         and 0 < a[i]:
                 lnp = 0
         else:

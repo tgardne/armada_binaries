@@ -253,9 +253,9 @@ if self_params=='y':
     a = float(input('a (mas): '))
     P = float(input('P (year): '))*365.25
     e = float(input('ecc : '))
-    inc = float(input('inc (deg): '))*np.pi/180
-    omega = float(input('omega (deg): '))*np.pi/180
-    bigomega = float(input('bigomega (deg): '))*np.pi/180
+    inc = float(input('inc (deg): '))
+    omega = float(input('omega (deg): '))
+    bigomega = float(input('bigomega (deg): '))
     T = float(input('T (mjd): '))
 
 ###########################################
@@ -319,9 +319,9 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
 ## Do a least-squares fit
 ###########################################
 params = Parameters()
-params.add('w',   value= omega, min=0, max=2*np.pi)
-params.add('bigw', value= bigomega, min=0, max=2*np.pi)
-params.add('inc', value= inc, min=0, max=2*np.pi)
+params.add('w',   value= omega, min=0, max=360)
+params.add('bigw', value= bigomega, min=0, max=360)
+params.add('inc', value= inc, min=0, max=180)
 params.add('e', value= e, min=0, max=0.99)
 params.add('a', value= a, min=0)
 params.add('P', value= P, min=0)
@@ -452,9 +452,9 @@ while filter_wds == 'y':
 
 
     params = Parameters()
-    params.add('w',   value= omega, min=0, max=2*np.pi)
-    params.add('bigw', value= bigomega, min=0, max=2*np.pi)
-    params.add('inc', value= inc, min=0, max=2*np.pi)
+    params.add('w',   value= omega, min=0, max=360)
+    params.add('bigw', value= bigomega, min=0, max=360)
+    params.add('inc', value= inc, min=0, max=180)
     params.add('e', value= e, min=0, max=0.99)
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
@@ -559,13 +559,13 @@ f = open("%s/%s_%s_orbit_ls.txt"%(directory,target_hd,date),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
 f.write("# Perr(d) aerr(mas) eerr ierr(deg) werr(deg) Werr(deg) Terr(mjd)\r\n")
 f.write("%s %s %s %s %s %s %s %s\r\n"%(P_start.value,a_start.value,e_start.value,
-                                   inc_start.value*180/np.pi,w_start.value*180/np.pi,
-                                   bigw_start.value*180/np.pi,T_start.value,
+                                   inc_start.value,w_start.value,
+                                   bigw_start.value,T_start.value,
                                   resids_median))
 try:
     f.write("%s %s %s %s %s %s %s"%(P_start.stderr,a_start.stderr,e_start.stderr,
-                                       inc_start.stderr*180/np.pi,w_start.stderr*180/np.pi,
-                                       bigw_start.stderr*180/np.pi,T_start.stderr))
+                                       inc_start.stderr,w_start.stderr,
+                                       bigw_start.stderr,T_start.stderr))
 except:
     f.write("Errors not estimated")
 f.close()
@@ -616,21 +616,21 @@ for period in tqdm(P2):
 
     for i in np.arange(20):
         ## randomize orbital elements
-        bigw2 = np.random.uniform(0,2*np.pi)
-        inc2 = np.random.uniform(0,np.pi)
+        bigw2 = np.random.uniform(0,360)
+        inc2 = np.random.uniform(0,180)
         T2 = np.random.uniform(58000,60000)
 
         params = Parameters()
-        #params.add('w',   value= w_start, min=0, max=2*np.pi)
-        #params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
-        #params.add('inc', value= inc_start, min=0, max=2*np.pi)
+        #params.add('w',   value= w_start, min=0, max=360)
+        #params.add('bigw', value= bigw_start, min=0, max=360)
+        #params.add('inc', value= inc_start, min=0, max=180)
         #params.add('e', value= e_start, min=0, max=0.99)
         #params.add('a', value= a_start, min=0)
         #params.add('P', value= P_start, min=0)
         #params.add('T', value= T_start, min=0)
         params.add('w',   value= 0, vary=False)
-        params.add('bigw', value= bigw2, min=0, max=2*np.pi)
-        params.add('inc', value= inc2, min=0, max=2*np.pi)
+        params.add('bigw', value= bigw2, min=0, max=360)
+        params.add('inc', value= inc2, min=0, max=180)
         params.add('e', value= 0, vary=False)
         params.add('a', value= a2, min=0)
         params.add('P', value= period, vary=False)
@@ -684,16 +684,16 @@ print('Best inner period = %s'%period_best)
 
 ## Do a fit at best period
 params = Parameters()
-params.add('w',   value= w_start, min=0, max=2*np.pi)
-params.add('bigw', value= bigw_start, min=0, max=2*np.pi)
-params.add('inc', value= inc_start, min=0, max=np.pi)
+params.add('w',   value= w_start, min=0, max=360)
+params.add('bigw', value= bigw_start, min=0, max=360)
+params.add('inc', value= inc_start, min=0, max=180)
 params.add('e', value= e_start, min=0, max=0.99)
 params.add('a', value= a_start, min=0)
 params.add('P', value= P_start, min=0)
 params.add('T', value= T_start, min=0)
-params.add('w2',   value= 0, vary=False)#w2, min=0, max=2*np.pi)
-params.add('bigw2', value= params_inner[:,4][idx], min=0, max=2*np.pi)
-params.add('inc2', value= params_inner[:,5][idx], min=0, max=np.pi)
+params.add('w2',   value= 0, vary=False)#w2, min=0, max=360)
+params.add('bigw2', value= params_inner[:,4][idx], min=0, max=360)
+params.add('inc2', value= params_inner[:,5][idx], min=0, max=180)
 params.add('e2', value= 0, vary=False)#0.1, min=0,max=0.99)
 params.add('a2', value= params_inner[:,1][idx], min=0)
 params.add('P2', value= period_best, min=0)
@@ -734,16 +734,16 @@ chi2 = []
 for semi in tqdm(a_grid):
     for angle in i_grid:
         params = Parameters()
-        params.add('w',   value= best_outer[3], vary=False)#min=0, max=2*np.pi)
-        params.add('bigw', value= best_outer[4], vary=False)#min=0, max=2*np.pi)
-        params.add('inc', value= best_outer[5], vary=False)#min=0, max=2*np.pi)
+        params.add('w',   value= best_outer[3], vary=False)#min=0, max=360)
+        params.add('bigw', value= best_outer[4], vary=False)#min=0, max=360)
+        params.add('inc', value= best_outer[5], vary=False)#min=0, max=180)
         params.add('e', value= best_outer[2], vary=False)#min=0, max=0.99)
         params.add('a', value= best_outer[1], vary=False)#min=0)
         params.add('P', value= best_outer[0], vary=False)#min=0)
         params.add('T', value= best_outer[6], vary=False)#min=0)
         params.add('w2',   value= 0, vary=False)
-        params.add('bigw2', value= best_inner[4], min=0, max=2*np.pi)
-        params.add('inc2', value= angle*np.pi/180, vary=False)#min=0, max=2*np.pi)
+        params.add('bigw2', value= best_inner[4], min=0, max=360)
+        params.add('inc2', value= angle, vary=False)#min=0, max=180)
         params.add('e2', value= 0, vary=False)
         params.add('a2', value= semi, vary=False)#a2, min=0)
         params.add('P2', value= best_inner[0], min=0)

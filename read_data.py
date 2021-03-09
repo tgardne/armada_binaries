@@ -126,7 +126,7 @@ def read_orb6(target,file):
                     if str(line.split('|')[15])=='u':
                         a = float(line.split('|')[14])/1000
     
-            inc = float(line.split('|')[17])*np.pi/180
+            inc = float(line.split('|')[17])
             e = float(line.split('|')[25])
     
             if str(line.split('|')[12])=='m':
@@ -157,13 +157,13 @@ def read_orb6(target,file):
                             T = float(line.split('|')[22])*365.2422-678940.37 #NEED TO CHECK !!!!!
                             print('CHECK THIS ONE!!')
         
-            omega = float(line.split('|')[27])*np.pi/180
+            omega = float(line.split('|')[27])
         
-            bigomega = float(line.split('|')[19])*np.pi/180
+            bigomega = float(line.split('|')[19])
     
     print('--------------------------')
     print('a(mas),P(yr),e,i(deg),omega(deg),bigomega(deg),T(mjd)')
-    print(a,P/365,e,inc*180/np.pi,omega*180/np.pi,bigomega*180/np.pi,T)
+    print(a,P/365,e,inc,omega,bigomega,T)
     print('--------------------------')
     
     return(a,P,e,inc,omega,bigomega,T)
