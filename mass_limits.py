@@ -47,25 +47,43 @@ semi_period = input('Period semi limit file: ')
 detection_period = np.load(detection_period)
 semi_period = np.load(semi_period)
 
+semi_10 = np.full(len(detection_period),0.01)
+semi_50 = np.full(len(detection_period),0.05)
+semi_100 = np.full(len(detection_period),0.1)
+
 abin1 = ((detection_period/365.25)**2*mass_star1)**(1/3)
 abin2 = ((detection_period/365.25)**2*mass_star2)**(1/3)
 mass_planet1 = mass_star1/(abin1-semi_period*distance/1000)*(semi_period*distance/1000)/0.0009546
 mass_planet2 = mass_star2/(abin2-semi_period*distance/1000)*(semi_period*distance/1000)/0.0009546
+mass_planet1_10 = mass_star1/(abin1-semi_10*distance/1000)*(semi_10*distance/1000)/0.0009546
+mass_planet1_50 = mass_star1/(abin1-semi_50*distance/1000)*(semi_50*distance/1000)/0.0009546
+mass_planet1_100 = mass_star1/(abin1-semi_100*distance/1000)*(semi_100*distance/1000)/0.0009546
+mass_planet2_10 = mass_star2/(abin2-semi_10*distance/1000)*(semi_10*distance/1000)/0.0009546
+mass_planet2_50 = mass_star2/(abin2-semi_50*distance/1000)*(semi_50*distance/1000)/0.0009546
+mass_planet2_100 = mass_star2/(abin2-semi_100*distance/1000)*(semi_100*distance/1000)/0.0009546
 
 plt.plot(detection_period,mass_planet1,'o-')
+plt.plot(detection_period,mass_planet1_10,'--',label='10uas')
+plt.plot(detection_period,mass_planet1_50,'--',label='50uas')
+plt.plot(detection_period,mass_planet1_100,'--',label='100uas')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Period (d)')
 plt.ylabel('Mass (MJ)')
 plt.title('Mass1 HD %s'%target_hd)
+plt.legend()
 plt.savefig('%s/mass_limits/HD%s_%s_masslimit1.pdf'%(path,target_hd,date))
 plt.close()
 
 plt.plot(detection_period,mass_planet2,'o-')
+plt.plot(detection_period,mass_planet2_10,'--',label='10uas')
+plt.plot(detection_period,mass_planet2_50,'--',label='50uas')
+plt.plot(detection_period,mass_planet2_100,'--',label='100uas')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Period (d)')
 plt.ylabel('Mass (MJ)')
 plt.title('Mass2 HD %s'%target_hd)
+plt.legend()
 plt.savefig('%s/mass_limits/HD%s_%s_masslimit2.pdf'%(path,target_hd,date))
 plt.close()

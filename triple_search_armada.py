@@ -301,8 +301,8 @@ for ra_try in tqdm(ra_grid):
         params = Parameters()
         params.add('ra12',   value= ra_try, vary=False)
         params.add('dec12', value= dec_try, vary=False)
-        params.add('ra13',   value= dra2)
-        params.add('dec13', value= ddec2)
+        params.add('ra13',   value= dra2, vary=False)
+        params.add('dec13', value= ddec2, vary=False)
         params.add('ratio12', value= a3, min=1.0)
         params.add('ratio13', value= a3_2, min=1.0)
         params.add('ud1',   value= a4, vary=False)#min=0.0,max=2.0)
@@ -311,7 +311,7 @@ for ra_try in tqdm(ra_grid):
         params.add('bw', value= a6, vary=False)#min=0,max=1)
 
         minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
-        result = minner.minimize()
+        result = minner.leastsq(xtol=1e-5,ftol=1e-5)
         chi2 = result.redchi
 
         ra_results.append(ra_try)

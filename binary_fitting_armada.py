@@ -246,20 +246,23 @@ if side=='red':
     visamperr = visamperr[:,idx:]
 
 ## do polynomial dispersion fit for each visphi measurement
-dispersion=[]
-for vis in visphi:
-    if np.count_nonzero(~np.isnan(vis))>0:
-        y=vis
-        x=eff_wave[0]
-        idx = np.isfinite(x) & np.isfinite(y)
-        z=np.polyfit(x[idx],y[idx],2)
-        p = np.poly1d(z)
-        dispersion.append(p(x))
-    else:
-        dispersion.append(vis)
-dispersion=np.array(dispersion)
-## subtract dispersion (FIXME: should fit dispersion at each measurement)
-visphi_new = visphi-dispersion
+if method=='dphase':
+    dispersion=[]
+    for vis in visphi:
+        if np.count_nonzero(~np.isnan(vis))>0:
+            y=vis
+            x=eff_wave[0]
+            idx = np.isfinite(x) & np.isfinite(y)
+            z=np.polyfit(x[idx],y[idx],2)
+            p = np.poly1d(z)
+            dispersion.append(p(x))
+        else:
+            dispersion.append(vis)
+    dispersion=np.array(dispersion)
+    ## subtract dispersion (FIXME: should fit dispersion at each measurement)
+    visphi_new = visphi-dispersion
+else:
+    visphi_new = visphi
 
 ######################################################################
 ## USER GIVES STARTING VALUES FOR FITS
@@ -316,7 +319,7 @@ for ra_try in tqdm(ra_grid):
             params.add('ra',   value= ra_try, vary=False)
             params.add('dec', value= dec_try, vary=False)
             params.add('ratio', value= a3, min=1.0)
-            params.add('ud1',   value= a4, min=0.0,max=3.0)
+            params.add('ud1',   value= a4, vary=False)#min=0.0,max=3.0)
             params.add('ud2', value= a5, vary=False)
             params.add('bw', value=a6, vary=False)#min=0.0, max=0.1)
             minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
@@ -367,7 +370,13 @@ if plot_grid=='y':
 
 ra_results = np.array(ra_results)
 dec_results = np.array(dec_results)
+ratio_results = np.array(ratio_results)
 chi_sq = np.array(chi_sq)
+
+np.save("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ra.npy"%(target_id,target_id,date),ra_results)
+np.save("/Users/tgardne/ARMADA_epochs/%s/%s_%s_dec.npy"%(target_id,target_id,date),dec_results)
+np.save("/Users/tgardne/ARMADA_epochs/%s/%s_%s_ratio.npy"%(target_id,target_id,date),ratio_results)
+np.save("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chisq.npy"%(target_id,target_id,date),chi_sq)
 
 index = np.argmin(chi_sq)
 
@@ -608,7 +617,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
 ### Now do errors
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
-size = 0.3
+size = 0.5
 steps = 200
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)

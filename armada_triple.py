@@ -15,7 +15,7 @@ from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
 from read_data import read_data,read_wds,read_orb6
-from astrometry_model import astrometry_model,triple_model,lnlike,lnprior,lnpost,create_init
+from astrometry_model import astrometry_model,triple_model,astrometry_model_vlti,triple_model_vlti
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
@@ -43,6 +43,7 @@ elif os.getcwd()[7:19] == 'adam.scovera':
 ## Specify Target
 ###########################################
 target_hd = input('Target HD #: ')
+note = input('Note for save file: ')
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
@@ -117,15 +118,26 @@ for i,j in zip(t,etalon_factor):
     print(i,j)
 
 ## apply etalon correction
+vlti = input('Add indices for vlti (y/n)? ')
+if vlti=='y':
+    vlti_idx = input('enter indices (e.g. 1 2 3): ').split(' ')
+    vlti_idx = np.array([int(i) for i in vlti_idx])
+else:
+    vlti_idx = []
 etalon = input('Apply etalon correction? (y/n) ')
 if etalon=='y':
     print('Applying etalon correction')
+    if len(vlti_idx)>0:
+        print('Setting VLTI correction factors to 1.0')
+        etalon_factor[vlti_idx] = 1.0
     p = p/etalon_factor
 else:
     print('No etalon correction applied')
 xpos=p*np.sin(theta)
 ypos=p*np.cos(theta)
 
+vlti_mask = np.ones(len(t),dtype=bool)
+vlti_mask[vlti_idx] = False
 
 ###########################################
 ## Read in WDS data - and plot to check
@@ -149,7 +161,11 @@ if input_wds == 'y':
     plt.plot(xpos_wds,ypos_wds,'o',label='WDS')
     plt.plot(xpos_wds[0],ypos_wds[0],'*')
     plt.plot(xpos[idx],ypos[idx],'*')
-    plt.plot(xpos,ypos,'+',label='ARMADA')
+    if len(vlti_idx)>0:
+        plt.plot(xpos[vlti_mask],ypos[vlti_mask],'+',label='ARMADA-CHARA')
+        plt.plot(xpos[vlti_idx],ypos[vlti_idx],'+',label='ARMADA-VLTI')
+    else:
+        plt.plot(xpos,ypos,'+',label='ARMADA')
     plt.plot(0,0,'*')
     plt.gca().invert_xaxis()
     plt.title('All Data')
@@ -219,15 +235,27 @@ error_min_all = np.concatenate([error_min,error_min_wds])
 error_pa_all = np.concatenate([error_pa,error_pa_wds])
 error_deg_all = np.concatenate([error_deg,error_deg_wds])
 
+vlti_mask_all = np.ones(len(t_all),dtype=bool)
+vlti_mask_all[vlti_idx] = False
+
 ##########################################
 ## Function for fitting/plotting data
 #########################################
 def ls_fit(params,xp,yp,tp,emaj,emin,epa):
     #do fit, minimizer uses LM for least square fitting of model to data
-    minner = Minimizer(astrometry_model, params, fcn_args=(xp,yp,tp,
-                                                       emaj,emin,epa),
-                            nan_policy='omit')
-    result = minner.minimize()
+    if len(vlti_idx)>0:
+        minner = Minimizer(astrometry_model_vlti, params, fcn_args=(xp[vlti_mask_all],yp[vlti_mask_all],tp[vlti_mask_all],
+                                                        emaj[vlti_mask_all],emin[vlti_mask_all],epa[vlti_mask_all],
+                                                        xp[vlti_idx],yp[vlti_idx],tp[vlti_idx],
+                                                        emaj[vlti_idx],emin[vlti_idx],epa[vlti_idx]),
+                                nan_policy='omit')
+        result = minner.minimize()
+    else:
+        minner = Minimizer(astrometry_model, params, fcn_args=(xp,yp,tp,
+                                                        emaj,emin,epa),
+                                nan_policy='omit')
+        result = minner.minimize()
+
     # write error report
     print(report_fit(result))
 
@@ -250,13 +278,18 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
     w_start = result.params['w']
     bigw_start = result.params['bigw']
     T_start = result.params['T']
+    mirc_scale_start = result.params['mirc_scale']
 
     ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
                                             w_start,bigw_start,P_start,
                                             T_start,t_all)
     fig,ax=plt.subplots()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
-    ax.plot(xpos,ypos,'o', label='ARMADA')
+    if len(vlti_idx)>0:
+        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+    else:
+        ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
     #plot lines from data to best fit orbit
@@ -287,7 +320,10 @@ params.add('e', value= e, min=0, max=0.99)
 params.add('a', value= a, min=0)
 params.add('P', value= P, min=0)
 params.add('T', value= T, min=0)
-params.add('mirc_scale', value=1, vary=False)
+if len(vlti_idx)>0:
+    params.add('mirc_scale', value=1)
+else:
+    params.add('mirc_scale',value=1,vary=False)
 
 result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
 
@@ -304,7 +340,11 @@ def on_click_remove(event):
 
     ax.cla()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
-    ax.plot(xpos,ypos,'o', label='ARMADA')
+    if len(vlti_idx)>0:
+        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+    else:
+        ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
     #plot lines from data to best fit orbit
@@ -332,7 +372,11 @@ def on_click_flip(event):
 
     ax.cla()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
-    ax.plot(xpos,ypos,'o', label='ARMADA')
+    if len(vlti_idx)>0:
+        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+    else:
+        ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
     #plot lines from data to best fit orbit
@@ -359,12 +403,17 @@ while filter_wds == 'y':
     w_start = result.params['w']
     bigw_start = result.params['bigw']
     T_start = result.params['T']
+    mirc_scale_start = result.params['mirc_scale']
     ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
                                         w_start,bigw_start,P_start,
                                         T_start,t_all)
     fig,ax=plt.subplots()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
-    ax.plot(xpos,ypos,'o', label='ARMADA')
+    if len(vlti_idx)>0:
+        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+    else:
+        ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
     #plot lines from data to best fit orbit
@@ -387,7 +436,11 @@ while filter_wds == 'y':
 
     fig,ax=plt.subplots()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
-    ax.plot(xpos,ypos,'o', label='ARMADA')
+    if len(vlti_idx)>0:
+        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+    else:
+        ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
     ax.plot(ra, dec, '--',color='g')
     #plot lines from data to best fit orbit
@@ -417,7 +470,10 @@ while filter_wds == 'y':
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
     params.add('T', value= T, min=0)
-    params.add('mirc_scale', value=1, vary=False)
+    if len(vlti_idx)>0:
+        params.add('mirc_scale', value=1)
+    else:
+        params.add('mirc_scale',value=1,vary=False)
 
     result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
     filter_wds = input('Remove more data? (y/n)')
@@ -425,8 +481,14 @@ while filter_wds == 'y':
 ##########################################
 ## Save Plots
 ##########################################
-resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
-                            error_min,error_pa)
+if len(vlti_idx)>0:
+    resids_armada = astrometry_model_vlti(result.params,xpos[vlti_mask],ypos[vlti_mask],t[vlti_mask],error_maj[vlti_mask],
+                                error_min[vlti_mask],error_pa[vlti_mask],
+                                xpos[vlti_idx],ypos[vlti_idx],t[vlti_idx],
+                                error_maj[vlti_idx],error_min[vlti_idx],error_pa[vlti_idx])
+else:
+    resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
+                                error_min,error_pa)
 ndata_armada = 2*sum(~np.isnan(xpos))
 chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-7)
 print('-'*10)
@@ -451,12 +513,17 @@ inc_start = result.params['inc']
 w_start = result.params['w']
 bigw_start = result.params['bigw']
 T_start = result.params['T']
+mirc_scale_start = result.params['mirc_scale']
 ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
                                         w_start,bigw_start,P_start,
                                         T_start,t_all)
 fig,ax=plt.subplots()
 ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
-ax.plot(xpos,ypos,'o', label='ARMADA')
+if len(vlti_idx)>0:
+    ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
+    ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+else:
+    ax.plot(xpos,ypos,'o', label='ARMADA')
 ax.plot(0,0,'*')
 ax.plot(ra, dec, '--',color='g')
 #plot lines from data to best fit orbit
@@ -472,13 +539,21 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Outer Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_outer_binary.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_outer_binary.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## plot resids for ARMADA
 fig,ax=plt.subplots()
-xresid = xpos - rapoints[:len(xpos)]
-yresid = ypos - decpoints[:len(ypos)]
+if len(vlti_idx)>0:
+    xresid_vlti = xpos[vlti_idx]*mirc_scale_start - rapoints[:len(xpos)][vlti_idx]
+    yresid_vlti = ypos[vlti_idx]*mirc_scale_start - decpoints[:len(ypos)][vlti_idx]
+    xresid_chara = xpos[vlti_mask] - rapoints[:len(xpos)][vlti_mask]
+    yresid_chara = ypos[vlti_mask] - decpoints[:len(ypos)][vlti_mask]
+    xresid = np.concatenate([xresid_chara,xresid_vlti])
+    yresid = np.concatenate([yresid_chara,yresid_vlti])
+else:
+    xresid = xpos - rapoints[:len(xpos)]
+    yresid = ypos - decpoints[:len(ypos)]
 
 #need to measure error ellipse angle east of north
 for ras, decs, w, h, angle in zip(xresid,yresid,error_maj/scale,error_min/scale,error_deg):
@@ -486,14 +561,19 @@ for ras, decs, w, h, angle in zip(xresid,yresid,error_maj/scale,error_min/scale,
                       angle=90-angle, facecolor='none', edgecolor='black')
     ax.add_patch(ellipse)
 
-ax.plot(xresid, yresid, 'o')
+if len(vlti_idx)>0:
+    ax.plot(xresid[vlti_idx],yresid[vlti_idx],'o', label='ARMADA-VLTI')
+    ax.plot(xresid[vlti_mask],yresid[vlti_mask],'o', label='ARMADA-CHARA')
+else:
+    ax.plot(xresid,yresid,'o', label='ARMADA')
 ax.plot(0,0,'*')
 ax.set_xlabel('milli-arcsec')
 ax.set_ylabel('milli-arcsec')
 ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Resids'%target_hd)
-plt.savefig('%s/HD%s_resid_binary.pdf'%(directory,target_hd))
+plt.legend()
+plt.savefig('%s/HD%s_%s_resid_binary.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## residuals
@@ -504,12 +584,12 @@ print('Mean residual = %s micro-as'%resids_median)
 print('-'*10)
 
 ## Save txt file with best orbit
-f = open("%s/%s_orbit_binary.txt"%(directory,target_hd),"w+")
-f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
-f.write("%s %s %s %s %s %s %s %s"%(P_start.value,a_start.value,e_start.value,
+f = open("%s/%s_%s_orbit_binary.txt"%(directory,target_hd,note),"w+")
+f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mirc_scale mean_resid(mu-as)\r\n")
+f.write("%s %s %s %s %s %s %s %s %s"%(P_start.value,a_start.value,e_start.value,
                                    inc_start.value*180/np.pi,w_start.value*180/np.pi,
                                    bigw_start.value*180/np.pi,T_start.value,
-                                  resids_median))
+                                  mirc_scale_start.value,resids_median))
 f.close()
 
 ##########################################
@@ -563,14 +643,27 @@ for i in tqdm(np.arange(20)):
     params.add('a2', value= a2, min=0)
     params.add('P2', value= P2, min=0)
     params.add('T2', value= T2, min=0)
-    params.add('mirc_scale', value=1, vary=False)
+    if len(vlti_idx)>0:
+        params.add('mirc_scale', value=1)
+    else:
+        params.add('mirc_scale',value=1,vary=False)
 
     #do fit, minimizer uses LM for least square fitting of model to data
-    minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
-                                                        error_maj_all,error_min_all,
-                                                        error_pa_all),
-                        nan_policy='omit')
-    result = minner.minimize()
+    if len(vlti_idx)>0:
+        minner = Minimizer(triple_model_vlti, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
+                                                            error_maj_all[vlti_mask_all],error_min_all[vlti_mask_all],
+                                                            error_pa_all[vlti_mask_all],
+                                                            xpos_all[vlti_idx],ypos_all[vlti_idx],t_all[vlti_idx],
+                                                            error_maj_all[vlti_idx],error_min_all[vlti_idx],
+                                                            error_pa_all[vlti_idx]),
+                            nan_policy='omit')
+        result = minner.minimize()
+    else:
+        minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
+                                                            error_maj_all,error_min_all,
+                                                            error_pa_all),
+                            nan_policy='omit')
+        result = minner.minimize()
     #try:
     #    print(report_fit(result))
     #except:
@@ -629,15 +722,14 @@ mirc_scale_best = mirc_scale_best[idx]
 ##########################################
 ## Save Plots for Triple
 ##########################################
-idx = np.where(t<58757)
-xpos[idx]/=mirc_scale_best
-ypos[idx]/=mirc_scale_best
-idx = np.where(t_all<58757)
-xpos_all[idx]/=mirc_scale_best
-ypos_all[idx]/=mirc_scale_best
-
-resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
-                            error_min,error_pa)
+if len(vlti_idx)>0:
+    resids_armada = triple_model_vlti(result.params,xpos[vlti_mask],ypos[vlti_mask],t[vlti_mask],error_maj[vlti_mask],
+                                error_min[vlti_mask],error_pa[vlti_mask],
+                                xpos[vlti_idx],ypos[vlti_idx],t[vlti_idx],
+                                error_maj[vlti_idx],error_min[vlti_idx],error_pa[vlti_idx])
+else:
+    resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
+                                error_min,error_pa)
 ndata_armada = 2*sum(~np.isnan(xpos))
 if circular=='y':
     print(ndata_armada)
@@ -649,10 +741,25 @@ print('-'*10)
 print('chi2 armada = %s'%chi2_armada)
 print('-'*10)
 
+if len(vlti_idx)>0:
+    xpos[vlti_idx]*=mirc_scale_best
+    ypos[vlti_idx]*=mirc_scale_best
+    xpos_all[vlti_idx]*=mirc_scale_best
+    ypos_all[vlti_idx]*=mirc_scale_best
+else:
+    idx = np.where(t<58757)
+    xpos[idx]/=mirc_scale_best
+    ypos[idx]/=mirc_scale_best
+    idx = np.where(t_all<58757)
+    xpos_all[idx]/=mirc_scale_best
+    ypos_all[idx]/=mirc_scale_best
+
 ## plot fit
 scale=1
 if chi2_armada<1.0 and chi2_armada>0:
     scale=1/np.sqrt(chi2_armada)
+else:
+    scale=float(input('scale errors by: '))
 
 ra,dec,rapoints,decpoints = triple_orbit_model(a_best,e_best,inc_best,
                                         w_best,bigw_best,P_best,
@@ -665,7 +772,11 @@ ra2,dec2,rapoints2,decpoints2 = orbit_model(a_best,e_best,inc_best,
 
 fig,ax=plt.subplots()
 ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
-ax.plot(xpos,ypos,'o', label='ARMADA')
+if len(vlti_idx)>0:
+    ax.plot(xpos[vlti_idx],ypos[vlti_idx],'o', label='ARMADA-VLTI')
+    ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+else:
+    ax.plot(xpos,ypos,'o', label='ARMADA')
 ax.plot(0,0,'*')
 ax.plot(ra, dec, '--',color='g')
 #plot lines from data to best fit orbit
@@ -681,11 +792,11 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Outer Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_outer_triple.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_outer_triple.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## plot inner wobble
-idx = np.where(error_maj/scale<1)
+#idx = np.where(error_maj/scale<1)
 ra_inner = ra - ra2
 dec_inner = dec - dec2
 rapoints_inner = rapoints - rapoints2
@@ -695,7 +806,11 @@ xpos_inner = xpos_all - rapoints2
 ypos_inner = ypos_all - decpoints2
 
 fig,ax=plt.subplots()
-ax.plot(xpos_inner[:len(xpos)][idx], ypos_inner[:len(xpos)][idx], '+')
+if len(vlti_idx)>0:
+    ax.plot(xpos_inner[:len(xpos)][vlti_idx],ypos_inner[:len(xpos)][vlti_idx],'+', label='ARMADA-VLTI')
+    ax.plot(xpos_inner[:len(xpos)][vlti_mask],ypos_inner[:len(xpos)][vlti_mask],'+', label='ARMADA-CHARA')
+else:
+    ax.plot(xpos_inner[:len(xpos)],ypos_inner[:len(xpos)],'+', label='ARMADA')
 ax.plot(0,0,'*')
 ax.plot(ra_inner, dec_inner, '--',color='g')
 
@@ -708,9 +823,9 @@ for ras, decs, w, h, angle in zip(xpos_inner[:len(xpos)],ypos_inner[:len(xpos)],
 
 #plot lines from data to best fit orbit
 i=0
-while i<len(decpoints_inner[:len(xpos)][idx]):
-    x=[xpos_inner[:len(xpos)][idx][i],rapoints_inner[:len(xpos)][idx][i]]
-    y=[ypos_inner[:len(xpos)][idx][i],decpoints_inner[:len(xpos)][idx][i]]
+while i<len(decpoints_inner[:len(xpos)]):
+    x=[xpos_inner[:len(xpos)][i],rapoints_inner[:len(xpos)][i]]
+    y=[ypos_inner[:len(xpos)][i],decpoints_inner[:len(xpos)][i]]
     ax.plot(x,y,color="black")
     i+=1
 ax.set_xlabel('milli-arcsec')
@@ -719,7 +834,7 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Inner Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_inner_triple.pdf'%(directory,target_hd))
+plt.savefig('%s/HD%s_%s_inner_triple.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## plot resids for ARMADA
@@ -733,14 +848,19 @@ for ras, decs, w, h, angle in zip(xresid,yresid,error_maj/scale,error_min/scale,
                       angle=90-angle, facecolor='none', edgecolor='black')
     ax.add_patch(ellipse)
 
-ax.plot(xresid, yresid, 'o')
+if len(vlti_idx)>0:
+    ax.plot(xresid[vlti_idx],yresid[vlti_idx],'o', label='ARMADA-VLTI')
+    ax.plot(xresid[vlti_mask],yresid[vlti_mask],'o', label='ARMADA-CHARA')
+else:
+    ax.plot(xresid,yresid,'o', label='ARMADA')
 ax.plot(0,0,'*')
 ax.set_xlabel('milli-arcsec')
 ax.set_ylabel('milli-arcsec')
 ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Resids'%target_hd)
-plt.savefig('%s/HD%s_resid_triple.pdf'%(directory,target_hd))
+plt.legend()
+plt.savefig('%s/HD%s_%s_resid_triple.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## residuals
@@ -751,14 +871,14 @@ print('Mean residual = %s micro-as'%resids_median)
 print('-'*10)
 
 ## Save txt file with best orbit
-f = open("%s/%s_orbit_triple.txt"%(directory,target_hd),"w+")
-f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) P2 a2 e2 i2 w2 W2 T2 mean_resid(mu-as)\r\n")
-f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_best,
+f = open("%s/%s_%s_orbit_triple.txt"%(directory,target_hd,note),"w+")
+f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) P2 a2 e2 i2 w2 W2 T2 mirc_scale mean_resid(mu-as)\r\n")
+f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_best,
                                     a_best,e_best,
                                    inc_best,w_best,
                                    bigw_best,T_best,
                                    P2_best,a2_best,e2_best,
                                    inc2_best,w2_best,
                                    bigw2_best,T2_best,
-                                  resids_median))
+                                  mirc_scale_best,resids_median))
 f.close()

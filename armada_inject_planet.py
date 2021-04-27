@@ -252,9 +252,14 @@ error_deg_all = np.concatenate([error_deg,error_deg_wds])
 print('ADDING FAKE PLANET')
 pper = float(input('Planet period (d): '))
 psem = float(input('Planet wobble semi-major (uas): '))/1000
-planet_xy = add_planet(pper,psem,100,10,57715,t)
-planet_xy_wds = add_planet(pper,psem,100,10,57715,t_wds)
-planet_xy_all = add_planet(pper,psem,100,10,57715,t_all)
+
+bigw_injected = np.random.uniform(0,360)
+inc_injected = np.random.uniform(0,180)
+t0_injected = np.random.uniform(min(t),max(t))
+
+planet_xy = add_planet(pper,psem,bigw_injected,inc_injected,t0_injected,t)
+planet_xy_wds = add_planet(pper,psem,bigw_injected,inc_injected,t0_injected,t_wds)
+planet_xy_all = add_planet(pper,psem,bigw_injected,inc_injected,t0_injected,t_all)
 xpos += planet_xy[0]
 ypos += planet_xy[1]
 xpos_wds += planet_xy_wds[0]
@@ -569,11 +574,24 @@ f.close()
 ##########################################
 ## Grid Search for Additional Companions
 ##########################################
-ps = float(input('period search start (days): '))
-pe = float(input('period search end (days): '))
+#ps = float(input('period search start (days): '))
+#pe = float(input('period search end (days): '))
 ss = float(input('semi search start (mas): '))
 se = float(input('semi search end (mas): '))
-P2 = np.linspace(ps,pe,1000)
+#P2 = np.linspace(ps,pe,1000)
+
+## New test -- try period spacing from PHASES III paper
+time_span = max(t) - min(t)
+print('Time span of data = %s days'%time_span)
+f = 3
+min_per = float(input('minimum period to search (days) = '))
+#min_per = 2
+max_k = int(2*f*time_span / min_per)
+k_range = np.arange(max_k)[:-1] + 1
+P2 = 2*f*time_span / k_range
+#P2 = np.linspace(1,300,1000)
+print('Min/Max period (days) = %s / %s ; %s steps'%(min(P2),max(P2),len(k_range)))
+
 w2 = w_start
 #bigw2 = bigw_start
 #inc2 = inc_start
@@ -594,9 +612,9 @@ for period in tqdm(P2):
     for i in np.arange(10):
         ## randomize orbital elements
         ## 100,10,57715
-        bigw2 = np.random.uniform(90,110)
-        inc2 = np.random.uniform(5,15)
-        T2 = np.random.uniform(57710,57720)
+        bigw2 = np.random.uniform(0,360)
+        inc2 = np.random.uniform(0,180)
+        T2 = np.random.uniform(min(t),max(t))
 
         params = Parameters()
         params.add('w',   value= w_start, min=0, max=360)
@@ -647,6 +665,8 @@ idx = np.argmin(chi2)
 period_best = params_inner[:,0][idx]
 
 plt.plot(params_inner[:,0],1/chi2,'o-')
+plt.plot([pper,pper],[min(1/chi2),max(1/chi2)],'--',label='%s uas'%psem*1000)
+plt.xscale('log')
 plt.xlabel('Period (d)')
 plt.ylabel('1/chi2')
 plt.title('Best Period = %s'%period_best)
@@ -738,6 +758,7 @@ chi2 = np.array(chi2)
 a_inner = params_inner[:,1]
 i_inner = params_inner[:,5]
 plt.scatter(a_inner,i_inner,c=1/chi2,cmap=cm.inferno)
+plt.plot(psem,inc_injected,'+',markersize=20)
 plt.colorbar(label='1 / $\chi^2$')
 plt.xlabel('semi-major (mas)')
 plt.ylabel('inclination (deg)')

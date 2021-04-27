@@ -494,8 +494,8 @@ def read_vlti(dir,interact='n',exclude=''):
 
 def read_chara_old(file,interact='n',exclude=''):
 
-    #beam_map = {1:'S1',2:'S2',3:'E1',4:'E2',5:'W1',6:'W2'}
-    beam_map = {0:'S1',1:'S2',2:'E1',3:'E2',4:'W1',5:'W2'}
+    beam_map = {1:'S1',2:'S2',3:'E1',4:'E2',5:'W1',6:'W2'}
+    #beam_map = {0:'S1',1:'S2',2:'E1',3:'E2',4:'W1',5:'W2'}
 
     ## get information from fits file
     t3phi=[]
