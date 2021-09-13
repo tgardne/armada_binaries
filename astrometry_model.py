@@ -62,6 +62,74 @@ def astrometry_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     #resids[idx]*=10
     return (resids)
 
+def rv_model(params, data_rv, t, error_rv):
+   
+    #orbital parameters:
+    try:
+        w = params[0]*np.pi/180
+        e= params[1]
+        P = params[2]
+        T= params[3]
+        K = params[4]
+        gamma = params[5]
+    except:
+        w = params['w']*np.pi/180
+        e= params['e']
+        P = params['P']
+        T= params['T']
+        K= params['K']
+        gamma= params['gamma']
+
+    #Calculate the mean anamoly for each t in dataset:
+    M=[]
+    for i in t:
+        m_anom=2*np.pi/P*(i-T)
+        M.append(m_anom)
+    M=np.asarray(M)
+
+    #eccentric anamoly calculated for each t (using kepler function):
+    E=[]
+    for j in M:
+        #e_anom=keplerE(j,e)
+        e_anom=ks.getE(j,e)
+        E.append(e_anom)
+    E=np.asarray(E)
+
+    #Find velocity for model, compare to v1
+    v = 2*np.arctan(np.sqrt((1+e)/(1-e))*np.tan(E/2))
+    model = K*(np.cos(w+v)+e*np.cos(w))+gamma
+    return (data_rv-model)/error_rv
+
+def rv_model_circular(params, data_rv, t, error_rv):
+   
+    #orbital parameters:
+    try:
+        w = params[0]*np.pi/180
+        e= params[1]
+        P = params[2]
+        T= params[3]
+        K = params[4]
+        gamma = params[5]
+    except:
+        w = params['w']*np.pi/180
+        e= params['e']
+        P = params['P']
+        T= params['T']
+        K= params['K']
+        gamma= params['gamma']
+
+    #Calculate the mean anamoly for each t in dataset:
+    E=[]
+    for i in t:
+        m_anom=2*np.pi/P*(i-T)
+        E.append(m_anom)
+    E=np.asarray(E)
+
+    #Find velocity for model, compare to v1
+    v = 2*np.arctan(np.sqrt((1+e)/(1-e))*np.tan(E/2))
+    model = K*(np.cos(w+v)+e*np.cos(w))+gamma
+    return (data_rv-model)/error_rv
+
 ########################
 #astrometry model for fitting x,y,t data with error ellipses
 def triple_model(params, data_x, data_y, t, error_maj, error_min, error_pa):

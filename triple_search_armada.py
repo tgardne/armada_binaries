@@ -218,6 +218,19 @@ if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
 ########################################################
 
+t3phi_fit = t3phi[:,::100]
+t3phierr_fit = t3phierr[:,::100]
+vis2_fit = vis2[:,::100]
+vis2err_fit = vis2err[:,::100]
+visphi_fit = visphi[:,::100]
+visphierr_fit = visphi[:,::100]
+visamp_fit = visamp[:,::100]
+visamperr_fit = visamperr[:,::100]
+eff_wave_fit = eff_wave[:,::100]
+
+print(t3phi.shape)
+print(t3phi_fit.shape)
+
 ################################################
 ## Dispersion fit for dphase
 ################################################
@@ -237,6 +250,22 @@ dispersion=np.array(dispersion)
 
 ## subtract dispersion
 visphi_new = visphi-dispersion
+
+dispersion_fit=[]
+for vis in visphi_fit:
+    if np.count_nonzero(~np.isnan(vis))>0:
+        y=vis
+        x=eff_wave_fit[0]
+        idx = np.isfinite(x) & np.isfinite(y)
+        z=np.polyfit(x[idx],y[idx],2)
+        p = np.poly1d(z)
+        dispersion_fit.append(p(x))
+    else:
+        dispersion_fit.append(vis)
+dispersion_fit=np.array(dispersion_fit)
+
+## subtract dispersion
+visphi_new_fit = visphi_fit-dispersion_fit
 
 #method=input('VISPHI METHOD (dphase or visphi): ')
 if dtype=='chara':
@@ -310,7 +339,7 @@ for ra_try in tqdm(ra_grid):
         params.add('ud3', value= a5_2, vary=False)#min=0.0,max=2.0)
         params.add('bw', value= a6, vary=False)#min=0,max=1)
 
-        minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+        minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi_fit,t3phierr_fit,visphi_new_fit,visphierr_fit,vis2_fit,vis2err_fit,u_coords,v_coords,ucoords,vcoords,eff_wave_fit[0]),nan_policy='omit')
         result = minner.leastsq(xtol=1e-5,ftol=1e-5)
         chi2 = result.redchi
 

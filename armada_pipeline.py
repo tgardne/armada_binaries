@@ -692,6 +692,14 @@ print('-'*10)
 print('Median residual = %s micro-as'%resids_median)
 print('-'*10)
 
+## plot residuals vs time
+plt.errorbar(t,resids,yerr=error_maj/scale,fmt='o')
+plt.xlabel('Time (MJD)')
+plt.ylabel('residual (mas)')
+plt.title('Residuals vs Time')
+plt.savefig('%s/HD%s_%s_resid_time.pdf'%(directory,target_hd,date))
+plt.close()
+
 ## Save txt file with best orbit
 f = open("%s/%s_%s_orbit_ls.txt"%(directory,target_hd,date),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
@@ -741,8 +749,9 @@ min_per = float(input('minimum period to search (days) = '))
 max_k = int(2*f*time_span / min_per)
 k_range = np.arange(max_k)[:-1] + 1
 P2 = 2*f*time_span / k_range
-#P2 = np.linspace(1,300,1000)
+#P2 = np.linspace(100,1000,10000)
 print('Min/Max period (days) = %s / %s ; %s steps'%(min(P2),max(P2),len(k_range)))
+#P2 = np.linspace(20,30,1000)
 
 #ps = float(input('period search start (days): '))
 #pe = float(input('period search end (days): '))

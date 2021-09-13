@@ -2,7 +2,7 @@
 ## Tyler Gardner
 ##
 ## Pipeline to fit binary orbits
-## and search for 2 companions -- 2d grid
+## and search for additional companions
 ##
 ## For binary orbits from MIRCX/GRAVITY
 ##
@@ -16,11 +16,14 @@ from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
 from read_data import read_data,read_wds,read_orb6
-from astrometry_model import astrometry_model,triple_model,quad_model,triple_model,quad_model_circular,lnlike,lnprior,lnpost,create_init
+from astrometry_model import astrometry_model,triple_model,triple_model_circular,lnlike,lnprior,lnpost,create_init
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
 import random
+import emcee
+import corner
+from PyAstronomy import pyasl
 
 def cart2pol(x,y):
     x=-x
@@ -35,6 +38,93 @@ def cart2pol(x,y):
     if np.isnan(theta):
         theta_new=theta
     return(r,theta_new)
+
+def astrometry_model_mcmc(params, data_x, data_y, t, error_maj, error_min, error_pa):
+   
+    #orbital parameters:
+    try:
+        w = params[0]
+        bigw = params[1]
+        inc = params[2]
+        e= params[3]
+        a= params[4]
+        P = params[5]
+        T= params[6]
+    except:
+        w = params['w']
+        bigw = params['bigw']
+        inc = params['inc']
+        e= params['e']
+        a= params['a']
+        P = params['P']
+        T= params['T']
+
+    ## other method:
+    ke = pyasl.KeplerEllipse(a,P,e=e,Omega=bigw,i=inc,w=w,tau=T)
+    pos = ke.xyzPos(t)
+    model_x = pos[::,1]
+    model_y = pos[::,0]
+    
+    major_vector_x=np.sin(error_pa)
+    major_vector_y=np.cos(error_pa)
+    minor_vector_x=-major_vector_y
+    minor_vector_y=major_vector_x
+    resid_x=data_x-model_x
+    resid_y=data_y-model_y
+    resid_major=(resid_x*major_vector_x+resid_y*major_vector_y)/error_maj
+    resid_minor=(resid_x*minor_vector_x+resid_y*minor_vector_y)/error_min
+    resids=np.concatenate([resid_major,resid_minor])
+    
+    #resids[idx]*=10
+    return (resids)
+
+def lnlike(params,x,y,t,emaj,emin,epa):
+    '''
+    The log-likelihood function. Observational model assume independent Gaussian error bars.
+    '''
+    model = astrometry_model_mcmc(params,x,y,t,emaj,emin,epa)
+    lnlike=-0.5*np.nansum(model**2)
+    return(lnlike)
+
+def lnprior(params):
+    '''
+    The log-prior function.
+    '''
+    pars = [params[x:x+7] for x in range(0, len(params), 7)]
+    nPars = len(pars)
+    thetaT = np.transpose(pars)
+    w,bigw,inc,e,a,P,T=thetaT[0],thetaT[1],thetaT[2],thetaT[3],thetaT[4],thetaT[5],thetaT[6]
+            
+    for i in range(nPars):
+        if 0 < P[i] and 0 < T[i] and 0. <= e[i] < 1. \
+        and 0. <= w[i] <= 360 and 0. <= bigw[i] <= 360 and 0. <= inc[i] <= 180 \
+        and 0 < a[i]:
+                lnp = 0
+        else:
+                lnp = -np.inf
+    return lnp
+
+def lnpost(params,x,y,t,emaj,emin,epa):
+    '''
+    The log-posterior function. Sum of log-likelihood and log-prior.
+    '''
+    lp = lnprior(params)
+    if not np.isfinite(lp):
+        return -np.inf
+    return lp + lnlike(params,x,y,t,emaj,emin,epa)
+
+def create_init(theta):
+    pars = [theta[x:x+7] for x in range(0, len(theta), 7)]
+    init = []
+    for item in pars:
+        init.append(item[0] + random.uniform(-1,1))
+        init.append(item[1] + random.uniform(-1,1))
+        init.append(item[2] + random.uniform(-1,1))
+        init.append(item[3] + random.uniform(-0.1,0.1))
+        init.append(item[4] + random.uniform(-1,1))
+        init.append(item[5] + random.uniform(-0.1,0.1))
+        init.append(item[6] + random.uniform(-0.1,0.1))
+        return init
 
 ###########################################
 ## SETUP PATHS
@@ -59,8 +149,6 @@ elif os.getcwd()[7:19] == 'adam.scovera':
 ###########################################
 target_hd = input('Target HD #: ')
 date = input('Date for savefile: ')
-distance = float(input('Distance (pc): '))
-mass_star = float(input('Mass Star (Msun): '))
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
@@ -615,9 +703,9 @@ while rescale=='y':
     rescale = input('Rescale errors based off chi2? (y/n): ')
 
 if emethod == 'y':
-    directory='%s/HD%s_bootstrap/'%(path,target_hd)
+    directory='%s/HD%s_bootstrap_mcmc/'%(path,target_hd)
 else:
-    directory='%s/HD%s_chi2err/'%(path,target_hd)
+    directory='%s/HD%s_chi2err_mcmc/'%(path,target_hd)
 if not os.path.exists(directory):
     os.makedirs(directory)
 
@@ -692,8 +780,63 @@ print('-'*10)
 print('Median residual = %s micro-as'%resids_median)
 print('-'*10)
 
+## Run mcmc
+initial_params = [w_start.value,bigw_start.value,inc_start.value,
+                e_start.value,a_start.value,P_start.value,T_start.value]
+nDim = len(initial_params)
+nWalkers = 2*nDim
+init = [create_init(initial_params) for i in range(nWalkers)]
+sampler = emcee.EnsembleSampler(nWalkers, nDim, lnpost,args=[xpos_all,ypos_all,t_all,error_maj_all,
+                                                            error_min_all,error_pa_all])
+sampler.run_mcmc(init, 10000, progress=True)
+
+fig, axes = plt.subplots(7, figsize=(10, 14), sharex=True)
+samples = sampler.get_chain()
+labels=["$\omega$ (deg)","$\Omega$ (deg)","i (deg)","e","a (mas)","P (d)","T (MJD)"]
+for i in range(nDim):
+    ax = axes[i]
+    ax.plot(samples[:, :, i], "k", alpha=0.3)
+    ax.set_xlim(0, len(samples))
+    ax.set_ylabel(labels[i])
+    ax.yaxis.set_label_coords(-0.1, 0.5)
+axes[-1].set_xlabel("step number");
+plt.savefig('%s/HD%s_chains.pdf'%(directory,target_hd))
+plt.close()
+
+try:
+    tau = sampler.get_autocorr_time()
+    print('tau = ')
+    print(tau)
+    print(10*'-')
+
+    burn = int(3*np.mean(tau))
+    print('burn = ')
+    print(burn)
+    print(10*'-')
+
+    thin = int(np.mean(tau)/2)
+    print('thin = ')
+    print(thin)
+    print(10*'-')
+except:
+    print('did not run long enough!!!')
+    burn = 100
+    thin = 10
+
+flat_samples = sampler.get_chain(discard=burn, thin=thin, flat=True)
+print(flat_samples.shape)
+w_mcmc,bigw_mcmc,inc_mcmc,e_mcmc,a_mcmc,P_mcmc,T_mcmc = [np.std(flat_samples[:,0]),np.std(flat_samples[:,1]),
+                                                        np.std(flat_samples[:,2]),np.std(flat_samples[:,3]),
+                                                        np.std(flat_samples[:,4]),np.std(flat_samples[:,5]),
+                                                        np.std(flat_samples[:,6])]
+
+
+fig = corner.corner(flat_samples, labels=labels,truths=initial_params,label_kwargs={"fontsize":15})
+plt.savefig('%s/HD%s_corner.pdf'%(directory,target_hd))
+plt.close()
+
 ## Save txt file with best orbit
-f = open("%s/%s_%s_orbit_ls.txt"%(directory,target_hd,date),"w+")
+f = open("%s/%s_%s_orbit_mcmc.txt"%(directory,target_hd,date),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
 f.write("# Perr(d) aerr(mas) eerr ierr(deg) werr(deg) Werr(deg) Terr(mjd)\r\n")
 f.write("%s %s %s %s %s %s %s %s\r\n"%(P_start.value,a_start.value,e_start.value,
@@ -701,11 +844,20 @@ f.write("%s %s %s %s %s %s %s %s\r\n"%(P_start.value,a_start.value,e_start.value
                                    bigw_start.value,T_start.value,
                                   resids_median))
 try:
-    f.write("%s %s %s %s %s %s %s"%(P_start.stderr,a_start.stderr,e_start.stderr,
-                                       inc_start.stderr,w_start.stderr,
-                                       bigw_start.stderr,T_start.stderr))
+    f.write("%s %s %s %s %s %s %s"%(P_mcmc,a_mcmc,e_mcmc,
+                                       inc_mcmc,w_mcmc,
+                                       bigw_mcmc,T_mcmc))
 except:
     f.write("Errors not estimated")
+f.close()
+
+## Save txt file for paper
+f = open("%s/%s_%s_orbit_paper.txt"%(directory,target_hd,date),"w+")
+f.write("# P(d) T(mjd) e w(deg) W(deg) i(deg) a(mas) med_resid(mu-as)\r\n")
+f.write("$%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s$\r\n"%(P_start.value,
+                                P_mcmc,T_start.value,T_mcmc,e_start.value,e_mcmc,w_start.value,
+                                w_mcmc,bigw_start.value,bigw_mcmc,inc_start.value,inc_mcmc,
+                                a_start.value,a_mcmc,resids_median))
 f.close()
 
 ## Save txt file with wds orbit
@@ -723,222 +875,3 @@ for i,j,k,l,m,n in zip(t_wds,p_wds_new,theta_wds_new,error_maj_all[len(xpos):],e
     f.write("-- %s %s %s %s %s %s\r\n"%(i,j,k,l,m,n))
 f.write('#')
 f.close()
-
-##########################################
-## Grid Search for Additional Companions
-##########################################
-
-### New test -- try period spacing from PHASES III paper
-#time_span = max(t) - min(t)
-#print('Time span of data = %s days'%time_span)
-#f = 5
-#min_per = float(input('minimum period to search (days) = '))
-##min_per = 2
-#max_k = int(2*f*time_span / min_per)
-#k_range = np.arange(max_k)[:-1] + 1
-#P2 = 2*f*time_span / k_range
-#P2 = np.linspace(1,300,1000)
-#print('Min/Max period (days) = %s / %s ; %s steps'%(min(P2),max(P2),len(k_range)))
-
-ps = float(input('period search start (days): '))
-pe = float(input('period search end (days): '))
-steps = int(input('steps: '))
-#P2 = np.linspace(ps,pe,steps)
-P3 = np.logspace(np.log10(ps),np.log10(pe),steps)
-p2input = input('Use separate grid for Pinner? (y/[n])')
-if p2input=='y':
-    ps = float(input('period search start (days): '))
-    pe = float(input('period search end (days): '))
-    steps = int(input('steps: '))
-    P2 = np.logspace(np.log10(ps),np.log10(pe),steps)
-else:
-    P2 = np.logspace(np.log10(ps),np.log10(pe),steps)
-
-a2 = resids_median/1000
-if np.isnan(a2):
-    a2=1
-#T2 = 55075
-
-print('Grid Searching over period')
-niter = 20
-iternum = 0
-
-print('Grid Searching over period')
-params_inner2=np.zeros(shape=(len(P2)*len(P3)*niter,7))
-params_inner3=np.zeros(shape=(len(P2)*len(P3)*niter,7))
-params_outer_quad=np.zeros(shape=(len(P2)*len(P3)*niter,7))
-chi2_quad = np.zeros(shape=len(P2)*len(P3)*niter)
-
-params = Parameters()
-params.add('w',   value= w_start, min=0, max=360)
-params.add('bigw', value= bigw_start, min=0, max=360)
-params.add('inc', value= inc_start, min=0, max=180)
-params.add('e', value= e_start, min=0, max=0.99)
-params.add('a', value= a_start, min=0)
-params.add('P', value= P_start, min=0)
-params.add('T', value= T_start, min=0)
-params.add('w2',   value= 0, vary=False)
-params.add('bigw2', value= 100, min=0, max=360)
-params.add('inc2', value= 45, min=0, max=180)
-params.add('e2', value= 0, vary=False)
-params.add('a2', value= a2, min=0)
-params.add('P2', value= 1, vary=False)
-params.add('T2', value= 1, min=0)
-        
-params.add('w3',   value= 0, vary=False)
-params.add('bigw3', value= 100, min=0, max=360)
-params.add('inc3', value= 45, min=0, max=180)
-params.add('e3', value= 0, vary=False)
-params.add('a3', value= a2, min=0)
-params.add('P3', value= 1, vary=False)
-params.add('T3', value= 1, min=0)
-
-## randomize orbital elements
-bigw2 = np.random.uniform(0,360,niter)
-inc2 = np.random.uniform(0,180,niter)
-T2 = np.random.uniform(58000,59000,niter)
-bigw3 = np.random.uniform(0,360,niter)
-inc3 = np.random.uniform(0,180,niter)
-T3 = np.random.uniform(58000,59000,niter)
-
-if mirc_scale == 'y':
-    params.add('mirc_scale', value= 1.0)
-else:
-    params.add('mirc_scale', value= 1.0, vary=False)
-
-for period1 in tqdm(P2):
-    for period2 in P3:
-        for i in np.arange(niter):
-
-            params['bigw2'].value = bigw2[i]
-            params['inc2'].value = inc2[i]
-            params['P2'].value = period1
-            params['T2'].value= T2[i]
-        
-            params['bigw3'].value = bigw3[i]
-            params['inc3'].value = inc3[i]
-            params['P3'].value = period2
-            params['T3'].value = T3[i]
-            
-            #do fit, minimizer uses LM for least square fitting of model to data
-            minner = Minimizer(quad_model_circular, params, fcn_args=(xpos_all,ypos_all,t_all,
-                                                               error_maj_all,error_min_all,
-                                                               error_pa_all),
-                              nan_policy='omit')
-            result = minner.leastsq(xtol=1e-5,ftol=1e-5)
-            
-            chi2_quad[iternum] = result.chisqr
-            print(chi2_quad.shape,params_inner3.shape,params_inner2.shape,params_outer_quad.shape)
-            print(iternum)
-            params_inner3[iternum] = [result.params['P3'],result.params['a3'],result.params['e3'],result.params['w3'],
-                                      result.params['bigw3'],result.params['inc3'],result.params['T3']]
-            params_inner2[iternum] = [result.params['P2'],result.params['a2'],result.params['e2'],result.params['w2'],
-                                      result.params['bigw2'],result.params['inc2'],result.params['T2']]
-            params_outer_quad[iternum] = [result.params['P'],result.params['a'],result.params['e'],result.params['w'],
-                                          result.params['bigw'],result.params['inc'],result.params['T']]
-            iternum += 1
-
-    np.save('%s/HD%s_%s_params_inner2.npy'%(directory,target_hd,date),params_inner2)
-    np.save('%s/HD%s_%s_params_inner3.npy'%(directory,target_hd,date),params_inner3)
-    np.save('%s/HD%s_%s_params_outer_quad.npy'%(directory,target_hd,date),params_outer_quad)
-    np.save('%s/HD%s_%s_chi2_quad.npy'%(directory,target_hd,date),chi2_quad)
-
-idx = np.argmin(chi2_quad)
-period2_best = params_inner2[:,0][idx]
-period3_best = params_inner3[:,0][idx]
-
-#plt.plot(params_inner[:,0],1/chi2_noise,'.--')
-plt.plot(params_inner2[:,0],1/chi2_quad,'o-')
-plt.xscale('log')
-plt.xlabel('Period (d)')
-plt.ylabel('1/chi2')
-plt.title('Best Period2 = %s'%period2_best)
-plt.savefig('%s/HD%s_%s_chi2_period2.pdf'%(directory,target_hd,date))
-plt.close()
-
-plt.plot(params_inner3[:,0],1/chi2_quad,'o-')
-plt.xscale('log')
-plt.xlabel('Period (d)')
-plt.ylabel('1/chi2')
-plt.title('Best Period3 = %s'%period3_best)
-plt.savefig('%s/HD%s_%s_chi2_period3.pdf'%(directory,target_hd,date))
-plt.close()
-
-params_inner2_new = np.reshape(params_inner2,(int(params_inner2.shape[0]/niter),niter,7))
-params_inner3_new = np.reshape(params_inner3,(int(params_inner3.shape[0]/niter),niter,7))
-params_outer_new = np.reshape(params_outer_quad,(int(params_outer_quad.shape[0]/niter),niter,7))
-chi2_quad_new = np.reshape(chi2_quad,(int(chi2_quad.shape[0]/niter),niter))
-
-params_inner2_plot = []
-params_inner3_plot = []
-chi2_quad_plot = []
-for i,j,k in zip(chi2_quad_new,params_inner2_new,params_inner3_new):
-    #print(i.shape,j.shape,k.shape)
-    idx2 = np.argmin(i)
-    #print(idx)
-    params_inner2_plot.append(j[idx2])
-    params_inner3_plot.append(k[idx2])
-    chi2_quad_plot.append(i[idx2])
-params_inner2_plot = np.array(params_inner2_plot)
-params_inner3_plot = np.array(params_inner3_plot)
-chi2_quad_plot = np.array(chi2_quad_plot)
-
-P2_inner = params_inner2_plot[:,0]
-P3_inner = params_inner3_plot[:,0]
-plt.scatter(P2_inner,P3_inner,c=1/chi2_quad_plot,cmap=cm.inferno)
-plt.colorbar(label='1 / $\chi^2$')
-plt.xlabel('P2 (days)')
-plt.ylabel('P3 (days)')
-plt.savefig('%s/HD%s_%s_period_2d_grid.pdf'%(directory,target_hd,date))
-plt.close()
-
-print('Best inner periods = %s %s'%(period2_best,period3_best))
-
-## Do a fit at best period
-params = Parameters()
-params.add('w',   value= params_outer_quad[:,3][idx], min=0, max=360)
-params.add('bigw', value= params_outer_quad[:,4][idx], min=0, max=360)
-params.add('inc', value= params_outer_quad[:,5][idx], min=0, max=180)
-params.add('e', value= params_outer_quad[:,2][idx], min=0, max=0.99)
-params.add('a', value=params_outer_quad[:,1][idx], min=0)
-params.add('P', value= params_outer_quad[:,0][idx], min=0)
-params.add('T', value= params_outer_quad[:,6][idx], min=0)
-params.add('w2',   value= 0, vary=False)#w2, min=0, max=360)
-params.add('bigw2', value= params_inner2[:,4][idx], min=0, max=360)
-params.add('inc2', value= params_inner2[:,5][idx], min=0, max=180)
-params.add('e2', value= 0, vary=False)#0.1, min=0,max=0.99)
-params.add('a2', value= params_inner2[:,1][idx], min=0)
-params.add('P2', value= period2_best, min=0)
-params.add('T2', value= params_inner2[:,6][idx], min=0)
-params.add('w3',   value= 0, vary=False)#w2, min=0, max=360)
-params.add('bigw3', value= params_inner3[:,4][idx], min=0, max=360)
-params.add('inc3', value= params_inner3[:,5][idx], min=0, max=180)
-params.add('e3', value= 0, vary=False)#0.1, min=0,max=0.99)
-params.add('a3', value= params_inner3[:,1][idx], min=0)
-params.add('P3', value= period3_best, min=0)
-params.add('T3', value= params_inner3[:,6][idx], min=0)
-if mirc_scale == 'y':
-    params.add('mirc_scale', value= 1.0)
-else:
-    params.add('mirc_scale', value= 1.0, vary=False)
-
-#params.add('pscale', value=1)
-
-#do fit, minimizer uses LM for least square fitting of model to data
-minner = Minimizer(quad_model, params, fcn_args=(xpos_all,ypos_all,t_all,
-                                                   error_maj_all,error_min_all,
-                                                   error_pa_all),
-                  nan_policy='omit')
-result = minner.minimize()
-best_inner2 = [result.params['P2'],result.params['a2'],result.params['e2'],result.params['w2']
-                    ,result.params['bigw2'],result.params['inc2'],result.params['T2']]
-best_inner3 = [result.params['P3'],result.params['a3'],result.params['e3'],result.params['w3']
-                    ,result.params['bigw3'],result.params['inc3'],result.params['T3']]
-best_outer = [result.params['P'],result.params['a'],result.params['e'],result.params['w']
-                    ,result.params['bigw'],result.params['inc'],result.params['T']]
-try:
-    report_fit(result)
-except:
-    print('-'*10)
-    print('Triple fit FAILED!!!!')
-    print('-'*10)

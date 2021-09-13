@@ -41,17 +41,25 @@ def ellipse_fitting(x,y):
 def ellipse_hull_fit(x,y,xmean,ymean):
 
     data_test = []
-    for x,y in zip(x,y):
-        data_test.append([x,y])
+    for i,j in zip(x,y):
+        data_test.append([i,j])
     data_test = np.array(data_test)
 
     hull = ConvexHull(data_test)
     N=len(data_test[hull.vertices,0])
     x = data_test[hull.vertices,0] - xmean
     y = data_test[hull.vertices,1] - ymean
+    #print(x,y)
     U, S, V = np.linalg.svd(np.stack((x, y)))
+    #print(U,S,V)
     a,b = S*np.sqrt(2/N)
-    angle = np.arctan2(U[0][1],U[0][0])
+    #print('a,b')
+    #print(a,b)
+    #print('U[0][1],U[0][0]')
+    #print(U[0][1],U[0][0])
+    angle = np.arctan2(U[0][1],-U[0][0])
+    #print('angle')
+    #print(angle)
     if angle<0:
         angle = angle+np.pi
     return a,b,angle

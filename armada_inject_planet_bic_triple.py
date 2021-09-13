@@ -1,7 +1,7 @@
 ######################################################################
 ## Tyler Gardner
 ##
-## Planet injection method of PHASES III paper
+## Planet injection method of BIC method (Gardner et al 2018)
 ##
 ######################################################################
 
@@ -13,7 +13,7 @@ from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
 from read_data import read_data,read_wds,read_orb6
-from astrometry_model import astrometry_model,triple_model,lnlike,lnprior,lnpost,create_init
+from astrometry_model import astrometry_model,triple_model,quad_model,lnlike,lnprior,lnpost,create_init
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
@@ -164,7 +164,6 @@ else:
 xpos=p*np.sin(theta)
 ypos=p*np.cos(theta)
 
-
 ###########################################
 ## Read in WDS data - and plot to check
 ###########################################
@@ -225,10 +224,25 @@ if flip=='y':
 ###########################################
 ## Get an estimate of the orbital parameters
 ###########################################
-try:
-    a,P,e,inc,omega,bigomega,T = read_orb6(target,path_orb6)
-except:
-    print('No elements found in ORB6')
+orb_file = open(input('Triple orbit txt file: '))
+line = orb_file.readlines()[1]
+P = float(line.split()[0])
+a = float(line.split()[1])
+e = float(line.split()[2])
+inc = float(line.split()[3])
+omega = float(line.split()[4])
+bigomega = float(line.split()[5])
+T = float(line.split()[6])
+
+P2 = float(line.split()[7])
+a2 = float(line.split()[8])
+e2 = float(line.split()[9])
+inc2 = float(line.split()[10])
+omega2 = float(line.split()[11])
+bigomega2 = float(line.split()[12])
+T2 = float(line.split()[13])
+
+orb_file.close()
     
 self_params = input('Input own params?')
 if self_params=='y':
@@ -239,6 +253,14 @@ if self_params=='y':
     omega = float(input('omega (deg): '))
     bigomega = float(input('bigomega (deg): '))
     T = float(input('T (mjd): '))
+
+    a2 = float(input('a2 (mas): '))
+    P2 = float(input('P2 (year): '))*365.25
+    e2 = float(input('ecc2 : '))
+    inc2 = float(input('inc2 (deg): '))
+    omega2 = float(input('omega2 (deg): '))
+    bigomega2 = float(input('bigomega2 (deg): '))
+    T2 = float(input('T2 (mjd): '))
 
 ###########################################
 ## Combined WDS+ARMADA for fitting
@@ -256,7 +278,7 @@ error_deg_all = np.concatenate([error_deg,error_deg_wds])
 #########################################
 def ls_fit(params,xp,yp,tp,emaj,emin,epa):
     #do fit, minimizer uses LM for least square fitting of model to data
-    minner = Minimizer(astrometry_model, params, fcn_args=(xp,yp,tp,
+    minner = Minimizer(triple_model, params, fcn_args=(xp,yp,tp,
                                                        emaj,emin,epa),
                             nan_policy='omit')
     result = minner.minimize()
@@ -272,9 +294,19 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
     bigw_start = result.params['bigw']
     T_start = result.params['T']
 
-    ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
+    a2_start = result.params['a2']
+    P2_start = result.params['P2']
+    e2_start = result.params['e2']
+    inc2_start = result.params['inc2']
+    w2_start = result.params['w2']
+    bigw2_start = result.params['bigw2']
+    T2_start = result.params['T2']
+
+    ra,dec,rapoints,decpoints = triple_orbit_model(a_start,e_start,inc_start,
                                             w_start,bigw_start,P_start,
-                                            T_start,t_all)
+                                            T_start,a2_start,e2_start,inc2_start,
+                                            w2_start,bigw2_start,P2_start,
+                                            T2_start,t_all)
     fig,ax=plt.subplots()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     ax.plot(xpos,ypos,'o', label='ARMADA')
@@ -308,6 +340,13 @@ params.add('e', value= e, min=0, max=0.99)
 params.add('a', value= a, min=0)
 params.add('P', value= P, min=0)
 params.add('T', value= T, min=0)
+params.add('w2',   value= omega2, min=0, max=360)
+params.add('bigw2', value= bigomega2, min=0, max=360)
+params.add('inc2', value= inc2, min=0, max=180)
+params.add('e2', value= e2, min=0, max=0.99)
+params.add('a2', value= a2, min=0)
+params.add('P2', value= P2, min=0)
+params.add('T2', value= T2, min=0)
 params.add('mirc_scale', value= 1.0, vary=False)
 
 result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
@@ -380,9 +419,18 @@ while filter_wds == 'y':
     w_start = result.params['w']
     bigw_start = result.params['bigw']
     T_start = result.params['T']
-    ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
+    a2_start = result.params['a2']
+    P2_start = result.params['P2']
+    e2_start = result.params['e2']
+    inc2_start = result.params['inc2']
+    w2_start = result.params['w2']
+    bigw2_start = result.params['bigw2']
+    T2_start = result.params['T2']
+    ra,dec,rapoints,decpoints = triple_orbit_model(a_start,e_start,inc_start,
                                         w_start,bigw_start,P_start,
-                                        T_start,t_all)
+                                        T_start,a2_start,e2_start,inc2_start,
+                                        w2_start,bigw2_start,P2_start,
+                                        T2_start,t_all)
     fig,ax=plt.subplots()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     ax.plot(xpos,ypos,'o', label='ARMADA')
@@ -438,6 +486,13 @@ while filter_wds == 'y':
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
     params.add('T', value= T, min=0)
+    params.add('w2',   value= omega2, min=0, max=360)
+    params.add('bigw2', value= bigomega2, min=0, max=360)
+    params.add('inc2', value= inc2, min=0, max=180)
+    params.add('e2', value= e2, min=0, max=0.99)
+    params.add('a', value= a2, min=0)
+    params.add('P', value= P2, min=0)
+    params.add('T2', value= T2, min=0)
     params.add('mirc_scale', value= 1.0, vary=False)
 
     result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
@@ -453,9 +508,10 @@ while filter_wds == 'y':
 #print('-'*10)
 #print('chi2 armada = %s'%chi2_armada)
 #print('-'*10)
-resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
+
+resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
                             error_min,error_pa)
-resids_wds = astrometry_model(result.params,xpos_all[len(xpos):],ypos_all[len(xpos):],t_all[len(xpos):],
+resids_wds = triple_model(result.params,xpos_all[len(xpos):],ypos_all[len(xpos):],t_all[len(xpos):],
                             error_maj_all[len(xpos):],error_min_all[len(xpos):],error_pa_all[len(xpos):])
 ndata_armada = 2*sum(~np.isnan(xpos))
 ndata_wds = 2*sum(~np.isnan(xpos_all[len(xpos):]))
@@ -492,13 +548,20 @@ while rescale=='y':
     params.add('a', value= a, min=0)
     params.add('P', value= P, min=0)
     params.add('T', value= T, min=0)
+    params.add('w2',   value= omega2, min=0, max=360)
+    params.add('bigw2', value= bigomega2, min=0, max=360)
+    params.add('inc2', value= inc2, min=0, max=180)
+    params.add('e2', value= e2, min=0, max=0.99)
+    params.add('a2', value= a2, min=0)
+    params.add('P2', value= P2, min=0)
+    params.add('T2', value= T2, min=0)
     params.add('mirc_scale', value= 1.0,vary=False)
 
     result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
 
-    resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
+    resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
                                 error_min,error_pa)
-    resids_wds = astrometry_model(result.params,xpos_all[len(xpos):],ypos_all[len(xpos):],t_all[len(xpos):],
+    resids_wds = triple_model(result.params,xpos_all[len(xpos):],ypos_all[len(xpos):],t_all[len(xpos):],
                                 error_maj_all[len(xpos):],error_min_all[len(xpos):],error_pa_all[len(xpos):])
     ndata_armada = 2*sum(~np.isnan(xpos))
     ndata_wds = 2*sum(~np.isnan(xpos_all[len(xpos):]))
@@ -534,10 +597,19 @@ inc_start = result.params['inc']
 w_start = result.params['w']
 bigw_start = result.params['bigw']
 T_start = result.params['T']
+a2_start = result.params['a2']
+P2_start = result.params['P2']
+e2_start = result.params['e2']
+inc2_start = result.params['inc2']
+w2_start = result.params['w2']
+bigw2_start = result.params['bigw2']
+T2_start = result.params['T2']
 chi2_best_binary = result.chisqr
-ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
+ra,dec,rapoints,decpoints = triple_orbit_model(a_start,e_start,inc_start,
                                         w_start,bigw_start,P_start,
-                                        T_start,t_all)
+                                        T_start,a2_start,e2_start,inc2_start,
+                                        w2_start,bigw2_start,P2_start,
+                                        T2_start,t_all)
 fig,ax=plt.subplots()
 ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
 ax.plot(xpos,ypos,'o', label='ARMADA')
@@ -556,7 +628,7 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Outer Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_%s_outer_leastsquares.pdf'%(directory,target_hd,date))
+plt.savefig('%s/HD%s_%s_outer_triple_leastsquares.pdf'%(directory,target_hd,date))
 plt.close()
 
 ## plot resids for ARMADA
@@ -577,7 +649,7 @@ ax.set_ylabel('milli-arcsec')
 ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Resids'%target_hd)
-plt.savefig('%s/HD%s_%s_resid_leastsquares.pdf'%(directory,target_hd,date))
+plt.savefig('%s/HD%s_%s_resid_triple_leastsquares.pdf'%(directory,target_hd,date))
 plt.close()
 
 ## residuals
@@ -588,11 +660,13 @@ print('Mean residual = %s micro-as'%resids_median)
 print('-'*10)
 
 ## Save txt file with best orbit
-f = open("%s/%s_orbit_ls.txt"%(directory,target_hd),"w+")
-f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
-f.write("%s %s %s %s %s %s %s %s"%(P_start.value,a_start.value,e_start.value,
-                                   inc_start.value,w_start.value,
-                                   bigw_start.value,T_start.value,
+f = open("%s/%s_orbit_triple_ls.txt"%(directory,target_hd),"w+")
+f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) P2(d) a2(mas) e2 i2(deg) w2(deg) W2(deg) T2(mjd) mean_resid(mu-as)\r\n")
+f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_start.value,a_start.value,
+                                    e_start.value,inc_start.value,w_start.value,
+                                   bigw_start.value,T_start.value,P2_start.value,
+                                   a2_start.value,e2_start.value,inc2_start.value,
+                                   w2_start.value,bigw2_start.value,T2_start.value,
                                   resids_median))
 f.close()
 
@@ -615,23 +689,25 @@ f.close()
 #####################################################################
 ## Grid Search for Additional Companions and Add Planets at each step
 #####################################################################
-ps = float(input('period search start (days): '))
-pe = float(input('period search end (days): '))
-P2 = np.logspace(np.log10(ps),np.log10(pe),20)
-a2 = resids_median/1000
+#ps = float(input('period search start (days): '))
+#pe = float(input('period search end (days): '))
+ps = 10
+pe = 1000
+P3 = np.logspace(np.log10(ps),np.log10(pe),20)
+a3 = np.logspace(np.log10(0.005),np.log10(0.2),20)
 
-z_max = float(input("Enter z(P) max from real data = "))
+#z_max = float(input("Enter z(P) max from real data = "))
 print('Grid Searching over period -- adding planets at each step')
 
-semi_limit = []
-for per in tqdm(P2):
-    loop = 'y'
-    semi_p = a2
-    iteration = 1
+percentage_recovered = []
+n_data = 2*len(xpos_all)
 
-    while loop == 'y':
-        z_vals = []
-        for step in range(1000):
+for per in tqdm(P3):
+    n_success = []
+    for semi_p in a3:
+
+        success = 0
+        for step in range(100):
 
             ############################################
             ## ADD A FAKE PLANET
@@ -647,7 +723,7 @@ for per in tqdm(P2):
             xpos_all_new = xpos_all + planet_xy_all[0]
             ypos_all_new = ypos_all + planet_xy_all[1]
 
-            ## First do a binary chi2
+            ## First do a triple chi2
             params = Parameters()
             params.add('w',   value= w_start, min=0, max=360)
             params.add('bigw', value= bigw_start, min=0, max=360)
@@ -656,13 +732,20 @@ for per in tqdm(P2):
             params.add('a', value= a_start, min=0)
             params.add('P', value= P_start, min=0)
             params.add('T', value= T_start, min=0)
+            params.add('w2',   value= w2_start, min=0, max=360)
+            params.add('bigw2', value= bigw2_start, min=0, max=360)
+            params.add('inc2', value= inc2_start, min=0, max=180)
+            params.add('e2', value= e2_start, min=0, max=0.99)
+            params.add('a2', value= a2_start, min=0)
+            params.add('P2', value= P2_start, min=0)
+            params.add('T2', value= T2_start, min=0)
             params.add('mirc_scale', value= 1.0, vary=False)
-            minner = Minimizer(astrometry_model, params, fcn_args=(xpos_all_new,ypos_all_new,t_all,
+            minner = Minimizer(triple_model, params, fcn_args=(xpos_all_new,ypos_all_new,t_all,
                                                                error_maj_all,error_min_all,
                                                                error_pa_all),
                             nan_policy='omit')
             result = minner.minimize()
-            chi2_binary = result.chisqr
+            chi2_triple = result.chisqr
 
             params = Parameters()
             params.add('w',   value= w_start, min=0, max=360)
@@ -672,63 +755,52 @@ for per in tqdm(P2):
             params.add('a', value= a_start, min=0)
             params.add('P', value= P_start, min=0)
             params.add('T', value= T_start, min=0)
-            params.add('w2',   value= 0, vary=False)
-            params.add('bigw2', value= bigw_p, min=0, max=360)
-            params.add('inc2', value= inc_p, min=0, max=180)
-            params.add('e2', value= 0, vary=False)
-            params.add('a2', value= semi_p, vary=False)#min=0)
-            params.add('P2', value= per, vary=False)
-            params.add('T2', value= T_p, min=0)
+            params.add('w2',   value= w2_start, min=0, max=360)
+            params.add('bigw2', value= bigw2_start, min=0, max=360)
+            params.add('inc2', value= inc2_start, min=0, max=180)
+            params.add('e2', value= e2_start, min=0, max=0.99)
+            params.add('a2', value= a2_start, min=0)
+            params.add('P2', value= P2_start, min=0)
+            params.add('T2', value= T2_start, min=0)
+            params.add('w3',   value= 0, vary=False)
+            params.add('bigw3', value= bigw_p, min=0, max=360)
+            params.add('inc3', value= inc_p, min=0, max=180)
+            params.add('e3', value= 0, vary=False)
+            params.add('a3', value= semi_p, vary=False)#min=0)
+            params.add('P3', value= per, vary=False)
+            params.add('T3', value= T_p, min=0)
             params.add('mirc_scale', value= 1.0, vary=False)
 
             #do fit, minimizer uses LM for least square fitting of model to data
-            minner = Minimizer(triple_model, params, fcn_args=(xpos_all_new,ypos_all_new,t_all,
+            minner = Minimizer(quad_model, params, fcn_args=(xpos_all_new,ypos_all_new,t_all,
                                                                error_maj_all,error_min_all,
                                                                error_pa_all),
                               nan_policy='omit')
             result = minner.leastsq(xtol=1e-5,ftol=1e-5)
             #result = minner.minimize()
-            chi2_triple = result.chisqr
+            chi2_quad = result.chisqr
 
-            #print(chi2_triple,chi2_binary)
-            zval = ((4*sum(~np.isnan(xpos_all_new))-11)/(11-7))*(chi2_binary-chi2_triple)/chi2_triple
-            z_vals.append(zval)
+            #BIC for each fit, if planet fit smaller then it is a detection
+            bic_astrometry= chi2_triple + 14*np.log(n_data)
+            bic_planet= chi2_quad + 19*np.log(n_data)
 
-        z_vals = np.array(z_vals)
-        idx = np.where(z_vals<z_max)
+            if (bic_planet+5)<bic_astrometry and result.params['a3']<(semi_p+0.3*semi_p) and result.params['a3']>(semi_p-0.3*semi_p) and result.params['P3']<(per+0.3*per) and result.params['P3']>(per-0.3*per):
+                success+=1
 
-        ## FIXME this part could use some optimization...
-        #print(semi_p)
-        #print(len(idx[0]))
-        if len(idx[0])<13:
-            if len(idx[0])<8:
-                semi_p = semi_p-0.01*semi_p
-            else:
-                semi_limit.append(semi_p)
-                loop='n'
-        else:
-            if len(idx[0])<500:
-                semi_p = semi_p+0.1*semi_p
-            else:
-                if len(idx[0])<100:
-                    semi_p = semi_p+0.05*semi_p
-                else:
-                    semi_p = semi_p+0.5*semi_p
-        iteration+=1
-        #print(iteration)
-        if iteration>100:
-            semi_limit.append(np.nan)
-            loop='n'
+        n_success.append(success)
+    n_success = np.array(n_success)
+    percentage_recovered.append(n_success)
 
-semi_limit = np.array(semi_limit)
+percentage_recovered = np.array(percentage_recovered)
 
-plt.plot(P2,semi_limit,'o-')
-plt.xlabel('Period (d)')
-plt.ylabel('semi_limit (mas)')
-plt.title('Detection Limit')
-plt.savefig('%s/HD%s_%s_detection_limit.pdf'%(directory,target_hd,date))
-plt.close()
+#plt.plot(P2,semi_limit,'o-')
+#plt.xlabel('Period (d)')
+#plt.ylabel('semi_limit (mas)')
+#plt.title('Detection Limit')
+#plt.savefig('%s/HD%s_%s_detection_limit.pdf'%(directory,target_hd,date))
+#plt.close()
 
 ## save parameter arrays
-np.save('%s/HD%s_%s_detection_per.npy'%(directory,target_hd,date),P2)
-np.save('%s/HD%s_%s_detection_semi.npy'%(directory,target_hd,date),semi_limit)
+np.save('%s/HD%s_%s_triple_bic_per.npy'%(directory,target_hd,date),P3)
+np.save('%s/HD%s_%s_triple_bic_semi.npy'%(directory,target_hd,date),a3)
+np.save('%s/HD%s_%s_triple_bic_percent.npy'%(directory,target_hd,date),percentage_recovered)

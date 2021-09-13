@@ -14,12 +14,15 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
-from read_data import read_data,read_wds,read_orb6
-from astrometry_model import astrometry_model,triple_model,astrometry_model_vlti,triple_model_vlti
+from read_data import read_data,read_rv,read_wds,read_orb6
+from astrometry_model import astrometry_model,astrometry_model_vlti,rv_model,rv_model_circular,triple_model,triple_model_circular,triple_model_combined,triple_model_vlti_combined,triple_model_vlti,triple_model_combined_circular,lnlike,lnprior,lnpost,create_init
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
 import random
+from PyAstronomy.pyasl import foldAt
+from PyAstronomy import pyasl
+ks=pyasl.MarkleyKESolver()
 
 ###########################################
 ## SETUP PATHS
@@ -72,6 +75,11 @@ weight=1
 
 t,p,theta,error_maj,error_min,error_pa,error_deg = read_data(file,weight)
 file.close()
+
+file_rv=open('%s/HD_%s_rv.txt'%(path,target_hd))
+weight_rv = float(input('Err for RV [1 km/s]: '))
+t_rv,rv,err_rv = read_rv(file_rv,weight_rv)
+file_rv.close()
 
 ### correct PAs based on precession
 coord = SkyCoord.from_name("HD %s"%target_hd,parse=True)
@@ -617,9 +625,14 @@ T_best = []
 mirc_scale_best = []
 chi2_results = []
 
-for i in tqdm(np.arange(20)):
+K_best = []
+gamma_best = []
+
+for i in tqdm(np.arange(50)):
     bigw2 = random.uniform(0,360)
-    T2 = random.uniform(min(t)-P2,max(t)+P2)
+    T2 = random.uniform(57000,59000)
+    K = random.uniform(-50,50)
+    gamma = random.uniform(-30,30)
     if circular!='y':
         e2 = random.uniform(0,0.99)
         w2 = random.uniform(0,360)
@@ -643,6 +656,8 @@ for i in tqdm(np.arange(20)):
     params.add('a2', value= a2, min=0)
     params.add('P2', value= P2, min=0)
     params.add('T2', value= T2, min=0)
+    params.add('K',value=K)
+    params.add('gamma',value=gamma)
     if len(vlti_idx)>0:
         params.add('mirc_scale', value=1)
     else:
@@ -650,18 +665,18 @@ for i in tqdm(np.arange(20)):
 
     #do fit, minimizer uses LM for least square fitting of model to data
     if len(vlti_idx)>0:
-        minner = Minimizer(triple_model_vlti, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
+        minner = Minimizer(triple_model_vlti_combined, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
                                                             error_maj_all[vlti_mask_all],error_min_all[vlti_mask_all],
                                                             error_pa_all[vlti_mask_all],
                                                             xpos_all[vlti_idx],ypos_all[vlti_idx],t_all[vlti_idx],
                                                             error_maj_all[vlti_idx],error_min_all[vlti_idx],
-                                                            error_pa_all[vlti_idx]),
+                                                            error_pa_all[vlti_idx],rv,t_rv,err_rv),
                             nan_policy='omit')
         result = minner.minimize()
     else:
-        minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
+        minner = Minimizer(triple_model_combined, params, fcn_args=(xpos_all,ypos_all,t_all,
                                                             error_maj_all,error_min_all,
-                                                            error_pa_all),
+                                                            error_pa_all,rv,t_rv,err_rv),
                             nan_policy='omit')
         result = minner.minimize()
     #try:
@@ -683,6 +698,8 @@ for i in tqdm(np.arange(20)):
     bigw_best.append(result.params['bigw'])
     inc_best.append(result.params['inc'])
     T_best.append(result.params['T'])
+    K_best.append(result.params['K'])
+    gamma_best.append(result.params['gamma'])
     mirc_scale_best.append(result.params['mirc_scale'])
     chi2_results.append(result.redchi)
 P2_best = np.array(P2_best)
@@ -699,6 +716,8 @@ w_best = np.array(w_best)
 bigw_best = np.array(bigw_best)
 inc_best = np.array(inc_best)
 T_best = np.array(T_best)
+K_best = np.array(K_best)
+gamma_best = np.array(gamma_best)
 mirc_scale_best = np.array(mirc_scale_best)
 chi2_results = np.array(chi2_results)
 
@@ -717,6 +736,8 @@ w_best = w_best[idx]
 bigw_best = bigw_best[idx]
 inc_best = inc_best[idx]
 T_best = T_best[idx]
+K_best = K_best[idx]
+gamma_best = gamma_best[idx]
 mirc_scale_best = mirc_scale_best[idx]
 
 ##########################################
@@ -872,13 +893,41 @@ print('-'*10)
 
 ## Save txt file with best orbit
 f = open("%s/%s_%s_orbit_triple.txt"%(directory,target_hd,note),"w+")
-f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) P2 a2 e2 i2 w2 W2 T2 mirc_scale mean_resid(mu-as)\r\n")
-f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_best,
+f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) P2 a2 e2 i2 w2 W2 T2 mirc_scale K gamma mean_resid(mu-as)\r\n")
+f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_best,
                                     a_best,e_best,
                                    inc_best,w_best,
                                    bigw_best,T_best,
                                    P2_best,a2_best,e2_best,
                                    inc2_best,w2_best,
                                    bigw2_best,T2_best,
-                                  mirc_scale_best,resids_median))
+                                  mirc_scale_best,K_best,
+                                  gamma_best,resids_median))
 f.close()
+
+#Plot RV results:
+w2_rv = w2_best*np.pi/180+np.pi
+foldtime= foldAt(t_rv,P2_best,T0=T2_best)
+tt=np.linspace(T2_best,T2_best+P2_best,100)
+MM=[]
+for i in tt:
+    mm_anom=2*np.pi/P2_best*(i-T2_best)
+    MM.append(mm_anom)
+MM=np.asarray(MM)
+EE=[]
+for j in MM:
+    #ee_anom=keplerE(j,a1[1])
+    ee_anom=ks.getE(j,e2_best)
+    EE.append(ee_anom)
+EE=np.asarray(EE)
+f=2*np.arctan(np.sqrt((1+e2_best)/(1-e2_best))*np.tan(EE/2))
+y1=K_best*(np.cos(w2_rv+f)+e2_best*np.cos(w2_rv))+gamma_best
+tt_fold=foldAt(tt,P2_best,T0=T2_best)
+
+plt.errorbar(foldtime,rv,yerr=err_rv,fmt='o')
+plt.plot(tt_fold,y1,'.')
+plt.ylabel('RV(km/s)')
+plt.xlabel('Phase')
+plt.title('RV Curve')
+plt.savefig('%s/HD%s_%s_orbit_rv.pdf'%(directory,target_hd,note))
+plt.close()

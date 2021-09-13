@@ -49,6 +49,22 @@ def read_data(file,weight):
     
     return(t,p,theta,error_maj,error_min,error_pa,error_deg)
 
+def read_rv(file,weight):
+    rv=[]
+    t=[]
+    err=[]
+    for line in file.readlines():
+        if line.startswith('#'):
+            continue
+        rv.append(float(line.split()[1]))
+        t.append(float(line.split()[0])-0.5) ##txt file in HJD
+        err.append(1)
+    file.close()
+    rv=np.array(rv)
+    t=np.array(t)
+    err=weight*np.asarray(err)    
+    return(t,rv,err)
+
 def read_wds(file,weight,dtype):
     p_wds=[]
     degrees_wds=[]  #text file is in degrees

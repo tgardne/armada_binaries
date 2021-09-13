@@ -309,6 +309,8 @@ def read_vlti(dir,interact='n',exclude=''):
     vistels=[]
     ucoords=[]
     vcoords=[]
+    flux=[]
+    fluxerr=[]
 
     for file in os.listdir(dir):
         if file.endswith("singlescivis.fits"):
@@ -317,8 +319,12 @@ def read_vlti(dir,interact='n',exclude=''):
             oi_t3 = oifile['OI_T3',10].data
             oi_vis2 = oifile['OI_VIS2',10].data
             oi_vis = oifile['OI_VIS',10].data
+            oi_flux = oifile['OI_FLUX',10].data
 
-            eff_wave.append(oifile['OI_WAVELENGTH',10].data.field('EFF_WAVE'))
+            nwave = oifile['OI_WAVELENGTH',10].data.field('EFF_WAVE').shape[0]
+            cut = int(nwave*0.05)
+
+            eff_wave.append(oifile['OI_WAVELENGTH',10].data.field('EFF_WAVE')[cut:-cut])
             time_obs.append(oifile[0].header['MJD-OBS'])
 
             for i in eachindex(oi_t3):
@@ -331,8 +337,8 @@ def read_vlti(dir,interact='n',exclude=''):
                 t3[t3flag] = np.nan
                 t3err[t3flag] = np.nan
 
-                t3phi.append(t3)
-                t3phierr.append(t3err)
+                t3phi.append(t3[cut:-cut])
+                t3phierr.append(t3err[cut:-cut])
                 tels.append(oi_t3[i].field('STA_INDEX'))
 
                 u1coord = oi_t3[i]['U1COORD']
@@ -354,8 +360,8 @@ def read_vlti(dir,interact='n',exclude=''):
                 v2[v2flag] = np.nan
                 v2err[v2flag] = np.nan
 
-                vis2.append(v2)
-                vis2err.append(v2err)
+                vis2.append(v2[cut:-cut])
+                vis2err.append(v2err[cut:-cut])
                 vistels.append(oi_vis2[i].field('STA_INDEX'))
                 ucoords.append(oi_vis2[i]['UCOORD'])
                 vcoords.append(oi_vis2[i]['VCOORD'])
@@ -370,16 +376,24 @@ def read_vlti(dir,interact='n',exclude=''):
                 vphi[vphiflag] = np.nan
                 vphierr[vphiflag] = np.nan
 
-                visphi.append(vphi)
-                visphierr.append(vphierr)
+                visphi.append(vphi[cut:-cut])
+                visphierr.append(vphierr[cut:-cut])
 
                 vamp = oi_vis[i]['VISAMP']
                 vamperr = oi_vis[i]['VISAMPERR']
                 vamp[vphiflag] = np.nan
                 vamperr[vphiflag] = np.nan
 
-                visamp.append(vamp)
-                visamperr.append(vamperr)
+                visamp.append(vamp[cut:-cut])
+                visamperr.append(vamperr[cut:-cut])
+
+            for i in eachindex(oi_flux):
+                fluxdata = oi_flux[i]['FLUX']
+                fluxdataerr = oi_flux[i]['FLUXERR']
+
+                flux.append(fluxdata[cut:-cut])
+                fluxerr.append(fluxdataerr[cut:-cut])
+
             oifile.close()
 
     t3phi=np.array(t3phi)
@@ -398,6 +412,8 @@ def read_vlti(dir,interact='n',exclude=''):
     vistels=np.array(vistels)
     ucoords=np.array(ucoords)
     vcoords=np.array(vcoords)
+    flux=np.array(flux)
+    fluxerr=np.array(fluxerr)
 
     if interact=='y':
 
@@ -490,7 +506,7 @@ def read_vlti(dir,interact='n',exclude=''):
         vis2err = vis2err.reshape((6*n_v2,n_wl))
 
     ########################################################
-    return t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs
+    return t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs,flux,fluxerr
 
 def read_chara_old(file,interact='n',exclude=''):
 
