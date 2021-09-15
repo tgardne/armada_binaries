@@ -3,7 +3,7 @@
 ##
 ## Do a grid search to fit binary model
 ## Designed for fitting to MIRCX/GRAVITY data
-## Can fit to closure phase, dphase, vis2
+## Can fit to closure phase, dphase, vis2, visamp
 ## 
 ## Outputs pdf and txt files with plots, results
 ##
@@ -24,6 +24,7 @@ import matplotlib as mpl
 from tqdm import tqdm
 from matplotlib.patches import Ellipse
 from ellipse_fitting import ellipse_hull_fit
+from scipy.signal import medfilt
 
 ######################################################################
 ## DEFINE FITTING FUNCTIONS
@@ -66,7 +67,7 @@ def cvis_model(params, u, v, wl):
     return vis
 
 ## function which returns residual of model and data to be minimized
-def combined_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,vamp,vamperr,u_coord,v_coord,ucoord,vcoord,wl,vtels):
+def combined_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,vamp,vamperr,u_coord,v_coord,ucoord,vcoord,wl,vtels,flag):
 
     diff=np.empty((0,len(wl)))
 
@@ -96,12 +97,8 @@ def combined_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,vamp,vamperr,u_coo
     if 'dphase' in flag:
         complex_vis = cvis_model(params,ucoord,vcoord,wl)
         visibility = np.angle(complex_vis)
-        if method=='dphase':
-            dphase = visibility[1:,:]-visibility[:-1,:]
-            dphase = np.insert(dphase,dphase.shape[0],np.nan,axis=0)
-        else:
-            dphase = visibility
-        vis_model = dphase
+        dphase = visibility[1:,:]-visibility[:-1,:]
+        vis_model = np.insert(dphase,dphase.shape[0],np.nan,axis=0)
         vis_model = np.swapaxes(vis_model,0,1)
         vis_model=np.array(vis_model)
         vphi_data = vphi*np.pi/180
@@ -116,97 +113,33 @@ def combined_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,vamp,vamperr,u_coo
     if 'visphi' in flag:
         complex_vis = cvis_model(params,ucoord,vcoord,wl)
         visibility = np.angle(complex_vis)
-
-        ## correct for slope and offset
-        try:    
-            vp1 = params['vp1']
-            vp2 = params['vp2']
-            vp3 = params['vp3']
-            vp4 = params['vp4']
-            vp5 = params['vp5']
-            vp6 = params['vp6'] 
-            fp1 = params['fp1']
-            fp2 = params['fp2']
-            fp3 = params['fp3']
-            fp4 = params['fp4']
-            fp5 = params['fp5']
-            fp6 = params['fp6']
-            ffp1 = params['ffp1']
-            ffp2 = params['ffp2']
-            ffp3 = params['ffp3']
-            ffp4 = params['ffp4']
-            ffp5 = params['ffp5']
-            ffp6 = params['ffp6']
-            fffp1 = params['fffp1']
-            fffp2 = params['fffp2']
-            fffp3 = params['fffp3']
-            fffp4 = params['fffp4']
-            fffp5 = params['fffp5']
-            fffp6 = params['fffp6']
-        except: 
-            vp1 = params[18]
-            vp2 = params[19]
-            vp3 = params[20]
-            vp4 = params[21]
-            vp5 = params[22]
-            vp6 = params[23] 
-            fp1 = params[24]
-            fp2 = params[25]
-            fp3 = params[26]
-            fp4 = params[27]
-            fp5 = params[28]
-            fp6 = params[29]
-            ffp1 = params[30]
-            ffp2 = params[31]
-            ffp3 = params[32]
-            ffp4 = params[33]
-            ffp5 = params[34]
-            ffp6 = params[35]
-            fffp1 = params[36]
-            fffp2 = params[37]
-            fffp3 = params[38]
-            fffp4 = params[39]
-            fffp5 = params[40]
-            fffp6 = params[41]
-        
-        dphase = visibility
-        vis_model = dphase
-        vis_model = np.swapaxes(vis_model,0,1)
-        vis_model=np.array(vis_model)
-
-        idx1 = np.where(np.all(vtels==vtels[0],axis=1))
-        idx2 = np.where(np.all(vtels==vtels[1],axis=1))
-        idx3 = np.where(np.all(vtels==vtels[2],axis=1))
-        idx4 = np.where(np.all(vtels==vtels[3],axis=1))
-        idx5 = np.where(np.all(vtels==vtels[4],axis=1))
-        idx6 = np.where(np.all(vtels==vtels[5],axis=1))
-
-        ll = (wl-np.median(wl))/(max(wl)-min(wl))
-
-        vis_model[idx1]+=(vp1 + fp1*ll + ffp1*ll**2 + fffp1*ll**3)
-        vis_model[idx2]+=(vp2 + fp2*ll + ffp2*ll**2 + fffp2*ll**3)
-        vis_model[idx3]+=(vp3 + fp3*ll + ffp3*ll**2 + fffp3*ll**3)
-        vis_model[idx4]+=(vp4 + fp4*ll + ffp4*ll**2 + fffp4*ll**3)
-        vis_model[idx5]+=(vp5 + fp5*ll + ffp5*ll**2 + fffp5*ll**3)
-        vis_model[idx6]+=(vp6 + fp6*ll + ffp6*ll**2 + fffp6*ll**3)
+        vis_model = np.swapaxes(visibility,0,1)
 
         vphi_data = vphi*np.pi/180
         vphi_err = vphierr*np.pi/180
         vphi_data[vphi_err==0]=np.nan
         if absolute=='y':
-            vphi_diff = np.arctan2(np.sin(abs(vphi_data)-abs(vis_model)),np.cos(abs(vphi_data)-abs(vis_model))) / vphi_err
+            vphi_diff = np.arctan2(np.sin(abs(vphi_data)-abs(vis_model)),np.cos(abs(vphi_data)-abs(vis_model)))# / vphi_err
         else:
-            vphi_diff = np.arctan2(np.sin(vphi_data-vis_model),np.cos(vphi_data-vis_model)) / vphi_err
+            vphi_diff = np.arctan2(np.sin(vphi_data-vis_model),np.cos(vphi_data-vis_model))# / vphi_err
+
+        ## Subtract order 3 poly coefficients from residuals
+        for nmeas in np.arange(vphi_diff.shape[0]):
+            xdata = (wl-np.median(wl)) / (np.max(wl-np.min(wl)))
+            idx = np.where(np.isfinite(vphi_diff[nmeas,:]))
+            unit = xdata[idx]*0+1
+            A = np.array([unit,xdata[idx],xdata[idx]**2,xdata[idx]**3])
+
+            result = np.linalg.lstsq(A.T,vphi_diff[nmeas,:][idx],rcond=-1)
+            vphi_diff[nmeas,:] -= (result[0][0]+result[0][1]*xdata+result[0][2]*xdata**2+result[0][3]*xdata**3)
+
+        vphi_diff/=vphi_err
         diff = np.append(diff,vphi_diff,axis=0)
 
-    if 'vamp' in flag:
+    if 'visamp' in flag:
 
         complex_vis = cvis_model(params,ucoord,vcoord,wl)
         visibility = np.absolute(complex_vis)
-        #if method=='dphase':
-        #    damp = visibility[1:,:]-visibility[:-1,:]
-        #    damp = np.insert(damp,damp.shape[0],np.nan,axis=0)
-        #else:
 
         ## correct for slope and offset
         try:    
@@ -310,7 +243,7 @@ def bootstrap_data(params,t3,t3err,vp,vperr,v2,v2err,vamp,vamperr,ucc,vcc,uc,vc,
         vis2err_boot = vis2err_boot.reshape(int(vis2err_boot.shape[0])*int(vis2err_boot.shape[1]),vis2err_boot.shape[2])
 
         #do fit, minimizer uses LM for least square fitting of model to data
-        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_boot,t3phierr_boot,visphi_boot,visphierr_boot,vis2_boot,vis2err_boot,visamp_boot,visamperr_boot,u_coords_boot,v_coords_boot,ucoords_boot,vcoords_boot,wl),
+        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_boot,t3phierr_boot,visphi_boot,visphierr_boot,vis2_boot,vis2err_boot,visamp_boot,visamperr_boot,u_coords_boot,v_coords_boot,ucoords_boot,vcoords_boot,wl,fitting_vars),
                            nan_policy='omit')
         result = minner.minimize()
 
@@ -330,27 +263,24 @@ date=input('Date for saved files (e.g. 2018Jul19):')
 dir=input('Path to oifits directory:')
 target_id=input('Target ID (e.g. HD_206901): ')
 
-method=input('VISPHI METHOD (dphase or visphi): ')
-#if dtype=='chara' or dtype==:
-#    method = 'dphase'
-#else:
-#    method = 'visphi'
-
 interact = input('interactive session with data? (y/n): ')
 exclude = input('exclude a telescope (e.g. E1): ')
 
 reduction_params = input('ncoh int_time (notes): ').split(' ')
-flag = input('fit to: vis2,cphase,dphase,vamp,visphi (separate with spaces): ').split(' ')
-absolute = input('use absolute phase value (y/n)?')
-#absolute='n'
+fitting_vars = input('fit to: vis2,cphase,dphase,visphi,visamp (separate with spaces): ').split(' ')
+
+## UNCOMMENT THIS FOR 1:1 binaries with FLIPS
+#absolute = input('use absolute phase value (y/n)?')
+absolute='n'
 
 ## check directory exists for save files
 save_dir="/Users/tgardne/ARMADA_epochs/%s/"%target_id
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
-## Test dropping long baselines
-bl_drop = input('Drop long baselines? (y/n): ')
+## Uncomment this if you want to drop LONG baselines
+#bl_drop = input('Drop long baselines? (y/n): ')
+bl_drop='n'
 
 ## get information from fits file
 if dtype=='chara':
@@ -360,41 +290,37 @@ if dtype=='vlti':
 if dtype=='chara_old':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
 ########################################################
-print(t3phi.shape,t3phierr.shape)
-print(visphi.shape,visphierr.shape)
-print(vis2.shape,vis2err.shape)
-print(visamp.shape,visamperr.shape)
-print(flux.shape,fluxerr.shape)
-print(eff_wave.shape)
+print("T3phi shape = ", t3phi.shape)
+print("Vis2 shape = ", visphi.shape)
 
-## Split spectrum in half
-#side = input('red or blue? ')
-side = ''
-if side=='blue':
-    idx = int(eff_wave.shape[-1]/2)
-    eff_wave = eff_wave[:,:idx]
-    t3phi = t3phi[:,:idx]
-    t3phierr = t3phierr[:,:idx]
-    vis2 = vis2[:,:idx]
-    vis2err = vis2err[:,:idx]
-    visphi = visphi[:,:idx]
-    visphierr = visphierr[:,:idx]
-    visamp = visamp[:,:idx]
-    visamperr = visamperr[:,:idx]
-if side=='red':
-    idx = int(eff_wave.shape[-1]/2)
-    eff_wave = eff_wave[:,idx:]
-    t3phi = t3phi[:,idx:]
-    t3phierr = t3phierr[:,idx:]
-    vis2 = vis2[:,idx:]
-    vis2err = vis2err[:,idx:]
-    visphi = visphi[:,idx:]
-    visphierr = visphierr[:,idx:]
-    visamp = visamp[:,idx:]
-    visamperr = visamperr[:,idx:]
+### Split spectrum in half
+##side = input('red or blue? ')
+#side = ''
+#if side=='blue':
+#    idx = int(eff_wave.shape[-1]/2)
+#    eff_wave = eff_wave[:,:idx]
+#    t3phi = t3phi[:,:idx]
+#    t3phierr = t3phierr[:,:idx]
+#    vis2 = vis2[:,:idx]
+#    vis2err = vis2err[:,:idx]
+#    visphi = visphi[:,:idx]
+#    visphierr = visphierr[:,:idx]
+#    visamp = visamp[:,:idx]
+#    visamperr = visamperr[:,:idx]
+#if side=='red':
+#    idx = int(eff_wave.shape[-1]/2)
+#    eff_wave = eff_wave[:,idx:]
+#    t3phi = t3phi[:,idx:]
+#    t3phierr = t3phierr[:,idx:]
+#    vis2 = vis2[:,idx:]
+#    vis2err = vis2err[:,idx:]
+#    visphi = visphi[:,idx:]
+#    visphierr = visphierr[:,idx:]
+#    visamp = visamp[:,idx:]
+#    visamperr = visamperr[:,idx:]
 
-## do polynomial dispersion fit for each visphi measurement
-if method=='dphase':
+## do polynomial dispersion fit for each dphase measurement
+if 'dphase' in fitting_vars:
     dispersion=[]
     for vis in visphi:
         if np.count_nonzero(~np.isnan(vis))>0:
@@ -422,12 +348,13 @@ grid_size = float(input('search grid size (mas): '))
 steps = int(input('steps in grid: '))
 a3 = float(input('flux ratio (f1/f2): '))
 
-a4 = float(input('UD1 (mas): '))
-a5 = float(input('UD2 (mas): '))
-a6 = float(input('bw smearing (1/R): '))
-#a4 = 0.5
-#a5 = 0.5
-#a6 = 0.005
+a4 = 0.5 #float(input('UD1 (mas): '))
+a5 = 0.5 #float(input('UD2 (mas): '))
+if dtype == "chara":
+    a6 = 0.005
+else:
+    a6 = 0.00001
+#a6 = float(input('bw smearing (1/R): '))
 
 vary_ratio = input('vary fratio on grid? (y/n) ')
 plot_grid = input('plot grid (y/n)? ')
@@ -442,6 +369,37 @@ dec_grid = np.linspace(ddec-grid_size,ddec+grid_size,steps)
 ######################################################################
 ## CHI2 MAPS
 ######################################################################
+
+## medfilt HR VLTI to get rid of outliers
+if dtype=='vlti':
+    nloop = 0
+    while nloop<3:
+        t3phi_filtered = medfilt(t3phi,(1,11))
+        vis2_filtered = medfilt(vis2,(1,11))
+        visphi_new_filtered = medfilt(visphi_new,(1,11))
+        visamp_filtered = medfilt(visamp,(1,11))
+
+        t3phi_resid = t3phi-t3phi_filtered
+        vis2_resid = vis2-vis2_filtered
+        visphi_new_resid = visphi_new-visphi_new_filtered
+        visamp_resid = visamp-visamp_filtered
+
+        std_t3phi = np.nanstd(t3phi_resid)
+        std_vis2 = np.nanstd(vis2_resid)
+        std_visphi_new = np.nanstd(visphi_new_resid)
+        std_visamp = np.nanstd(visamp_resid)
+
+        idx_t3phi = np.where(abs(t3phi_resid)>(3*std_t3phi))
+        idx_vis2 = np.where(abs(vis2_resid)>(3*std_vis2))
+        idx_visphi_new = np.where(abs(visphi_new_resid)>(3*std_visphi_new))
+        idx_visamp = np.where(abs(visamp_resid)>(3*std_visamp))
+
+        t3phi[idx_t3phi]=np.nan
+        vis2[idx_vis2]=np.nan
+        visphi_new[idx_visphi_new]=np.nan
+        visamp[idx_visamp]=np.nan
+
+        nloop+=1
 
 chi_sq = []
 ra_results = []
@@ -485,32 +443,7 @@ for ra_try in tqdm(ra_grid):
             params.add('f5',value=0,vary=False)
             params.add('f6',value=0,vary=False)
 
-            params.add('vp1',value=0,vary=False)
-            params.add('vp2',value=0,vary=False)
-            params.add('vp3',value=0,vary=False)
-            params.add('vp4',value=0,vary=False)
-            params.add('vp5',value=0,vary=False)
-            params.add('vp6',value=0,vary=False)
-            params.add('fp1',value=0,vary=False)
-            params.add('fp2',value=0,vary=False)
-            params.add('fp3',value=0,vary=False)
-            params.add('fp4',value=0,vary=False)
-            params.add('fp5',value=0,vary=False)
-            params.add('fp6',value=0,vary=False)
-            params.add('ffp1',value=0,vary=False)
-            params.add('ffp2',value=0,vary=False)
-            params.add('ffp3',value=0,vary=False)
-            params.add('ffp4',value=0,vary=False)
-            params.add('ffp5',value=0,vary=False)
-            params.add('ffp6',value=0,vary=False)
-            params.add('fffp1',value=0,vary=False)
-            params.add('fffp2',value=0,vary=False)
-            params.add('fffp3',value=0,vary=False)
-            params.add('fffp4',value=0,vary=False)
-            params.add('fffp5',value=0,vary=False)
-            params.add('fffp6',value=0,vary=False)
-
-            minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels),nan_policy='omit')
+            minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
             result = minner.minimize()
             chi2 = result.chisqr
             ra_result = result.params['ra'].value
@@ -521,8 +454,8 @@ for ra_try in tqdm(ra_grid):
             bw_result = result.params['bw'].value
         else:
             ## fixed params (faster)
-            params = [ra_try,dec_try,a3,a4,a5,a6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-            chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels)
+            params = [ra_try,dec_try,a3,a4,a5,a6,1,1,1,1,1,1,0,0,0,0,0,0]
+            chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars)
             chi2 = np.nansum(chi**2)
             ra_result = ra_try
             dec_result = dec_try
@@ -584,7 +517,7 @@ params.add('ud1',   value= best_params[3], vary=False)#min=0.0,max=2.0)
 params.add('ud2', value= best_params[4], vary=False)#min=0.0,max=2.0)
 params.add('bw', value=best_params[5], min=0.0, max=0.1)
 
-if 'vamp' in flag:
+if 'visamp' in fitting_vars:
     params.add('v1',value=0)
     params.add('v2',value=0)
     params.add('v3',value=0)
@@ -610,58 +543,8 @@ else:
     params.add('f4',value=0,vary=False)
     params.add('f5',value=0,vary=False)
     params.add('f6',value=0,vary=False)
-if 'visphi' in flag:
-    params.add('vp1',value=0)
-    params.add('vp2',value=0)
-    params.add('vp3',value=0)
-    params.add('vp4',value=0)
-    params.add('vp5',value=0)
-    params.add('vp6',value=0)
-    params.add('fp1',value=0)
-    params.add('fp2',value=0)
-    params.add('fp3',value=0)
-    params.add('fp4',value=0)
-    params.add('fp5',value=0)
-    params.add('fp6',value=0)
-    params.add('ffp1',value=0)
-    params.add('ffp2',value=0)
-    params.add('ffp3',value=0)
-    params.add('ffp4',value=0)
-    params.add('ffp5',value=0)
-    params.add('ffp6',value=0)
-    params.add('fffp1',value=0)
-    params.add('fffp2',value=0)
-    params.add('fffp3',value=0)
-    params.add('fffp4',value=0)
-    params.add('fffp5',value=0)
-    params.add('fffp6',value=0)
-else:
-    params.add('vp1',value=0,vary=False)
-    params.add('vp2',value=0,vary=False)
-    params.add('vp3',value=0,vary=False)
-    params.add('vp4',value=0,vary=False)
-    params.add('vp5',value=0,vary=False)
-    params.add('vp6',value=0,vary=False)
-    params.add('fp1',value=0,vary=False)
-    params.add('fp2',value=0,vary=False)
-    params.add('fp3',value=0,vary=False)
-    params.add('fp4',value=0,vary=False)
-    params.add('fp5',value=0,vary=False)
-    params.add('fp6',value=0,vary=False)
-    params.add('ffp1',value=0,vary=False)
-    params.add('ffp2',value=0,vary=False)
-    params.add('ffp3',value=0,vary=False)
-    params.add('ffp4',value=0,vary=False)
-    params.add('ffp5',value=0,vary=False)
-    params.add('ffp6',value=0,vary=False)
-    params.add('fffp1',value=0,vary=False)
-    params.add('fffp2',value=0,vary=False)
-    params.add('fffp3',value=0,vary=False)
-    params.add('fffp4',value=0,vary=False)
-    params.add('fffp5',value=0,vary=False)
-    params.add('fffp6',value=0,vary=False)
 
-minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels),nan_policy='omit')
+minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
 result = minner.minimize()
 report_fit(result)
 
@@ -685,31 +568,6 @@ f3_best = result.params['f3'].value
 f4_best = result.params['f4'].value
 f5_best = result.params['f5'].value
 f6_best = result.params['f6'].value
-
-vp1_best = result.params['vp1'].value
-vp2_best = result.params['vp2'].value
-vp3_best = result.params['vp3'].value
-vp4_best = result.params['vp4'].value
-vp5_best = result.params['vp5'].value
-vp6_best = result.params['vp6'].value
-fp1_best = result.params['fp1'].value
-fp2_best = result.params['fp2'].value
-fp3_best = result.params['fp3'].value
-fp4_best = result.params['fp4'].value
-fp5_best = result.params['fp5'].value
-fp6_best = result.params['fp6'].value
-ffp1_best = result.params['ffp1'].value
-ffp2_best = result.params['ffp2'].value
-ffp3_best = result.params['ffp3'].value
-ffp4_best = result.params['ffp4'].value
-ffp5_best = result.params['ffp5'].value
-ffp6_best = result.params['ffp6'].value
-fffp1_best = result.params['fffp1'].value
-fffp2_best = result.params['fffp2'].value
-fffp3_best = result.params['fffp3'].value
-fffp4_best = result.params['fffp4'].value
-fffp5_best = result.params['fffp5'].value
-fffp6_best = result.params['fffp6'].value
 
 ######################################################################
 ## FORM MODEL FROM BEST FIT PARAMS TO PLOT AGAINST DATA
@@ -736,31 +594,6 @@ best_params.add('f4',value=f4_best)
 best_params.add('f5',value=f5_best)
 best_params.add('f6',value=f6_best)
 
-best_params.add('vp1',value=vp1_best)
-best_params.add('vp2',value=vp2_best)
-best_params.add('vp3',value=vp3_best)
-best_params.add('vp4',value=vp4_best)
-best_params.add('vp5',value=vp5_best)
-best_params.add('vp6',value=vp6_best)
-best_params.add('fp1',value=fp1_best)
-best_params.add('fp2',value=fp2_best)
-best_params.add('fp3',value=fp3_best)
-best_params.add('fp4',value=fp4_best)
-best_params.add('fp5',value=fp5_best)
-best_params.add('fp6',value=fp6_best)
-best_params.add('ffp1',value=ffp1_best)
-best_params.add('ffp2',value=ffp2_best)
-best_params.add('ffp3',value=ffp3_best)
-best_params.add('ffp4',value=ffp4_best)
-best_params.add('ffp5',value=ffp5_best)
-best_params.add('ffp6',value=ffp6_best)
-best_params.add('fffp1',value=fffp1_best)
-best_params.add('fffp2',value=fffp2_best)
-best_params.add('fffp3',value=fffp3_best)
-best_params.add('fffp4',value=fffp4_best)
-best_params.add('fffp5',value=fffp5_best)
-best_params.add('fffp6',value=fffp6_best)
-
 best_fit = np.around(np.array([ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best,chi_sq_best]),decimals=4)
 
 ##### Just a grid plot ######
@@ -778,9 +611,9 @@ cp_model = (np.angle(complex_vis[:,:,0])+np.angle(complex_vis[:,:,1])+np.angle(c
 cp_model = np.swapaxes(cp_model,0,1)
 
 complex_vis = cvis_model(best_params,ucoords,vcoords, eff_wave[0])
-visibility = np.angle(complex_vis)#*180/np.pi
+visibility = np.angle(complex_vis)*180/np.pi
 visibility_amp = np.absolute(complex_vis)
-if method=='dphase':
+if 'dphase' in fitting_vars:
     dphase = visibility[1:,:]-visibility[:-1,:]
     dphase = np.insert(dphase,dphase.shape[0],np.nan,axis=0)
 #    vamp = visibility_amp[1:,:]-visibility_amp[:-1,:]
@@ -791,6 +624,32 @@ else:
 vamp = visibility_amp
 visphi_model = np.swapaxes(dphase,0,1)
 visamp_model = np.swapaxes(vamp,0,1)
+
+## add dispersion back into visphi
+#if 'visphi' in fitting_vars:
+    #if absolute=='y':
+    #    vphi_diff = np.arctan2(np.sin((abs(visphi_new)-abs(visphi_model))*np.pi/180),np.cos((abs(visphi_new)-abs(visphi_model))*np.pi/180))
+    #else:
+    #    vphi_diff = np.arctan2(np.sin((visphi_new-visphi_model)*np.pi/180),np.cos((visphi_new-visphi_model)*np.pi/180))
+    #visphi_model+=add_dispersion(eff_wave[0],vphi_diff)
+    #ll = (eff_wave[0]-np.median(eff_wave[0]))/(max(eff_wave[0])-min(eff_wave[0]))
+    #for idx in np.arange(visphi_model.shape[0]):
+    #    visphi_model[idx,:]+=(vplist[idx] + fplist[idx]*ll + ffplist[idx]*ll**2 + fffplist[idx]*ll**3)
+
+## Add order 3 poly coefficients from residuals to model
+if 'visphi' in fitting_vars:
+    if absolute=='y':
+        vphi_diff = np.arctan2(np.sin((abs(visphi_new)-abs(visphi_model))*np.pi/180),np.cos((abs(visphi_new)-abs(visphi_model))*np.pi/180))*180/np.pi
+    else:
+        vphi_diff = np.arctan2(np.sin((visphi_new-visphi_model)*np.pi/180),np.cos((visphi_new-visphi_model)*np.pi/180))*180/np.pi
+
+    for nmeas in np.arange(vphi_diff.shape[0]):
+        xdata = (eff_wave[0]-np.median(eff_wave[0])) / (np.max(eff_wave[0]-np.min(eff_wave[0])))
+        idx = np.where(np.isfinite(vphi_diff[nmeas,:]))
+        unit = xdata[idx]*0+1
+        A = np.array([unit,xdata[idx],xdata[idx]**2,xdata[idx]**3])
+        result = np.linalg.lstsq(A.T,vphi_diff[nmeas,:][idx],rcond=-1)
+        visphi_model[nmeas,:] += (result[0][0]+result[0][1]*xdata+result[0][2]*xdata**2+result[0][3]*xdata**3)
 
 #print(vis_model.shape)
 idx1 = np.where(np.all(vistels==vistels[0],axis=1))
@@ -806,15 +665,6 @@ visamp_model[idx3]*=(v3_best+f3_best*ll)
 visamp_model[idx4]*=(v4_best+f4_best*ll)
 visamp_model[idx5]*=(v5_best+f5_best*ll)
 visamp_model[idx6]*=(v6_best+f6_best*ll)
-
-visphi_model[idx1]+=(vp1_best + fp1_best*ll + ffp1_best*ll**2 + fffp1_best*ll**3)
-visphi_model[idx2]+=(vp2_best + fp2_best*ll + ffp2_best*ll**2 + fffp2_best*ll**3)
-visphi_model[idx3]+=(vp3_best + fp3_best*ll + ffp3_best*ll**2 + fffp3_best*ll**3)
-visphi_model[idx4]+=(vp4_best + fp4_best*ll + ffp4_best*ll**2 + fffp4_best*ll**3)
-visphi_model[idx5]+=(vp5_best + fp5_best*ll + ffp5_best*ll**2 + fffp5_best*ll**3)
-visphi_model[idx6]+=(vp6_best + fp6_best*ll + ffp6_best*ll**2 + fffp6_best*ll**3)
-
-visphi_model*=(180/np.pi)
 
 complex_vis2 = cvis_model(best_params,ucoords,vcoords,eff_wave[0])
 visibility2 = complex_vis2*np.conj(complex_vis2)
@@ -999,7 +849,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
     reduction = ('Reduction params (ncoh,nbs,ncs,int):%s'%reduction_params)
     textfig.text(0.5,0.75,txt_fit_cp,size=12,ha="center")
     textfig.text(0.5,0.5,reduction,size=12,ha="center")
-    textfig.text(0.5,0.25,flag,size=12,ha='center')
+    textfig.text(0.5,0.25,reduction_params,size=12,ha='center')
     pdf.savefig()
     plt.close()
 
@@ -1008,7 +858,10 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
 size = 0.5
-steps = 200
+if dtype=='vlti':
+    steps = 100
+else:
+    steps = 200
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
 chi_sq = []
@@ -1049,7 +902,7 @@ for ra_try in tqdm(ra_grid):
         params.add('f5',value=f5_best,vary=False)
         params.add('f6',value=f6_best,vary=False)
 
-        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels),nan_policy='omit')
+        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
         result = minner.minimize()
         red_chi2 = result.redchi
         
