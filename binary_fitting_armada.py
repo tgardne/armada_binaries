@@ -270,8 +270,8 @@ reduction_params = input('ncoh int_time (notes): ').split(' ')
 fitting_vars = input('fit to: vis2,cphase,dphase,visphi,visamp (separate with spaces): ').split(' ')
 
 ## UNCOMMENT THIS FOR 1:1 binaries with FLIPS
-#absolute = input('use absolute phase value (y/n)?')
-absolute='n'
+absolute = input('use absolute phase value (y/n)?')
+#absolute='n'
 
 ## check directory exists for save files
 save_dir="/Users/tgardne/ARMADA_epochs/%s/"%target_id
@@ -671,6 +671,64 @@ visibility2 = complex_vis2*np.conj(complex_vis2)
 vis2_model = visibility2.real
 vis2_model = np.swapaxes(vis2_model,0,1)
 
+#############################################
+## drop tel by tel and refit -- test pupil
+#############################################
+xfit = []
+yfit = []
+for exclude in ['none','E1','W2','W1','S2','S1','E2']:
+    # get information from fits file
+    if dtype=='chara':
+        t3phi_d,t3phierr_d,vis2_d,vis2err_d,visphi_d,visphierr_d,visamp_d,visamperr_d,u_coords_d,v_coords_d,ucoords_d,vcoords_d,eff_wave_d,tels_d,vistels_d,time_obs_d = read_chara(dir,target_id,interact,exclude,bl_drop)
+    #if dtype=='vlti':
+    #    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
+    #if dtype=='chara_old':
+    #    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
+    else:
+        xfit.append(0)
+        yfit.append(0)
+        continue
+    ########################################################
+    ## do polynomial dispersion fit for each visphi measurement
+    if 'dphase' in fitting_vars:
+        dispersion=[]
+        for vis in visphi_d:
+            if np.count_nonzero(~np.isnan(vis))>0:
+                y=vis
+                x=eff_wave_d[0]
+                idx = np.isfinite(x) & np.isfinite(y)
+                z=np.polyfit(x[idx],y[idx],2)
+                p = np.poly1d(z)
+                dispersion.append(p(x))
+            else:
+                dispersion.append(vis)
+        dispersion=np.array(dispersion)
+        ## subtract dispersion (FIXME: should fit dispersion at each measurement)
+        visphi_new_d = visphi_d-dispersion
+    else:
+        visphi_new_d = visphi_d
+
+    print('Computing best fit -- dropping %s'%exclude)
+
+    ra_start = np.random.uniform(ra_best-0.05,ra_best+0.05)
+    dec_start = np.random.uniform(dec_best-0.05,dec_best+0.05)
+
+    params = Parameters()
+    params.add('ra',   value= ra_start)
+    params.add('dec', value= dec_start)
+    params.add('ratio', value= ratio_best, min=1.0)
+    params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=2.0)
+    params.add('ud2', value= ud2_best, vary=False)#min=0.0,max=2.0)
+    params.add('bw', value=bw_best, min=0.0, max=0.1)
+
+    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_d,t3phierr_d,visphi_new_d,visphierr_d,vis2_d,vis2err_d,visamp_d,visamperr_d,u_coords_d,v_coords_d,ucoords_d,vcoords_d,eff_wave_d[0],vistels_d,fitting_vars),nan_policy='omit')
+    result = minner.minimize()
+
+    xfit.append(result.params['ra'].value)
+    yfit.append(result.params['dec'].value)
+xfit=np.array(xfit)
+yfit=np.array(yfit)
+
 ## plot results
 with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":target_id,"2":date}) as pdf:
     
@@ -708,8 +766,9 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
     vis2_plot = np.array(np.array_split(vis2,n_v2))
     vis2err_plot = np.array(np.array_split(vis2err,n_v2))
     vis2_model_plot = np.array(np.array_split(vis2_model,n_v2))
-    flux_plot = np.array(np.array_split(flux,n_v2))
-    fluxerr_plot = np.array(np.array_split(fluxerr,n_v2))
+    if dtype=='vlti':
+        flux_plot = np.array(np.array_split(flux,n_v2))
+        fluxerr_plot = np.array(np.array_split(fluxerr,n_v2))
     
     ## next pages - cp model fits
     index = np.arange(ntri)
@@ -840,7 +899,25 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
         plt.ylabel('Normalized Flux')    
         plt.legend() 
         pdf.savefig()
-        plt.close()  
+        plt.close()
+
+    ## next page -- tel drop
+    if dtype=='chara':
+        spread = np.sqrt((xfit-xfit[0])**2+(yfit-yfit[0])**2)
+        for x,y,label in zip(xfit,yfit,['none','E1','W2','W1','S2','S1','E2']):
+            if label=='none':
+                plt.scatter(x, y, marker='*', zorder=2, label=label)
+            else:
+                plt.scatter(x, y, marker='o', label=label)
+
+        plt.title('STDEV = %s mas'%np.around(np.std(spread),4))
+        plt.xlabel('d_RA (mas)')
+        plt.ylabel('d_DE (mas)')
+        plt.gca().invert_xaxis()
+        plt.axis('equal')
+        plt.legend()
+        pdf.savefig()  
+        plt.close()
 
     ## next page - reduction and fit parameters
     textfig = plt.figure(figsize=(11.69,8.27))

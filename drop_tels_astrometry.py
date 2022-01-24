@@ -1,7 +1,7 @@
 ######################################################################
 ## Tyler Gardner
 ##
-## Bootstrap across time
+## 
 ## Dropping tel by tel
 ## (to search for systematic / pupil errors)
 ##
@@ -129,64 +129,6 @@ def combined_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,vamp,vamperr,u_coo
     diff = np.array(diff)
     return diff
 
-## function for bootstrap
-def bootstrap_data(params,t3,t3err,vp,vperr,v2,v2err,vamp,vamperr,ucc,vcc,uc,vc,wl):
-    ra_results=[]
-    dec_results=[]
-
-    #ra_start = params['ra'].value
-    #dec_start = params['dec'].value
-
-    for i in tqdm(np.arange(1000)):
-
-        #print(params['ra'].value,params['dec'].value)
-
-        ## vary starting position slightly
-        #params['ra'].value = np.random.uniform(0.999*ra_start,1.001*ra_start)
-        #params['dec'].value = np.random.uniform(0.999*dec_start,1.001*dec_start)
-    
-        #print(params['ra'].value,params['dec'].value)
-
-        r = np.random.randint(t3.shape[0],size=len(t3))
-        t3phi_boot = t3[r,:]
-        t3phierr_boot = t3err[r,:]
-        u_coords_boot = ucc[r,:]
-        v_coords_boot = vcc[r,:]
-
-        visphi_boot = vp[r,:]
-        visphierr_boot = vperr[r,:]
-        visamp_boot =vamp[r,:]
-        visamperr_boot =vamperr[r,:]
-        ucoords_boot = uc[r,:]
-        vcoords_boot = vc[r,:]
-
-        vis2_boot = v2[r,:]
-        vis2err_boot = v2err[r,:]
-    
-        t3phi_boot = t3phi_boot.reshape(int(t3phi_boot.shape[0])*int(t3phi_boot.shape[1]),t3phi_boot.shape[2])
-        t3phierr_boot = t3phierr_boot.reshape(int(t3phierr_boot.shape[0])*int(t3phierr_boot.shape[1]),t3phierr_boot.shape[2])
-        u_coords_boot = u_coords_boot.reshape(int(u_coords_boot.shape[0])*int(u_coords_boot.shape[1]),u_coords_boot.shape[2])
-        v_coords_boot = v_coords_boot.reshape(int(v_coords_boot.shape[0])*int(v_coords_boot.shape[1]),v_coords_boot.shape[2])
-        visphi_boot = visphi_boot.reshape(int(visphi_boot.shape[0])*int(visphi_boot.shape[1]),visphi_boot.shape[2])
-        visphierr_boot = visphierr_boot.reshape(int(visphierr_boot.shape[0])*int(visphierr_boot.shape[1]),visphierr_boot.shape[2])
-        visamp_boot = visamp_boot.reshape(int(visamp_boot.shape[0])*int(visamp_boot.shape[1]),visamp_boot.shape[2])
-        visamperr_boot = visamperr_boot.reshape(int(visamperr_boot.shape[0])*int(visamperr_boot.shape[1]),visamperr_boot.shape[2])
-        ucoords_boot = ucoords_boot.reshape(int(ucoords_boot.shape[0])*int(ucoords_boot.shape[1]))
-        vcoords_boot = vcoords_boot.reshape(int(vcoords_boot.shape[0])*int(vcoords_boot.shape[1]))
-        vis2_boot = vis2_boot.reshape(int(vis2_boot.shape[0])*int(vis2_boot.shape[1]),vis2_boot.shape[2])
-        vis2err_boot = vis2err_boot.reshape(int(vis2err_boot.shape[0])*int(vis2err_boot.shape[1]),vis2err_boot.shape[2])
-
-        #do fit, minimizer uses LM for least square fitting of model to data
-        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_boot,t3phierr_boot,visphi_boot,visphierr_boot,vis2_boot,vis2err_boot,visamp_boot,visamperr_boot,u_coords_boot,v_coords_boot,ucoords_boot,vcoords_boot,wl),
-                           nan_policy='omit')
-        result = minner.minimize()
-
-        ra_results.append(result.params['ra'].value)
-        dec_results.append(result.params['dec'].value)
-    ra_results=np.array(ra_results)
-    dec_results=np.array(dec_results)
-    return ra_results,dec_results
-
 ######################################################################
 ## LOAD DATA
 ######################################################################
@@ -218,7 +160,7 @@ flag = ['cphase','dphase']
 absolute='n'
 
 ## check directory exists for save files
-save_dir="/Users/tgardne/ARMADA_epochs/bootstrap_results/%s/"%target_id
+save_dir="/Users/tgardne/ARMADA_epochs/droptels_results/%s/"%target_id
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
@@ -362,11 +304,6 @@ dec_results = np.array(dec_results)
 ratio_results = np.array(ratio_results)
 chi_sq = np.array(chi_sq)
 
-np.save("/Users/tgardne/ARMADA_epochs/bootstrap_results/%s/%s_%s_ra.npy"%(target_id,target_id,date),ra_results)
-np.save("/Users/tgardne/ARMADA_epochs/bootstrap_results/%s/%s_%s_dec.npy"%(target_id,target_id,date),dec_results)
-np.save("/Users/tgardne/ARMADA_epochs/bootstrap_results/%s/%s_%s_ratio.npy"%(target_id,target_id,date),ratio_results)
-np.save("/Users/tgardne/ARMADA_epochs/bootstrap_results/%s/%s_%s_chisq.npy"%(target_id,target_id,date),chi_sq)
-
 index = np.argmin(chi_sq)
 
 ## model params
@@ -446,7 +383,7 @@ vis2_model = visibility2.real
 vis2_model = np.swapaxes(vis2_model,0,1)
 
 ## plot results
-with PdfPages("/Users/tgardne/ARMADA_epochs/bootstrap_results/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":target_id,"2":date}) as pdf:
+with PdfPages("/Users/tgardne/ARMADA_epochs/droptels_results/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":target_id,"2":date}) as pdf:
     
     ## first page - chisq grid
     plt.scatter(ra_results, dec_results, c=1/chi_sq, cmap=cm.inferno)
@@ -604,13 +541,10 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/bootstrap_results/%(1)s/%(1)s_%(2)s_
 
 #if bootstrap_errors == 'y':
 #############################################
-## Split data by time -- drop tel by tel
+## drop tel by tel and refit
 #############################################
 xfit = []
 yfit = []
-aell = []
-bell = []
-thetaell = []
 
 for exclude in ['none','E1','W2','W1','S2','S1','E2']:
 
@@ -642,81 +576,35 @@ for exclude in ['none','E1','W2','W1','S2','S1','E2']:
     else:
         visphi_new = visphi
 
-    print('Computing errors with BOOTSTRAP -- dropping %s'%exclude)
-    print('Shape of t3phi = ',t3phi.shape)
-    print('Shape of vis2 = ',vis2.shape)
+    print('Computing best fit -- dropping %s'%exclude)
 
-    if dtype=='chara':
-        num = 20
-        num2 = 15
-    if dtype=='vlti':
-        num = 4
-        num2 = 6
-    t3phi = t3phi.reshape(int(len(t3phi)/num),num,len(t3phi[0]))
-    t3phierr = t3phierr.reshape(int(len(t3phierr)/num),num,len(t3phierr[0]))
-    vis2 = vis2.reshape(int(len(vis2)/num2),num2,len(vis2[0]))
-    vis2err = vis2err.reshape(int(len(vis2err)/num2),num2,len(vis2err[0]))
-    visphi_new = visphi_new.reshape(int(len(visphi_new)/num2),num2,len(visphi_new[0]))
-    visphierr = visphierr.reshape(int(len(visphierr)/num2),num2,len(visphierr[0]))
-    visamp = visamp.reshape(int(len(visamp)/num2),num2,len(visamp[0]))
-    visamperr = visamperr.reshape(int(len(visamperr)/num2),num2,len(visamperr[0]))
-    tels = tels.reshape(int(len(tels)/num),num,len(tels[0]))
-    vistels = vistels.reshape(int(len(vistels)/num2),num2,len(vistels[0]))
-    u_coords = u_coords.reshape(int(len(u_coords)/num),num,len(u_coords[0]))
-    v_coords = v_coords.reshape(int(len(v_coords)/num),num,len(v_coords[0]))
-    ucoords = ucoords.reshape(int(len(ucoords)/num2),num2,1)
-    vcoords = vcoords.reshape(int(len(vcoords)/num2),num2,1)
-    print('New shape of t3phi = ',t3phi.shape)
-    print('New shape of vis2 = ',vis2.shape)
+    ra_start = np.random.uniform(ra_best-0.05,ra_best+0.05)
+    dec_start = np.random.uniform(dec_best-0.05,dec_best+0.05)
+
     params = Parameters()
-    params.add('ra',   value= ra_best)
-    params.add('dec', value= dec_best)
+    params.add('ra',   value= ra_start)
+    params.add('dec', value= dec_start)
     params.add('ratio', value= ratio_best, min=1.0)
     params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=2.0)
     params.add('ud2', value= ud2_best, vary=False)#min=0.0,max=2.0)
     params.add('bw', value=bw_best, min=0.0, max=0.1)
-    ra_boot,dec_boot = bootstrap_data(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-    ra_mean = np.mean(ra_boot)
-    dec_mean = np.mean(dec_boot)
-    a,b,theta = ellipse_hull_fit(ra_boot,dec_boot,ra_mean,dec_mean)
-    angle = theta*180/np.pi
-    ## want to measure east of north (different than python)
-    angle_new = 90-angle
-    if angle_new<0:
-        angle_new=360+angle_new
-    xfit.append(ra_mean)
-    yfit.append(dec_mean)
-    aell.append(a)
-    bell.append(b)
-    thetaell.append(angle)
-    ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
-    ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
-    plt.gca().add_patch(ell)
-    plt.scatter(ra_boot, dec_boot, zorder=2)
-    plt.title('a,b,thet=%s'%ellipse_params)
-    plt.xlabel('d_RA (mas)')
-    plt.ylabel('d_DE (mas)')
-    plt.gca().invert_xaxis()
-    plt.axis('equal')
-    plt.savefig("/Users/tgardne/ARMADA_epochs/bootstrap_results/%s/%s_%s_ellipse_boot_no_%s.pdf"%(target_id,target_id,date,exclude))
-    plt.close()
 
-    ## write results to a txt file
-    t = np.around(np.nanmedian(time_obs),4)
-    sep,pa = np.around(cart2pol(ra_mean,dec_mean),decimals=4)
-    f = open("/Users/tgardne/ARMADA_epochs/bootstrap_results/%s/%s_%s_bootstrap_no_%s.txt"%(target_id,target_id,date,exclude),"w+")
-    f.write("# date mjd sep(mas) pa(Deg) err_maj(mas) err_min(mas) err_pa(deg)\r\n")
-    f.write("%s %s %s %s %s %s %s"%(date,t,sep,pa,ellipse_params[0],ellipse_params[1],ellipse_params[2]))
-    f.close()
+    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+    result = minner.minimize()
 
-for x,y,a,b,angle,label in zip(xfit,yfit,aell,bell,thetaell,['none','E1','W2','W1','S2','S1','E2']):
-    ell = Ellipse(xy=(x,y),width=2*a,height=2*b,angle=angle,facecolor='none',edgecolor='black')
-    plt.gca().add_patch(ell)
-    plt.scatter(x, y, zorder=2, label=label)
+    xfit.append(result.params['ra'].value)
+    yfit.append(result.params['dec'].value)
+
+for x,y,label in zip(xfit,yfit,['none','E1','W2','W1','S2','S1','E2']):
+    if label=='none':
+        plt.scatter(x, y, marker='*', zorder=2, label=label)
+    else:
+        plt.scatter(x, y, marker='o', label=label)
+
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.gca().invert_xaxis()
 plt.axis('equal')
 plt.legend()
-plt.savefig("/Users/tgardne/ARMADA_epochs/bootstrap_results/%s/%s_%s_ellipse_boot.pdf"%(target_id,target_id,date))
+plt.savefig("/Users/tgardne/ARMADA_epochs/droptels_results/%s/%s_%s_fits.pdf"%(target_id,target_id,date))
 plt.close()

@@ -828,8 +828,8 @@ for period1 in tqdm(P2):
             result = minner.leastsq(xtol=1e-5,ftol=1e-5)
             
             chi2_quad[iternum] = result.chisqr
-            print(chi2_quad.shape,params_inner3.shape,params_inner2.shape,params_outer_quad.shape)
-            print(iternum)
+            #print(chi2_quad.shape,params_inner3.shape,params_inner2.shape,params_outer_quad.shape)
+            #print(iternum)
             params_inner3[iternum] = [result.params['P3'],result.params['a3'],result.params['e3'],result.params['w3'],
                                       result.params['bigw3'],result.params['inc3'],result.params['T3']]
             params_inner2[iternum] = [result.params['P2'],result.params['a2'],result.params['e2'],result.params['w2'],

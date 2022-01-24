@@ -22,6 +22,7 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
     t3phierr=[]
     eff_wave = []
     time_obs = []
+    az = []
     tels = []
     u_coords = []
     v_coords = []
@@ -51,6 +52,8 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
 
                 eff_wave.append(hdu['OI_WAVELENGTH'].data['EFF_WAVE'][1:-1])
                 time_obs.append(oi_mjd)
+
+                az.append(hdu[0].header['AZ'])
 
                 for i in eachindex(oi_t3):
                     ## use this to exclude a telescope
@@ -186,6 +189,7 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
     v_coords = np.array(v_coords)
     eff_wave = np.array(eff_wave)
     time_obs = np.array(time_obs)
+    az = np.array(az)
     tels = np.array(tels)
 
     vis2=np.array(vis2)
@@ -290,7 +294,7 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
 
     ########################################################
 
-    return t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs
+    return t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs,az
 
 def read_vlti(dir,interact='n',exclude=''):
     t3phi=[]

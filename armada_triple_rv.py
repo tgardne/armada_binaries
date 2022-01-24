@@ -15,7 +15,7 @@ from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
 from read_data import read_data,read_rv,read_wds,read_orb6
-from astrometry_model import astrometry_model,astrometry_model_vlti,rv_model,rv_model_circular,triple_model,triple_model_circular,triple_model_combined,triple_model_vlti_combined,triple_model_vlti,triple_model_combined_circular,lnlike,lnprior,lnpost,create_init
+from astrometry_model import astrometry_model,astrometry_model_vlti,rv_model,rv_model_circular,triple_model,triple_model_circular,triple_model_combined,triple_model_vlti,triple_model_vlti_combined,lnlike,lnprior,lnpost,create_init
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
@@ -564,9 +564,10 @@ else:
     yresid = ypos - decpoints[:len(ypos)]
 
 #need to measure error ellipse angle east of north
-for ras, decs, w, h, angle in zip(xresid,yresid,error_maj/scale,error_min/scale,error_deg):
+for ras, decs, w, h, angle, d in zip(xresid,yresid,error_maj/scale,error_min/scale,error_deg,t):
     ellipse = Ellipse(xy=(ras, decs), width=2*w, height=2*h, 
                       angle=90-angle, facecolor='none', edgecolor='black')
+    ax.annotate(d,xy=(ras,decs))
     ax.add_patch(ellipse)
 
 if len(vlti_idx)>0:
@@ -605,7 +606,7 @@ f.close()
 ##########################################
 P2 = float(input('P2 (d): '))
 a2 = float(input('a2 (mas): '))
-inc2 = float(input('i2 (deg): '))
+inc2_guess = float(input('i2 (deg), enter n for no guess: '))
 circular = input('circular orbit? (y/n): ')
 
 P2_best = []
@@ -630,6 +631,10 @@ gamma_best = []
 
 for i in tqdm(np.arange(50)):
     bigw2 = random.uniform(0,360)
+    if inc2_guess=='n':
+        inc2 = random.uniform(0,180)
+    else:
+        inc2 = inc2_guess
     T2 = random.uniform(57000,59000)
     K = random.uniform(-50,50)
     gamma = random.uniform(-30,30)
@@ -777,22 +782,41 @@ else:
 
 ## plot fit
 scale=1
-if chi2_armada<1.0 and chi2_armada>0:
-    scale=1/np.sqrt(chi2_armada)
+if len(vlti_idx)>0:
+    scale_mircx = float(input('scale mircx errors by: '))
+    scale_vlti = float(input('scale vlti errors by: '))
 else:
-    scale=float(input('scale errors by: '))
+    if chi2_armada<1.0 and chi2_armada>0:
+        scale=1/np.sqrt(chi2_armada)
+    else:
+        scale=float(input('scale errors by: '))
+
+if len(vlti_idx)>0:
+    error_maj[vlti_mask]/=scale_mircx
+    error_min[vlti_mask]/=scale_mircx
+    error_maj[vlti_idx]/=scale_vlti
+    error_min[vlti_idx]/=scale_vlti
+else:
+    error_maj/=scale
+    error_min/=scale
 
 ra,dec,rapoints,decpoints = triple_orbit_model(a_best,e_best,inc_best,
                                         w_best,bigw_best,P_best,
                                         T_best,a2_best,e2_best,
                                         inc2_best,w2_best,bigw2_best,
                                         P2_best,T2_best,t_all)
+ra_armada,dec_armada,rapoints_armada,decpoints_armada = triple_orbit_model(a_best,
+                                        e_best,inc_best,
+                                        w_best,bigw_best,P_best,
+                                        T_best,a2_best,e2_best,
+                                        inc2_best,w2_best,bigw2_best,
+                                        P2_best,T2_best,t)
 ra2,dec2,rapoints2,decpoints2 = orbit_model(a_best,e_best,inc_best,
                                         w_best,bigw_best,P_best,
-                                        T_best,t_all)
+                                        T_best,t)
 
 fig,ax=plt.subplots()
-ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
+ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], '+', label='WDS')
 if len(vlti_idx)>0:
     ax.plot(xpos[vlti_idx],ypos[vlti_idx],'o', label='ARMADA-VLTI')
     ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
@@ -818,25 +842,25 @@ plt.close()
 
 ## plot inner wobble
 #idx = np.where(error_maj/scale<1)
-ra_inner = ra - ra2
-dec_inner = dec - dec2
-rapoints_inner = rapoints - rapoints2
-decpoints_inner = decpoints - decpoints2
+ra_inner = ra_armada - ra2
+dec_inner = dec_armada - dec2
+rapoints_inner = rapoints_armada - rapoints2
+decpoints_inner = decpoints_armada - decpoints2
 
-xpos_inner = xpos_all - rapoints2
-ypos_inner = ypos_all - decpoints2
+xpos_inner = xpos - rapoints2
+ypos_inner = ypos - decpoints2
 
 fig,ax=plt.subplots()
 if len(vlti_idx)>0:
-    ax.plot(xpos_inner[:len(xpos)][vlti_idx],ypos_inner[:len(xpos)][vlti_idx],'+', label='ARMADA-VLTI')
-    ax.plot(xpos_inner[:len(xpos)][vlti_mask],ypos_inner[:len(xpos)][vlti_mask],'+', label='ARMADA-CHARA')
+    ax.plot(xpos_inner[vlti_idx],ypos_inner[vlti_idx],'+', label='ARMADA-VLTI')
+    ax.plot(xpos_inner[vlti_mask],ypos_inner[vlti_mask],'+', label='ARMADA-CHARA')
 else:
-    ax.plot(xpos_inner[:len(xpos)],ypos_inner[:len(xpos)],'+', label='ARMADA')
+    ax.plot(xpos_inner,ypos_inner,'+', label='ARMADA')
 ax.plot(0,0,'*')
 ax.plot(ra_inner, dec_inner, '--',color='g')
 
 #need to measure error ellipse angle east of north
-for ras, decs, w, h, angle in zip(xpos_inner[:len(xpos)],ypos_inner[:len(xpos)],error_maj/scale,error_min/scale,error_deg):
+for ras, decs, w, h, angle in zip(xpos_inner,ypos_inner,error_maj,error_min,error_deg):
     #if w<0.05:
     ellipse = Ellipse(xy=(ras, decs), width=2*w, height=2*h, 
                         angle=90-angle, facecolor='none', edgecolor='black')
@@ -844,29 +868,31 @@ for ras, decs, w, h, angle in zip(xpos_inner[:len(xpos)],ypos_inner[:len(xpos)],
 
 #plot lines from data to best fit orbit
 i=0
-while i<len(decpoints_inner[:len(xpos)]):
-    x=[xpos_inner[:len(xpos)][i],rapoints_inner[:len(xpos)][i]]
-    y=[ypos_inner[:len(xpos)][i],decpoints_inner[:len(xpos)][i]]
+while i<len(decpoints_inner):
+    x=[xpos_inner[i],rapoints_inner[i]]
+    y=[ypos_inner[i],decpoints_inner[i]]
     ax.plot(x,y,color="black")
     i+=1
 ax.set_xlabel('milli-arcsec')
 ax.set_ylabel('milli-arcsec')
 ax.invert_xaxis()
 ax.axis('equal')
-ax.set_title('HD%s Inner Orbit'%target_hd)
-plt.legend()
+ax.set_title('HD%s Inner Wobble'%target_hd)
+if len(vlti_idx)>0:
+    plt.legend()
 plt.savefig('%s/HD%s_%s_inner_triple.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## plot resids for ARMADA
 fig,ax=plt.subplots()
-xresid = xpos - rapoints[:len(xpos)]
-yresid = ypos - decpoints[:len(ypos)]
+xresid = xpos - rapoints_armada
+yresid = ypos - decpoints_armada
 
 #need to measure error ellipse angle east of north
-for ras, decs, w, h, angle in zip(xresid,yresid,error_maj/scale,error_min/scale,error_deg):
+for ras, decs, w, h, angle, d in zip(xresid,yresid,error_maj,error_min,error_deg,t):
     ellipse = Ellipse(xy=(ras, decs), width=2*w, height=2*h, 
                       angle=90-angle, facecolor='none', edgecolor='black')
+    ax.annotate(d,xy=(ras,decs))
     ax.add_patch(ellipse)
 
 if len(vlti_idx)>0:
@@ -924,10 +950,10 @@ f=2*np.arctan(np.sqrt((1+e2_best)/(1-e2_best))*np.tan(EE/2))
 y1=K_best*(np.cos(w2_rv+f)+e2_best*np.cos(w2_rv))+gamma_best
 tt_fold=foldAt(tt,P2_best,T0=T2_best)
 
-plt.errorbar(foldtime,rv,yerr=err_rv,fmt='o')
-plt.plot(tt_fold,y1,'.')
+plt.errorbar(foldtime,rv,yerr=err_rv,fmt='+',color='black')
+plt.plot(tt_fold,y1,'.',color='g')
 plt.ylabel('RV(km/s)')
 plt.xlabel('Phase')
-plt.title('RV Curve')
+plt.title('HD%s Inner Orbit RV Curve'%target_hd)
 plt.savefig('%s/HD%s_%s_orbit_rv.pdf'%(directory,target_hd,note))
 plt.close()

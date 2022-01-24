@@ -27,7 +27,7 @@ interact=input('interact with data? (y/n): ')
 
 ## get information from fits file
 if dtype=='chara':
-    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs = read_chara(dir,target_id,interact,exclude)
+    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs,az = read_chara(dir,target_id,interact,exclude)
 if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs,flux_data,flux_err = read_vlti(dir,interact)
 if dtype=='chara_old':

@@ -15,8 +15,8 @@ from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
 from read_data import read_data,read_wds,read_orb6
-from astrometry_model import astrometry_model,triple_model,astrometry_model_vlti,triple_model_vlti
-from orbit_plotting import orbit_model,triple_orbit_model
+from astrometry_model import astrometry_model,triple_model,astrometry_model_vlti,triple_model_vlti,quad_model
+from orbit_plotting import orbit_model,triple_orbit_model,quad_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
 import random
@@ -601,11 +601,11 @@ f.close()
 ##########################################
 P2 = float(input('P2 (d): '))
 a2 = float(input('a2 (mas): '))
-inc2_guess = input('i2 (deg), enter n for no guess: ')
-try:
-    inc2_guess = float(inc2_guess)
-except:
-    pass
+inc2 = float(input('i2 (deg): '))
+
+P3 = float(input('P3 (d): '))
+a3 = float(input('a3 (mas): '))
+
 circular = input('circular orbit? (y/n): ')
 
 P2_best = []
@@ -615,6 +615,15 @@ w2_best = []
 bigw2_best = []
 inc2_best = []
 T2_best = []
+
+P3_best = []
+a3_best = []
+e3_best = []
+w3_best = []
+bigw3_best = []
+inc3_best = []
+T3_best = []
+
 P_best = []
 a_best = []
 e_best = []
@@ -628,10 +637,9 @@ chi2_results = []
 for i in tqdm(np.arange(50)):
     bigw2 = random.uniform(0,360)
     T2 = random.uniform(min(t)-P2,max(t)+P2)
-    if inc2_guess=='n':
-        inc2 = random.uniform(0,180)
-    else:
-        inc2 = inc2_guess
+    bigw3 = random.uniform(0,360)
+    T3 = random.uniform(min(t)-P3,max(t)+P3)
+    inc3 = random.uniform(0,180)
     if circular!='y':
         e2 = random.uniform(0,0.99)
         w2 = random.uniform(0,360)
@@ -650,11 +658,21 @@ for i in tqdm(np.arange(50)):
     params.add('a', value= a_start, min=0)
     params.add('P', value= P_start, min=0)
     params.add('T', value= T_start, min=0)
+
     params.add('bigw2', value= bigw2, min=0, max=360)
     params.add('inc2', value= inc2, min=0, max=180)
     params.add('a2', value= a2, min=0)
     params.add('P2', value= P2, min=0)
     params.add('T2', value= T2, min=0)
+
+    params.add('e3',value=0,vary=False)
+    params.add('w3',value=0,vary=False)
+    params.add('bigw3', value= bigw3, min=0, max=360)
+    params.add('inc3', value= inc3, min=0, max=180)
+    params.add('a3', value= a3, min=0)
+    params.add('P3', value= P3, min=0)
+    params.add('T3', value= T3, min=0)
+
     if len(vlti_idx)>0:
         params.add('mirc_scale', value=1)
     else:
@@ -662,7 +680,7 @@ for i in tqdm(np.arange(50)):
 
     #do fit, minimizer uses LM for least square fitting of model to data
     if len(vlti_idx)>0:
-        minner = Minimizer(triple_model_vlti, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
+        minner = Minimizer(quad_model_vlti, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
                                                             error_maj_all[vlti_mask_all],error_min_all[vlti_mask_all],
                                                             error_pa_all[vlti_mask_all],
                                                             xpos_all[vlti_idx],ypos_all[vlti_idx],t_all[vlti_idx],
@@ -671,7 +689,7 @@ for i in tqdm(np.arange(50)):
                             nan_policy='omit')
         result = minner.minimize()
     else:
-        minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
+        minner = Minimizer(quad_model, params, fcn_args=(xpos_all,ypos_all,t_all,
                                                             error_maj_all,error_min_all,
                                                             error_pa_all),
                             nan_policy='omit')
@@ -681,6 +699,14 @@ for i in tqdm(np.arange(50)):
     #except:
     #    print('No fit report')
 
+    P3_best.append(result.params['P3'])
+    a3_best.append(result.params['a3'])
+    e3_best.append(result.params['e3'])
+    w3_best.append(result.params['w3'])
+    bigw3_best.append(result.params['bigw3'])
+    inc3_best.append(result.params['inc3'])
+    T3_best.append(result.params['T3'])
+
     P2_best.append(result.params['P2'])
     a2_best.append(result.params['a2'])
     e2_best.append(result.params['e2'])
@@ -688,6 +714,7 @@ for i in tqdm(np.arange(50)):
     bigw2_best.append(result.params['bigw2'])
     inc2_best.append(result.params['inc2'])
     T2_best.append(result.params['T2'])
+
     P_best.append(result.params['P'])
     a_best.append(result.params['a'])
     e_best.append(result.params['e'])
@@ -695,8 +722,18 @@ for i in tqdm(np.arange(50)):
     bigw_best.append(result.params['bigw'])
     inc_best.append(result.params['inc'])
     T_best.append(result.params['T'])
+
     mirc_scale_best.append(result.params['mirc_scale'])
     chi2_results.append(result.redchi)
+
+P3_best = np.array(P3_best)
+a3_best = np.array(a3_best)
+e3_best = np.array(e3_best)
+w3_best = np.array(w3_best)
+bigw3_best = np.array(bigw3_best)
+inc3_best = np.array(inc3_best)
+T3_best = np.array(T3_best)
+
 P2_best = np.array(P2_best)
 a2_best = np.array(a2_best)
 e2_best = np.array(e2_best)
@@ -704,6 +741,7 @@ w2_best = np.array(w2_best)
 bigw2_best = np.array(bigw2_best)
 inc2_best = np.array(inc2_best)
 T2_best = np.array(T2_best)
+
 P_best = np.array(P_best)
 a_best = np.array(a_best)
 e_best = np.array(e_best)
@@ -722,6 +760,15 @@ w2_best = w2_best[idx]
 bigw2_best = bigw2_best[idx]
 inc2_best = inc2_best[idx]
 T2_best = T2_best[idx]
+
+P3_best = P3_best[idx]
+a3_best = a3_best[idx]
+e3_best = e3_best[idx]
+w3_best = w3_best[idx]
+bigw3_best = bigw3_best[idx]
+inc3_best = inc3_best[idx]
+T3_best = T3_best[idx]
+
 P_best = P_best[idx]
 a_best = a_best[idx]
 e_best = e_best[idx]
@@ -746,18 +793,27 @@ params.add('e', value= e_best, min=0, max=0.99)
 params.add('a', value= a_best, min=0)
 params.add('P', value= P_best, min=0)
 params.add('T', value= T_best, min=0)
+
 params.add('bigw2', value= bigw2_best, min=0, max=360)
 params.add('inc2', value= inc2_best, min=0, max=180)
 params.add('a2', value= a2_best, min=0)
 params.add('P2', value= P2_best, min=0)
 params.add('T2', value= T2_best, min=0)
+
+params.add('bigw3', value= bigw3_best, min=0, max=360)
+params.add('inc3', value= inc3_best, min=0, max=180)
+params.add('a3', value= a3_best, min=0)
+params.add('P3', value= P3_best, min=0)
+params.add('T3', value= T3_best, min=0)
+params.add('e3',value=0,vary=False)
+params.add('w3',value=0,vary=False)
 if len(vlti_idx)>0:
     params.add('mirc_scale', value=1)
 else:
     params.add('mirc_scale',value=1,vary=False)
 #do fit, minimizer uses LM for least square fitting of model to data
 if len(vlti_idx)>0:
-    minner = Minimizer(triple_model_vlti, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
+    minner = Minimizer(quad_model_vlti, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
                                                         error_maj_all[vlti_mask_all],error_min_all[vlti_mask_all],
                                                         error_pa_all[vlti_mask_all],
                                                         xpos_all[vlti_idx],ypos_all[vlti_idx],t_all[vlti_idx],
@@ -766,7 +822,7 @@ if len(vlti_idx)>0:
                         nan_policy='omit')
     result2 = minner.minimize()
 else:
-    minner = Minimizer(triple_model, params, fcn_args=(xpos_all,ypos_all,t_all,
+    minner = Minimizer(quad_model, params, fcn_args=(xpos_all,ypos_all,t_all,
                                                         error_maj_all,error_min_all,
                                                         error_pa_all),
                         nan_policy='omit')
@@ -777,20 +833,20 @@ print(report_fit(result2))
 ## Save Plots for Triple
 ##########################################
 if len(vlti_idx)>0:
-    resids_armada = triple_model_vlti(result.params,xpos[vlti_mask],ypos[vlti_mask],t[vlti_mask],error_maj[vlti_mask],
+    resids_armada = quad_model_vlti(result.params,xpos[vlti_mask],ypos[vlti_mask],t[vlti_mask],error_maj[vlti_mask],
                                 error_min[vlti_mask],error_pa[vlti_mask],
                                 xpos[vlti_idx],ypos[vlti_idx],t[vlti_idx],
                                 error_maj[vlti_idx],error_min[vlti_idx],error_pa[vlti_idx])
 else:
-    resids_armada = triple_model(result.params,xpos,ypos,t,error_maj,
+    resids_armada = quad_model(result.params,xpos,ypos,t,error_maj,
                                 error_min,error_pa)
 ndata_armada = 2*sum(~np.isnan(xpos))
 if circular=='y':
     print(ndata_armada)
     print(len(result.params))
-    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-12)
+    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-17)
 else:
-    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-14)
+    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-19)
 print('-'*10)
 print('chi2 armada = %s'%chi2_armada)
 print('-'*10)
@@ -815,15 +871,17 @@ if chi2_armada<1.0 and chi2_armada>0:
 else:
     scale=float(input('scale errors by: '))
 
-tmodel=np.linspace(t[0],t[0]+P_best,1000)
-ra,dec,rapoints,decpoints = triple_orbit_model(a_best,e_best,inc_best,
+ra,dec,rapoints,decpoints = quad_orbit_model(a_best,e_best,inc_best,
                                         w_best,bigw_best,P_best,
                                         T_best,a2_best,e2_best,
                                         inc2_best,w2_best,bigw2_best,
-                                        P2_best,T2_best,t_all,tmodel)
+                                        P2_best,T2_best,
+                                        a3_best,e3_best,
+                                        inc3_best,w3_best,bigw3_best,
+                                        P3_best,T3_best,t_all)
 ra2,dec2,rapoints2,decpoints2 = orbit_model(a_best,e_best,inc_best,
                                         w_best,bigw_best,P_best,
-                                        T_best,t_all,tmodel)
+                                        T_best,t_all)
 
 fig,ax=plt.subplots()
 ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
@@ -847,22 +905,11 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Outer Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_%s_outer_triple.pdf'%(directory,target_hd,note))
+plt.savefig('%s/HD%s_%s_outer_quad.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## plot inner wobble
 #idx = np.where(error_maj/scale<1)
-
-tmodel=np.linspace(t[0],t[0]+P2_best,1000)
-ra,dec,rapoints,decpoints = triple_orbit_model(a_best,e_best,inc_best,
-                                        w_best,bigw_best,P_best,
-                                        T_best,a2_best,e2_best,
-                                        inc2_best,w2_best,bigw2_best,
-                                        P2_best,T2_best,t_all,tmodel)
-ra2,dec2,rapoints2,decpoints2 = orbit_model(a_best,e_best,inc_best,
-                                        w_best,bigw_best,P_best,
-                                        T_best,t_all,tmodel)
-
 ra_inner = ra - ra2
 dec_inner = dec - dec2
 rapoints_inner = rapoints - rapoints2
@@ -901,7 +948,7 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Inner Orbit'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_%s_inner_triple.pdf'%(directory,target_hd,note))
+plt.savefig('%s/HD%s_%s_inner_quad.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## plot resids for ARMADA
@@ -928,7 +975,7 @@ ax.invert_xaxis()
 ax.axis('equal')
 ax.set_title('HD%s Resids'%target_hd)
 plt.legend()
-plt.savefig('%s/HD%s_%s_resid_triple.pdf'%(directory,target_hd,note))
+plt.savefig('%s/HD%s_%s_resid_quad.pdf'%(directory,target_hd,note))
 plt.close()
 
 ## residuals
@@ -939,7 +986,7 @@ print('Mean residual = %s micro-as'%resids_median)
 print('-'*10)
 
 ## Save txt file with best orbit
-f = open("%s/%s_%s_orbit_triple.txt"%(directory,target_hd,note),"w+")
+f = open("%s/%s_%s_orbit_quad.txt"%(directory,target_hd,note),"w+")
 f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) P2 a2 e2 i2 w2 W2 T2 mirc_scale mean_resid(mu-as)\r\n")
 f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(P_best,
                                     a_best,e_best,
