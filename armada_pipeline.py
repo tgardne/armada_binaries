@@ -148,8 +148,8 @@ for i,j in zip(t,etalon_factor):
 etalon = input('Apply etalon correction? (y/n) ')
 
 ## FIXME: make it easier to choose vlti data
-#vlti = input('Add indices for vlti (y/n)? ')
-vlti = 'n'
+vlti = input('Add indices for vlti (y/n)? ')
+#vlti = 'n'
 if vlti=='y':
     vlti_idx = input('enter indices (e.g. 1 2 3): ').split(' ')
     vlti_idx = np.array([int(i) for i in vlti_idx])
@@ -749,7 +749,7 @@ min_per = float(input('minimum period to search (days) = '))
 max_k = int(2*f*time_span / min_per)
 k_range = np.arange(max_k)[:-1] + 1
 P2 = 2*f*time_span / k_range
-#P2 = np.linspace(100,1000,10000)
+#P2 = np.logspace(np.log10(0.5),np.log10(5),5000)
 print('Min/Max period (days) = %s / %s ; %s steps'%(min(P2),max(P2),len(k_range)))
 #P2 = np.linspace(20,30,1000)
 

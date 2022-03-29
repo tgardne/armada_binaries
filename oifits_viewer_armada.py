@@ -34,6 +34,8 @@ if dtype=='chara_old':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
 print(t3phi.shape)
 print(eff_wave.shape)
+unique_tels = np.unique(tels,axis=0)
+unique_vistels = np.unique(vistels,axis=0)
 ## plot t3phi data
 label_size = 4
 mpl.rcParams['xtick.labelsize'] = label_size
@@ -41,10 +43,10 @@ mpl.rcParams['ytick.labelsize'] = label_size
 
 if dtype=='chara' or dtype=='chara_old':
     fig,axs = plt.subplots(4,5,figsize=(10,7),facecolor='w',edgecolor='k')
-    index = np.arange(20)
+    index = np.arange(len(unique_tels))
 if dtype=='vlti':
     fig,axs = plt.subplots(2,2,figsize=(10,7),facecolor='w',edgecolor='k')
-    index = np.arange(4)
+    index = np.arange(len(unique_tels))
 
 fig.subplots_adjust(hspace=0.5,wspace=.001)
 axs=axs.ravel()
@@ -53,7 +55,7 @@ for ind in index:
     t3data=[]
     t3errdata=[]
     for t,terr,tri in zip(t3phi,t3phierr,tels):
-        if str(tri)==str(tels[int(ind)]):
+        if str(tri)==str(unique_tels[int(ind)]):
             t3data.append(t)
             t3errdata.append(terr)
     t3data=np.array(t3data)
@@ -62,7 +64,7 @@ for ind in index:
     for y,yerr in zip(t3data,t3errdata):
         x=eff_wave[0]
         axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-')
-    axs[int(ind)].set_title(str(tels[int(ind)]))
+    axs[int(ind)].set_title(str(unique_tels[int(ind)]))
 
 fig.suptitle('%s Closure Phase'%target_id)
 fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
@@ -73,10 +75,10 @@ plt.show()
 ## plot vis2 data
 if dtype=='chara' or dtype=='chara_old':
     fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
-    index = np.arange(15)
+    index = np.arange(len(unique_vistels))
 if dtype=='vlti':
     fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
-    index = np.arange(6)
+    index = np.arange(len(unique_vistels))
 
 fig.subplots_adjust(hspace=0.5,wspace=.001)
 axs=axs.ravel()
@@ -87,7 +89,7 @@ for ind in index:
     uvis=[]
     vvis=[]
     for v,verr,uc,vc,bl in zip(vis2,vis2err,ucoord,vcoord,vistels):
-        if str(bl)==str(vistels[int(ind)]):
+        if str(bl)==str(unique_vistels[int(ind)]):
             v2data.append(v)
             v2errdata.append(verr)
             uvis.append(uc)
@@ -101,7 +103,7 @@ for ind in index:
         #x=np.sqrt(u**2+v**2)/eff_wave[0]
         x=eff_wave[0]
         axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-')
-    axs[int(ind)].set_title(str(vistels[int(ind)]))
+    axs[int(ind)].set_title(str(unique_vistels[int(ind)]))
 
 fig.suptitle('%s Vis2'%target_id)
 fig.text(0.5, 0.05, 'B/$\lambda$', ha='center')
@@ -112,10 +114,10 @@ plt.show()
 ## plot dphase data
 if dtype=='chara' or dtype=='chara_old':
     fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
-    index = np.arange(15)
+    index = np.arange(len(unique_vistels))
 if dtype=='vlti':
     fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
-    index = np.arange(6)
+    index = np.arange(len(unique_vistels))
 
 fig.subplots_adjust(hspace=0.5,wspace=.001)
 axs=axs.ravel()
@@ -126,7 +128,7 @@ for ind in index:
     uvis=[]
     vvis=[]
     for v,verr,uc,vc,bl in zip(visphi,visphierr,ucoord,vcoord,vistels):
-        if str(bl)==str(vistels[int(ind)]):
+        if str(bl)==str(unique_vistels[int(ind)]):
             v2data.append(v)
             v2errdata.append(verr)
             uvis.append(uc)
@@ -140,7 +142,7 @@ for ind in index:
         #x=np.sqrt(u**2+v**2)/eff_wave[0]
         x=eff_wave[0]
         axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-')
-    axs[int(ind)].set_title(str(vistels[int(ind)]))
+    axs[int(ind)].set_title(str(unique_vistels[int(ind)]))
 fig.suptitle('%s Diff Phase'%target_id)
 fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
 fig.text(0.05, 0.5, 'Diff Phase', va='center', rotation='vertical')
@@ -150,10 +152,10 @@ plt.show()
 ## plot visamp data
 if dtype=='chara' or dtype=='chara_old':
     fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
-    index = np.arange(15)
+    index = np.arange(len(unique_vistels))
 if dtype=='vlti':
     fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
-    index = np.arange(6)
+    index = np.arange(len(unique_vistels))
 
 fig.subplots_adjust(hspace=0.5,wspace=.001)
 axs=axs.ravel()
@@ -164,7 +166,7 @@ for ind in index:
     uvis=[]
     vvis=[]
     for v,verr,uc,vc,bl in zip(visamp,visamperr,ucoord,vcoord,vistels):
-        if str(bl)==str(vistels[int(ind)]):
+        if str(bl)==str(unique_vistels[int(ind)]):
             v2data.append(v)
             v2errdata.append(verr)
             uvis.append(uc)
@@ -178,7 +180,7 @@ for ind in index:
         #x=np.sqrt(u**2+v**2)/eff_wave[0]
         x=eff_wave[0]
         axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-')
-    axs[int(ind)].set_title(str(vistels[int(ind)]))
+    axs[int(ind)].set_title(str(unique_vistels[int(ind)]))
 fig.suptitle('%s VisAmp'%target_id)
 fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
 fig.text(0.05, 0.5, 'VisAmp', va='center', rotation='vertical')

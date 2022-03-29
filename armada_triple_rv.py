@@ -15,7 +15,7 @@ from matplotlib.patches import Ellipse
 from tqdm import tqdm
 import matplotlib.cm as cm
 from read_data import read_data,read_rv,read_wds,read_orb6
-from astrometry_model import astrometry_model,astrometry_model_vlti,rv_model,rv_model_circular,triple_model,triple_model_circular,triple_model_combined,triple_model_vlti,triple_model_vlti_combined,lnlike,lnprior,lnpost,create_init
+from astrometry_model import astrometry_model,astrometry_model_vlti,rv_model,rv_model_circular,triple_model,triple_model_circular,triple_model_combined,triple_model_combined2,triple_model_vlti,triple_model_vlti_combined,lnlike,lnprior,lnpost,create_init
 from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
@@ -606,8 +606,13 @@ f.close()
 ##########################################
 P2 = float(input('P2 (d): '))
 a2 = float(input('a2 (mas): '))
-inc2_guess = float(input('i2 (deg), enter n for no guess: '))
+inc2_guess = input('i2 (deg), enter n for no guess: ')
+try:
+    inc2_guess = float(inc2_guess)
+except:
+    pass
 circular = input('circular orbit? (y/n): ')
+outer_rv = input('Include orbit from outer component? (y,[n]): ')
 
 P2_best = []
 a2_best = []
@@ -628,16 +633,21 @@ chi2_results = []
 
 K_best = []
 gamma_best = []
+if outer_rv=='y':
+    K_outer_best = []
 
-for i in tqdm(np.arange(50)):
+niterations = int(input('N iterations (i.e. 50): '))
+for i in tqdm(np.arange(niterations)):
     bigw2 = random.uniform(0,360)
     if inc2_guess=='n':
         inc2 = random.uniform(0,180)
     else:
         inc2 = inc2_guess
-    T2 = random.uniform(57000,59000)
-    K = random.uniform(-50,50)
-    gamma = random.uniform(-30,30)
+    T2 = random.uniform(55000,57000)
+    K = random.uniform(0,50)
+    gamma = random.uniform(-50,50)
+    if outer_rv=='y':
+        K_outer = random.uniform(0,30)
     if circular!='y':
         e2 = random.uniform(0,0.99)
         w2 = random.uniform(0,360)
@@ -649,6 +659,8 @@ for i in tqdm(np.arange(50)):
     else:
         params.add('e2',value=e2,min=0,max=0.99)
         params.add('w2',value=w2,min=0,max=360)
+    if outer_rv=='y':
+        params.add('K_outer',value=K_outer)
     params.add('w',   value= w_start, min=0, max=360)
     params.add('bigw', value= bigw_start, min=0, max=360)
     params.add('inc', value= inc_start, min=0, max=180)
@@ -661,7 +673,7 @@ for i in tqdm(np.arange(50)):
     params.add('a2', value= a2, min=0)
     params.add('P2', value= P2, min=0)
     params.add('T2', value= T2, min=0)
-    params.add('K',value=K)
+    params.add('K',value=K,min=0)
     params.add('gamma',value=gamma)
     if len(vlti_idx)>0:
         params.add('mirc_scale', value=1)
@@ -679,11 +691,18 @@ for i in tqdm(np.arange(50)):
                             nan_policy='omit')
         result = minner.minimize()
     else:
-        minner = Minimizer(triple_model_combined, params, fcn_args=(xpos_all,ypos_all,t_all,
+        if outer_rv=='y':
+            minner = Minimizer(triple_model_combined2, params, fcn_args=(xpos_all,ypos_all,t_all,
                                                             error_maj_all,error_min_all,
                                                             error_pa_all,rv,t_rv,err_rv),
-                            nan_policy='omit')
-        result = minner.minimize()
+                                nan_policy='omit')
+            result = minner.minimize()   
+        else: 
+            minner = Minimizer(triple_model_combined, params, fcn_args=(xpos_all,ypos_all,t_all,
+                                                                error_maj_all,error_min_all,
+                                                                error_pa_all,rv,t_rv,err_rv),
+                                nan_policy='omit')
+            result = minner.minimize()
     #try:
     #    print(report_fit(result))
     #except:
@@ -707,6 +726,9 @@ for i in tqdm(np.arange(50)):
     gamma_best.append(result.params['gamma'])
     mirc_scale_best.append(result.params['mirc_scale'])
     chi2_results.append(result.redchi)
+    if outer_rv=='y':
+        K_outer_best.append(result.params['K_outer'])
+    
 P2_best = np.array(P2_best)
 a2_best = np.array(a2_best)
 e2_best = np.array(e2_best)
@@ -725,6 +747,8 @@ K_best = np.array(K_best)
 gamma_best = np.array(gamma_best)
 mirc_scale_best = np.array(mirc_scale_best)
 chi2_results = np.array(chi2_results)
+if outer_rv=='y':
+    K_outer_best = np.array(K_outer_best)
 
 idx = np.argmin(chi2_results)
 P2_best = P2_best[idx]
@@ -744,6 +768,87 @@ T_best = T_best[idx]
 K_best = K_best[idx]
 gamma_best = gamma_best[idx]
 mirc_scale_best = mirc_scale_best[idx]
+if outer_rv=='y':
+    K_outer_best = K_outer_best[idx]
+
+## Do a fit:
+params = Parameters()
+
+if circular=='y':
+    params.add('e2',value=0,vary=False)
+    params.add('w2',value=0,vary=False)
+else:
+    params.add('e2',value=e2_best,min=0,max=0.99)
+    params.add('w2',value=w2_best,min=0,max=360)
+if outer_rv=='y':
+    params.add('K_outer', K_outer_best)
+params.add('w',   value= w_best, min=0, max=360)
+params.add('bigw', value= bigw_best, min=0, max=360)
+params.add('inc', value= inc_best, min=0, max=180)
+params.add('e', value= e_best, min=0, max=0.99)
+params.add('a', value= a_best, min=0)
+params.add('P', value= P_best, min=0)
+params.add('T', value= T_best, min=0)
+params.add('bigw2', value= bigw2_best, min=0, max=360)
+params.add('inc2', value= inc2_best, min=0, max=180)
+params.add('a2', value= a2_best, min=0)
+params.add('P2', value= P2_best, min=0)
+params.add('T2', value= T2_best, min=0)
+params.add('K',value=K_best, min=0)
+params.add('gamma',value=gamma_best)
+if len(vlti_idx)>0:
+    params.add('mirc_scale', value=mirc_scale_best)
+else:
+    params.add('mirc_scale',value=1,vary=False)
+
+#do fit, minimizer uses LM for least square fitting of model to data
+if len(vlti_idx)>0:
+    minner = Minimizer(triple_model_vlti_combined, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
+                                                        error_maj_all[vlti_mask_all],error_min_all[vlti_mask_all],
+                                                        error_pa_all[vlti_mask_all],
+                                                        xpos_all[vlti_idx],ypos_all[vlti_idx],t_all[vlti_idx],
+                                                        error_maj_all[vlti_idx],error_min_all[vlti_idx],
+                                                        error_pa_all[vlti_idx],rv,t_rv,err_rv),
+                        nan_policy='omit')
+    result = minner.minimize()
+
+else:
+    if outer_rv=='y':
+        minner = Minimizer(triple_model_combined2, params, fcn_args=(xpos_all,ypos_all,t_all,
+                                                        error_maj_all,error_min_all,
+                                                        error_pa_all,rv,t_rv,err_rv),
+                            nan_policy='omit')
+        result = minner.minimize()   
+    else: 
+        minner = Minimizer(triple_model_combined, params, fcn_args=(xpos_all,ypos_all,t_all,
+                                                            error_maj_all,error_min_all,
+                                                            error_pa_all,rv,t_rv,err_rv),
+                            nan_policy='omit')
+        result = minner.minimize()
+#try:
+print(report_fit(result))
+#except:
+#    print('No fit report')
+P2_best = result.params['P2']
+a2_best = result.params['a2']
+e2_best = result.params['e2']
+w2_best = result.params['w2']
+bigw2_best = result.params['bigw2']
+inc2_best = result.params['inc2']
+T2_best = result.params['T2']
+P_best = result.params['P']
+a_best = result.params['a']
+e_best = result.params['e']
+w_best = result.params['w']
+bigw_best = result.params['bigw']
+inc_best = result.params['inc']
+T_best = result.params['T']
+K_best = result.params['K']
+gamma_best = result.params['gamma']
+mirc_scale_best = result.params['mirc_scale']
+chi2_results = result.redchi
+if outer_rv=='y':
+    K_outer_best = result.params['K_outer']
 
 ##########################################
 ## Save Plots for Triple
@@ -800,20 +905,21 @@ else:
     error_maj/=scale
     error_min/=scale
 
+tmodel=np.linspace(t[0],t[0]+P_best,1000)
 ra,dec,rapoints,decpoints = triple_orbit_model(a_best,e_best,inc_best,
                                         w_best,bigw_best,P_best,
                                         T_best,a2_best,e2_best,
                                         inc2_best,w2_best,bigw2_best,
-                                        P2_best,T2_best,t_all)
+                                        P2_best,T2_best,t_all,tmodel)
 ra_armada,dec_armada,rapoints_armada,decpoints_armada = triple_orbit_model(a_best,
                                         e_best,inc_best,
                                         w_best,bigw_best,P_best,
                                         T_best,a2_best,e2_best,
                                         inc2_best,w2_best,bigw2_best,
-                                        P2_best,T2_best,t)
+                                        P2_best,T2_best,t,tmodel)
 ra2,dec2,rapoints2,decpoints2 = orbit_model(a_best,e_best,inc_best,
                                         w_best,bigw_best,P_best,
-                                        T_best,t)
+                                        T_best,t,tmodel)
 
 fig,ax=plt.subplots()
 ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], '+', label='WDS')
@@ -842,6 +948,23 @@ plt.close()
 
 ## plot inner wobble
 #idx = np.where(error_maj/scale<1)
+
+tmodel=np.linspace(t[0],t[0]+P2_best,1000)
+ra,dec,rapoints,decpoints = triple_orbit_model(a_best,e_best,inc_best,
+                                        w_best,bigw_best,P_best,
+                                        T_best,a2_best,e2_best,
+                                        inc2_best,w2_best,bigw2_best,
+                                        P2_best,T2_best,t_all,tmodel)
+ra_armada,dec_armada,rapoints_armada,decpoints_armada = triple_orbit_model(a_best,
+                                        e_best,inc_best,
+                                        w_best,bigw_best,P_best,
+                                        T_best,a2_best,e2_best,
+                                        inc2_best,w2_best,bigw2_best,
+                                        P2_best,T2_best,t,tmodel)
+ra2,dec2,rapoints2,decpoints2 = orbit_model(a_best,e_best,inc_best,
+                                        w_best,bigw_best,P_best,
+                                        T_best,t,tmodel)
+
 ra_inner = ra_armada - ra2
 dec_inner = dec_armada - dec2
 rapoints_inner = rapoints_armada - rapoints2
@@ -935,19 +1058,46 @@ f.close()
 w2_rv = w2_best*np.pi/180+np.pi
 foldtime= foldAt(t_rv,P2_best,T0=T2_best)
 tt=np.linspace(T2_best,T2_best+P2_best,100)
+
+if outer_rv=='y':
+    w_rv_outer = w_best*np.pi/180+np.pi
+
 MM=[]
 for i in tt:
     mm_anom=2*np.pi/P2_best*(i-T2_best)
     MM.append(mm_anom)
 MM=np.asarray(MM)
+
+if outer_rv=='y':
+    MM2=[]
+    for i in t_rv:
+        mm_anom2=2*np.pi/P_best*(i-T_best)
+        MM2.append(mm_anom2)
+    MM2=np.asarray(MM2)
+
 EE=[]
 for j in MM:
     #ee_anom=keplerE(j,a1[1])
     ee_anom=ks.getE(j,e2_best)
     EE.append(ee_anom)
 EE=np.asarray(EE)
+
+if outer_rv=='y':
+    EE2=[]
+    for j in MM2:
+        #ee_anom=keplerE(j,a1[1])
+        ee_anom=ks.getE(j,e_best)
+        EE2.append(ee_anom)
+    EE2=np.asarray(EE2)
+
 f=2*np.arctan(np.sqrt((1+e2_best)/(1-e2_best))*np.tan(EE/2))
+if outer_rv=='y':
+    f_outer=2*np.arctan(np.sqrt((1+e_best)/(1-e_best))*np.tan(EE2/2))
+
 y1=K_best*(np.cos(w2_rv+f)+e2_best*np.cos(w2_rv))+gamma_best
+if outer_rv=='y':
+    rv += (K_outer_best*(np.cos(w_rv_outer+f_outer)+e_best*np.cos(w_rv_outer)))
+
 tt_fold=foldAt(tt,P2_best,T0=T2_best)
 
 plt.errorbar(foldtime,rv,yerr=err_rv,fmt='+',color='black')

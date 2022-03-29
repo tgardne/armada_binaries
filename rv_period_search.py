@@ -82,7 +82,7 @@ min_per = float(input('minimum period to search (days) = '))
 max_k = int(2*f*time_span / min_per)
 k_range = np.arange(max_k)[:-1] + 1
 P2 = 2*f*time_span / k_range
-P2 = np.logspace(np.log10(50),np.log10(500),1000)
+#P2 = np.logspace(np.log10(1),np.log10(50),1000)
 print('Min/Max period (days) = %s / %s ; %s steps'%(min(P2),max(P2),len(k_range)))
 
 print('Grid Searching over period')

@@ -47,9 +47,13 @@ def triple_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,tepoch,tmode
     
     return(ra,dec,rapoints,decpoints)
 
-def quad_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,a3,e3,inc3,w3,bigw3,P3,T3,t):
+def quad_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,a3,e3,inc3,w3,bigw3,P3,T3,t,tmodel='None'):
 
-    t0=np.linspace(t[0],t[0]+P,1000)
+    if tmodel=='None':
+        t0=np.linspace(t[0],t[0]+P,1000)
+    else:
+        t0=tmodel
+        
     ## other method:
     ke = pyasl.KeplerEllipse(a,P,e=e,Omega=bigw,i=inc,w=w,tau=T)
     ke2 = pyasl.KeplerEllipse(a2,P2,e=e2,Omega=bigw2,i=inc2,w=w2,tau=T2)

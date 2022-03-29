@@ -284,7 +284,7 @@ bl_drop='n'
 
 ## get information from fits file
 if dtype=='chara':
-    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara(dir,target_id,interact,exclude,bl_drop)
+    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs,az = read_chara(dir,target_id,interact,exclude,bl_drop)
 if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs,flux,fluxerr = read_vlti(dir,interact)
 if dtype=='chara_old':
@@ -443,8 +443,13 @@ for ra_try in tqdm(ra_grid):
             params.add('f5',value=0,vary=False)
             params.add('f6',value=0,vary=False)
 
-            minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
-            result = minner.minimize()
+            if dtype=='vlti':
+                minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi[:,::50],t3phierr[:,::50],visphi_new[:,::50],visphierr[:,::50],vis2[:,::50],vis2err[:,::50],visamp[:,::50],visamperr[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50],vistels,fitting_vars),nan_policy='omit')
+                result = minner.minimize()
+            else:
+                minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
+                result = minner.minimize()
+
             chi2 = result.chisqr
             ra_result = result.params['ra'].value
             dec_result = result.params['dec'].value
@@ -455,8 +460,12 @@ for ra_try in tqdm(ra_grid):
         else:
             ## fixed params (faster)
             params = [ra_try,dec_try,a3,a4,a5,a6,1,1,1,1,1,1,0,0,0,0,0,0]
-            chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars)
+            if dtype=='vlti':
+                chi = combined_minimizer(params,t3phi[:,::50],t3phierr[:,::50],visphi_new[:,::50],visphierr[:,::50],vis2[:,::50],vis2err[:,::50],visamp[:,::50],visamperr[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50],vistels,fitting_vars)
+            else:
+                chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars)
             chi2 = np.nansum(chi**2)
+            #print(chi2)
             ra_result = ra_try
             dec_result = dec_try
             ratio_result = a3
@@ -679,7 +688,7 @@ yfit = []
 for exclude in ['none','E1','W2','W1','S2','S1','E2']:
     # get information from fits file
     if dtype=='chara':
-        t3phi_d,t3phierr_d,vis2_d,vis2err_d,visphi_d,visphierr_d,visamp_d,visamperr_d,u_coords_d,v_coords_d,ucoords_d,vcoords_d,eff_wave_d,tels_d,vistels_d,time_obs_d = read_chara(dir,target_id,interact,exclude,bl_drop)
+        t3phi_d,t3phierr_d,vis2_d,vis2err_d,visphi_d,visphierr_d,visamp_d,visamperr_d,u_coords_d,v_coords_d,ucoords_d,vcoords_d,eff_wave_d,tels_d,vistels_d,time_obs_d,az_d = read_chara(dir,target_id,interact,exclude,bl_drop)
     #if dtype=='vlti':
     #    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
     #if dtype=='chara_old':

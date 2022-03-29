@@ -96,6 +96,45 @@ def triple_model(params, u, v, wl):
     vis=binary_disks_vector().triple2(ul,vl,ra12,dec12,ra13,dec13,ratio12,ratio13,ud1,ud2,ud3,bw)
     return vis
 
+## same thing, but for quad
+def quad_model(params, u, v, wl):  
+    try:
+        ra12 = params['ra12']
+        dec12 = params['dec12']
+        ra13 = params['ra13']
+        dec13 = params['dec13']
+        ra14 = params['ra14']
+        dec14 = params['dec14']
+        ratio12 = params['ratio12']
+        ratio13 = params['ratio13']
+        ratio14 = params['ratio14']
+        ud1 = params['ud1']
+        ud2 = params['ud2']
+        ud3 = params['ud3'] 
+        ud4 = params['ud4']  
+        bw = params['bw']
+    except: 
+        ra12 = params[0]
+        dec12 = params[1]
+        ra13 = params[2]
+        dec13 = params[3]
+        ra14 = params[4]
+        dec14 = params[5]
+        ratio12 = params[6]
+        ratio13 = params[7]
+        ratio14 = params[8]
+        ud1 = params[9]
+        ud2 = params[10]
+        ud3 = params[11] 
+        ud4 = params[12]  
+        bw = params[13]
+    
+    ul=np.array([u/i for i in wl])
+    vl=np.array([v/i for i in wl])
+    
+    vis=binary_disks_vector().quad2(ul,vl,ra12,dec12,ra13,dec13,ra14,dec14,ratio12,ratio13,ratio14,ud1,ud2,ud3,ud4,bw)
+    return vis
+
 ## function which returns residual of model and data to be minimized
 def combined_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,u_coord,v_coord,ucoord,vcoord,wl):
 
@@ -193,6 +232,55 @@ def triple_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,u_coord,v_coord,ucoo
     diff = np.array(diff)
     return diff
 
+## for quad
+## function which returns residual of model and data to be minimized
+def quad_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,u_coord,v_coord,ucoord,vcoord,wl):
+
+    diff=np.empty((0,len(wl)))
+
+    if 'cphase' in flag:
+        cp_model = []
+        for item1,item2 in zip(u_coord,v_coord):
+            complex_vis = quad_model(params, item1, item2, wl)
+            phase = np.angle(complex_vis[:,0])+np.angle(complex_vis[:,1])+np.angle(complex_vis[:,2])
+            cp_model.append(phase)
+        cp_model=np.array(cp_model)
+        cp = cp*np.pi/180
+        cp_err = cp_err*np.pi/180
+        cp_diff = np.arctan2(np.sin(cp-cp_model),np.cos(cp-cp_model))/cp_err
+        diff = np.append(diff,cp_diff,axis=0)
+
+    if 'vis2' in flag:
+        vis2_model = []
+        for item1,item2 in zip(ucoord,vcoord):
+            complex_vis2 = quad_model(params,item1,item2,wl)
+            visibility2 = complex_vis2*np.conj(complex_vis2)
+            vis2_model.append(visibility2.real)
+        vis2_model=np.array(vis2_model)
+        vis2_diff = (v2 - vis2_model) / v2err
+        diff = np.append(diff,vis2_diff,axis=0)
+
+    if 'dphase' in flag:
+        vis_model = []
+        for item1,item2 in zip(ucoord,vcoord):
+            complex_vis = quad_model(params,item1,item2,wl)
+            visibility = np.angle(complex_vis)
+            if method=='dphase':
+                dphase = visibility[1:]-visibility[:-1]
+                dphase = np.insert(dphase,len(dphase),np.nan)
+            else:
+                dphase = visibility
+            vis_model.append(dphase)
+        vis_model=np.array(vis_model)
+        vphi_data = vphi*np.pi/180
+        vphi_err = vphierr*np.pi/180
+        vphi_err[vphi_err==0]=100
+        vphi_diff = np.arctan2(np.sin(vphi_data-vis_model),np.cos(vphi_data-vis_model)) / vphi_err
+        diff = np.append(diff,vphi_diff,axis=0)
+    
+    diff = np.array(diff)
+    return diff
+
 ######################################################################
 ## LOAD DATA
 ######################################################################
@@ -240,7 +328,7 @@ dispersion=np.array(dispersion)
 visphi_new = visphi-dispersion
 
 ######################################################################
-## Now fit for OUTER binary and subtract out
+## Now fit for triple and subtract out
 ######################################################################
 
 #method=input('VISPHI METHOD (dphase or visphi): ')
@@ -252,63 +340,82 @@ else:
 flag = input('vis2,cphase,dphase (separate by spaces):')
 reduction_params = input('ncoh nbs ncs int reduction_method: ').split(' ')
 
-sep_value=float(input('outer sep guess (mas):'))
-pa_value=float(input('outer PA guess (deg):'))
-a3 = float(input('outer flux ratio (f1/f2): '))
-a4 = float(input('UD1 (mas): '))
-a5 = float(input('UD2 (mas): '))
-a6 = float(input('bw smearing (0.004): '))
+sep12_value=float(input('outer sep guess (mas):'))
+pa12_value=float(input('outer PA guess (deg):'))
+a12 = float(input('outer flux ratio (f1/f2): '))
+
+sep13_value=float(input('sep13 guess (mas):'))
+pa13_value=float(input('PA13 guess (deg):'))
+a13 = float(input('flux ratio 13 (f1/f2): '))
+
+a4 = 0.5
+a5 = float(input('bw smearing (0.004): '))
 
 plot_grid = input('plot grid (y/n)? ')
 
-dra = -sep_value*np.cos((90+pa_value)*np.pi/180)
-ddec = sep_value*np.sin((90+pa_value)*np.pi/180)
+dra12 = -sep12_value*np.cos((90+pa12_value)*np.pi/180)
+ddec12 = sep12_value*np.sin((90+pa12_value)*np.pi/180)
+
+dra13 = -sep13_value*np.cos((90+pa13_value)*np.pi/180)
+ddec13 = sep13_value*np.sin((90+pa13_value)*np.pi/180)
 
 ## Do a chi2 fit for phases
 params = Parameters()
-params.add('ra',   value= dra)
-params.add('dec', value= ddec)
-params.add('ratio', value= a3, min=1.0)
+params.add('ra12',   value= dra12)
+params.add('dec12', value= ddec12)
+params.add('ra13',   value= dra13)
+params.add('dec13', value= ddec13)
+params.add('ratio12', value= a12, min=1.0)
+params.add('ratio13', value= a13, min=1.0)
 params.add('ud1',   value= a4, vary=False)#min=0, max=2.0)
-params.add('ud2', value= a5, vary=False)#min=0, max=2.0)
-params.add('bw', value=a6, min=0, max=1)
+params.add('ud2', value= a4, vary=False)#min=0, max=2.0)
+params.add('ud3', value= a4, vary=False)#min=0, max=2.0)
+params.add('bw', value=a5, min=0, max=1)
 
 if dtype=='vlti':
-    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi[:,::50],t3phierr[:,::50],visphi_new[:,::50],visphierr[:,::50],vis2[:,::50],vis2err[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50]),nan_policy='omit')
+    minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi[:,::50],t3phierr[:,::50],visphi_new[:,::50],visphierr[:,::50],vis2[:,::50],vis2err[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50]),nan_policy='omit')
     result = minner.minimize()
     report_fit(result)
 else:
-    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+    minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
     result = minner.minimize()
     report_fit(result)
 
 chi_sq_best_inner = result.redchi
-ra_best_inner = result.params['ra'].value
-dec_best_inner = result.params['dec'].value
-ratio_best_inner = result.params['ratio'].value
+ra12_best_inner = result.params['ra12'].value
+dec12_best_inner = result.params['dec12'].value
+ra13_best_inner = result.params['ra13'].value
+dec13_best_inner = result.params['dec13'].value
+ratio12_best_inner = result.params['ratio12'].value
+ratio13_best_inner = result.params['ratio13'].value
 ud1_best_inner = result.params['ud1'].value
 ud2_best_inner = result.params['ud2'].value
+ud3_best_inner = result.params['ud3'].value
 bw_best_inner = result.params['bw'].value
 
 ## FORM MODEL FROM BEST FIT PARAMS TO SUBTRACT
 best_params = Parameters()
-best_params.add('ra',value=ra_best_inner)
-best_params.add('dec',value=dec_best_inner)
-best_params.add('ratio',value=ratio_best_inner)
+best_params.add('ra12',value=ra12_best_inner)
+best_params.add('dec12',value=dec12_best_inner)
+best_params.add('ra13',value=ra13_best_inner)
+best_params.add('dec13',value=dec13_best_inner)
+best_params.add('ratio12',value=ratio12_best_inner)
+best_params.add('ratio13',value=ratio13_best_inner)
 best_params.add('ud1',value=ud1_best_inner)
 best_params.add('ud2',value=ud2_best_inner)
+best_params.add('ud3',value=ud3_best_inner)
 best_params.add('bw',value=bw_best_inner)
 
 cp_model = []
 for item1,item2 in zip(u_coords,v_coords):
-    complex_vis = cvis_model(best_params, item1, item2, eff_wave[0])
+    complex_vis = triple_model(best_params, item1, item2, eff_wave[0])
     phase = (np.angle(complex_vis[:,0])+np.angle(complex_vis[:,1])+np.angle(complex_vis[:,2]))*180/np.pi
     cp_model.append(phase)
 cp_model=np.array(cp_model)
 
 visphi_model = []
 for item1,item2 in zip(ucoords,vcoords):     
-    complex_vis = cvis_model(best_params,item1, item2, eff_wave[0])
+    complex_vis = triple_model(best_params,item1, item2, eff_wave[0])
     visibility = np.angle(complex_vis)*180/np.pi
     if method=='dphase':
         dphase = visibility[1:]-visibility[:-1]
@@ -320,7 +427,7 @@ visphi_model=np.array(visphi_model)
 
 vis2_model = []
 for item1,item2 in zip(ucoords,vcoords):
-    complex_vis2 = cvis_model(best_params,item1,item2,eff_wave[0])
+    complex_vis2 = triple_model(best_params,item1,item2,eff_wave[0])
     visibility2 = complex_vis2*np.conj(complex_vis2)
     vis2_model.append(visibility2.real)
 vis2_model=np.array(vis2_model)
@@ -336,14 +443,13 @@ visphi_subtracted = visphi_new - visphi_model
 ## Now run a grid search for inner companion
 ######################################################################
 
-sep_value=float(input('inner sep start (mas):'))
-pa_value=float(input('inner PA start (deg):'))
+sep_value=float(input('fourth sep start (mas):'))
+pa_value=float(input('fourth PA start (deg):'))
 grid_size = float(input('search grid size (mas): '))
 steps = int(input('steps in grid: '))
-a3 = float(input('inner flux ratio (f1/f2): '))
-a4 = float(input('UD1 (mas): '))
-a5 = float(input('UD2 (mas): '))
-a6 = float(input('bw smearing (0.004): '))
+a3 = float(input('fourth flux ratio (f1/f2): '))
+a4 = 0.5
+a5 = float(input('bw smearing (0.004): '))
 
 dra = -sep_value*np.cos((90+pa_value)*np.pi/180)
 ddec = sep_value*np.sin((90+pa_value)*np.pi/180)
@@ -374,8 +480,8 @@ for ra_try in tqdm(ra_grid):
             params.add('dec', value= dec_try, vary=False)
             params.add('ratio', value= a3, min=1.0)
             params.add('ud1',   value= a4, vary=False)#min=0.0,max=3.0)
-            params.add('ud2', value= a5, vary=False)
-            params.add('bw', value=a6, vary=False)#min=0.0, max=0.1)
+            params.add('ud2', value= a4, vary=False)
+            params.add('bw', value=a5, vary=False)#min=0.0, max=0.1)
 
             if dtype=='vlti':
                 minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_subtracted[:,::50],t3phierr[:,::50],visphi_subtracted[:,::50],visphierr[:,::50],vis2_subtracted[:,::50],vis2err[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50]),nan_policy='omit')
@@ -393,7 +499,7 @@ for ra_try in tqdm(ra_grid):
         else:
 
             #create a set of Parameters
-            params = [ra_try,dec_try,a3,a4,a5,a6]
+            params = [ra_try,dec_try,a3,a4,a4,a5]
 
             #combined phases chi2
             if dtype=='vlti':
@@ -427,32 +533,7 @@ dec_results = np.array(dec_results)
 chi_sq = np.array(chi_sq)
 
 index = np.argmin(chi_sq)
-best_params = [ra_results[index],dec_results[index],a3,a4,a5,a6]
-
-######################################################################
-## DO CHI2 FIT AT BEST POINT ON GRID FOR PLOT
-######################################################################
-
-## Do a chi2 fit for phases
-params = Parameters()
-params.add('ra',   value= best_params[0])
-params.add('dec', value= best_params[1])
-params.add('ratio', value= best_params[2], min=1.0)
-params.add('ud1',   value= best_params[3],vary=False)# min=0,max=2.0)
-params.add('ud2', value= best_params[4],vary=False)# min=0,max=2.0)
-params.add('bw', value=best_params[5], min=0, max=1)
-
-minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_subtracted,t3phierr,visphi_subtracted,visphierr,vis2_subtracted,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
-result = minner.minimize()
-report_fit(result)
-
-chi_sq_best = result.redchi
-ra_best = result.params['ra'].value
-dec_best = result.params['dec'].value
-ratio_best = result.params['ratio'].value
-ud1_best = result.params['ud1'].value
-ud2_best = result.params['ud2'].value
-bw_best = result.params['bw'].value
+best_params = [ra_results[index],dec_results[index],a3,a4,a4,a5]
 
 ######################################################################
 ## Now do a joint fit to refine positions for both components
@@ -460,15 +541,15 @@ bw_best = result.params['bw'].value
 
 print('Now doing joint fit for both components')
 
-ra12_value=ra_best_inner
-dec12_value=dec_best_inner
-ra13_value=ra_best
-dec13_value=dec_best
-a5 = ratio_best_inner
-a6 = ratio_best
-a7 = ud1_best_inner
-a8 = ud2_best_inner
-a9 = ud2_best
+ra12_value=ra12_best_inner
+dec12_value=dec12_best_inner
+ra13_value=ra13_best_inner
+dec13_value=dec13_best_inner
+ra14_value=best_params[0]
+dec14_value=best_params[1]
+a5 = ratio12_best_inner
+a6 = ratio13_best_inner
+a7 = best_params[2]
 a10 = bw_best_inner
 
 ######################################################################
@@ -481,14 +562,18 @@ params.add('ra12',   value= ra12_value)
 params.add('dec12', value= dec12_value)
 params.add('ra13',   value= ra13_value)
 params.add('dec13', value= dec13_value)
+params.add('ra14',   value= ra14_value)
+params.add('dec14', value= dec14_value)
 params.add('ratio12', value= a5, min=1.0)
 params.add('ratio13', value= a6, min=1.0)
-params.add('ud1',   value= a7, vary=False)#min=0.0,max=2.0)
-params.add('ud2', value= a8, vary=False)#min=0.0,max=2.0)
-params.add('ud3', value= a9, vary=False)#min=0.0,max=2.0)
+params.add('ratio14', value= a7, min=1.0)
+params.add('ud1',   value= a4, vary=False)#min=0.0,max=2.0)
+params.add('ud2', value= a4, vary=False)#min=0.0,max=2.0)
+params.add('ud3', value= a4, vary=False)#min=0.0,max=2.0)
+params.add('ud4', value= a4, vary=False)#min=0.0,max=2.0)
 params.add('bw', value= a10, min=0,max=1)
 
-minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+minner = Minimizer(quad_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
 result = minner.minimize()
 report_fit(result)
 
@@ -497,11 +582,15 @@ ra12_best = result.params['ra12'].value
 dec12_best = result.params['dec12'].value
 ra13_best = result.params['ra13'].value
 dec13_best = result.params['dec13'].value
+ra14_best = result.params['ra14'].value
+dec14_best = result.params['dec14'].value
 ratio12_best = result.params['ratio12'].value
 ratio13_best = result.params['ratio13'].value
+ratio14_best = result.params['ratio14'].value
 ud1_best = result.params['ud1'].value
 ud2_best = result.params['ud2'].value
 ud3_best = result.params['ud3'].value
+ud4_best = result.params['ud4'].value
 bw_best = result.params['bw'].value
 
 ### Do a fit again to constrain UDs
@@ -542,25 +631,29 @@ best_params.add('ra12',   value= ra12_best)
 best_params.add('dec12', value= dec12_best)
 best_params.add('ra13',   value= ra13_best)
 best_params.add('dec13', value= dec13_best)
+best_params.add('ra14',   value= ra14_best)
+best_params.add('dec14', value= dec14_best)
 best_params.add('ratio12', value= ratio12_best)
 best_params.add('ratio13', value= ratio13_best)
+best_params.add('ratio14', value= ratio14_best)
 best_params.add('ud1',   value= ud1_best)
 best_params.add('ud2', value= ud2_best)
 best_params.add('ud3', value= ud3_best)
+best_params.add('ud4', value= ud4_best)
 best_params.add('bw', value=bw_best)
 
-best_fit = np.around(np.array([ra12_best,dec12_best,ra13_best,dec13_best,ratio12_best,ratio13_best,ud1_best,ud2_best,ud3_best,bw_best,chi_sq_best]),decimals=4)
+best_fit = np.around(np.array([ra12_best,dec12_best,ra13_best,dec13_best,ra14_best,dec14_best,ratio12_best,ratio13_best,ratio14_best,ud1_best,ud2_best,ud3_best,ud4_best,bw_best,chi_sq_best]),decimals=4)
 
 cp_model = []
 for item1,item2 in zip(u_coords,v_coords):
-    complex_vis = triple_model(best_params, item1, item2, eff_wave[0])
+    complex_vis = quad_model(best_params, item1, item2, eff_wave[0])
     phase = (np.angle(complex_vis[:,0])+np.angle(complex_vis[:,1])+np.angle(complex_vis[:,2]))*180/np.pi
     cp_model.append(phase)
 cp_model=np.array(cp_model)
 
 visphi_model = []
 for item1,item2 in zip(ucoords,vcoords):     
-    complex_vis = triple_model(best_params,item1, item2, eff_wave[0])
+    complex_vis = quad_model(best_params,item1, item2, eff_wave[0])
     visibility = np.angle(complex_vis)*180/np.pi
     if method=='dphase':
         dphase = visibility[1:]-visibility[:-1]
@@ -572,13 +665,13 @@ visphi_model=np.array(visphi_model)
 
 vis2_model = []
 for item1,item2 in zip(ucoords,vcoords):
-    complex_vis2 = triple_model(best_params,item1,item2,eff_wave[0])
+    complex_vis2 = quad_model(best_params,item1,item2,eff_wave[0])
     visibility2 = complex_vis2*np.conj(complex_vis2)
     vis2_model.append(visibility2.real)
 vis2_model=np.array(vis2_model)
 
 ## plot results
-with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_TRIPLE_search.pdf"%{"1":target_id,"2":date}) as pdf:
+with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_QUAD_search.pdf"%{"1":target_id,"2":date}) as pdf:
     
     ## first page - chisq grid
     plt.scatter(ra_results, dec_results, c=1/chi_sq, cmap=cm.inferno)
@@ -709,10 +802,10 @@ for ra_try in tqdm(ra_grid):
     for dec_try in dec_grid:
 
         #create a set of Parameters
-        params = [ra_try,dec_try,ra13_best,dec13_best,ratio12_best,ratio13_best,ud1_best,ud2_best,ud3_best,bw_best]
+        params = [ra_try,dec_try,ra13_best,dec13_best,ra14_best,dec14_best,ratio12_best,ratio13_best,ratio14_best,ud1_best,ud2_best,ud3_best,ud4_best,bw_best]
 
         #do fit, minimizer uses LM for least square fitting of model to data
-        chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+        chi = quad_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
         red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
 
         chi_sq.append(red_chi2)
@@ -767,7 +860,7 @@ dec_err = dec_results[index_err]
 ra_mean = np.mean(ra_err)
 dec_mean = np.mean(dec_err)
 a,b,theta = ellipse_hull_fit(ra_err,dec_err,ra_mean,dec_mean)
-angle = 360-theta*180/np.pi
+angle = theta*180/np.pi
 
 ## want to measure east of north (different than python)
 angle_new = 90-angle
@@ -807,10 +900,10 @@ for ra_try in tqdm(ra_grid):
     for dec_try in dec_grid:
 
         #create a set of Parameters
-        params = [ra12_best,dec12_best,ra_try,dec_try,ratio12_best,ratio13_best,ud1_best,ud2_best,ud3_best,bw_best]
+        params = [ra12_best,dec12_best,ra_try,dec_try,ra14_best,dec14_best,ratio12_best,ratio13_best,ratio14_best,ud1_best,ud2_best,ud3_best,ud4_best,bw_best]
 
         #do fit, minimizer uses LM for least square fitting of model to data
-        chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+        chi = quad_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
         red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
 
         chi_sq.append(red_chi2)
@@ -864,7 +957,7 @@ dec_err = dec_results[index_err]
 ra_mean = np.mean(ra_err)
 dec_mean = np.mean(dec_err)
 a2,b2,theta2 = ellipse_hull_fit(ra_err,dec_err,ra_mean,dec_mean)
-angle2 = 360-theta2*180/np.pi
+angle2 = theta2*180/np.pi
 
 ## want to measure east of north (different than python)
 angle_new2 = 90-angle2
@@ -883,12 +976,110 @@ plt.axis('equal')
 plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
-txt_fit_cp = ('Best fit (ra12,dec12,ra13,dec13,ratio12,ratio13,ud1,ud2,ud2,bw,redchi2): %s'%best_fit)
+#############################################
+print('Computing error ellipses for component 3')
+size = 1
+steps = 50
+ra_grid = np.linspace(ra14_best-size,ra14_best+size,steps)
+dec_grid = np.linspace(dec14_best-size,dec14_best+size,steps)
+
+chi_sq = []
+ra_results = []
+dec_results = []
+
+## draw plot
+if plot_grid=='y':
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.ion()
+    plt.show()
+for ra_try in tqdm(ra_grid):
+    for dec_try in dec_grid:
+
+        #create a set of Parameters
+        params = [ra12_best,dec12_best,ra13_best,dec13_best,ra_try,dec_try,ratio12_best,ratio13_best,ratio14_best,ud1_best,ud2_best,ud3_best,ud4_best,bw_best]
+
+        #do fit, minimizer uses LM for least square fitting of model to data
+        chi = quad_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+
+        chi_sq.append(red_chi2)
+        ra_results.append(ra_try)
+        dec_results.append(dec_try)
+    if plot_grid=='y':
+        ax.cla()
+        ax.set_xlim(min(ra_grid),max(ra_grid))
+        ax.set_ylim(min(dec_grid),max(dec_grid))
+        ax.set_xlabel('d_RA (mas)')
+        ax.set_ylabel('d_DE (mas)')
+        ax.scatter(ra_results,dec_results,c=chi_sq,cmap=cm.inferno_r)
+        ax.invert_xaxis()
+        #plt.colorbar()
+        plt.draw()
+        plt.pause(0.001)
+if plot_grid=='y':
+    plt.show()
+    plt.close()
+
+ra_results = np.array(ra_results)
+dec_results = np.array(dec_results)
+chi_sq = np.array(chi_sq)
+
+# write results
+#report_fit(result)
+index = np.argmin(chi_sq)
+
+print('-----RESULTS-------')
+print('ra13 = %s'%ra_results[index])
+print('dec13 = %s'%dec_results[index])
+print('redchi13 = %s'%chi_sq[index])
+print('-------------------')
+
+## plot chisq surface grid
+plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
+plt.colorbar()
+plt.xlabel('d_RA (mas)')
+plt.ylabel('d_DE (mas)')
+plt.axis('equal')
+plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp3.pdf'%{"1":target_id,"2":date})
+plt.close()
+
+## isolate region where delta_chisq < 1
+index_err = np.where(chi_sq < (chi_sq[index]+1) )
+chi_err = chi_sq[index_err]
+ra_err = ra_results[index_err]
+dec_err = dec_results[index_err]
+
+## fit an ellipse to the data
+ra_mean = np.mean(ra_err)
+dec_mean = np.mean(dec_err)
+a3,b3,theta3 = ellipse_hull_fit(ra_err,dec_err,ra_mean,dec_mean)
+angle3 = theta3*180/np.pi
+
+## want to measure east of north (different than python)
+angle_new3 = 90-angle3
+if angle_new3<0:
+    angle_new3=360+angle_new3
+ellipse_params3 = np.around(np.array([a3,b3,angle_new3]),decimals=4)
+
+ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a3,height=2*b3,angle=angle3,facecolor='lightgrey')
+plt.gca().add_patch(ell)
+plt.scatter(ra_err, dec_err, c=chi_err, cmap=cm.inferno_r,zorder=2)
+plt.colorbar()
+plt.title('a,b,thet=%s'%ellipse_params3)
+plt.xlabel('d_RA (mas)')
+plt.ylabel('d_DE (mas)')
+plt.axis('equal')
+plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp3.pdf'%{"1":target_id,"2":date})
+plt.close()
+
+txt_fit_cp = ('Best fit (ra12,dec12,ra13,dec13,ra14,dec14,ratio12,ratio13,ratio14,ud1,ud2,ud3,ud4,bw,redchi2): %s'%best_fit)
 ## write results to a txt file
 t = np.around(np.nanmedian(time_obs),4)
 sep12,pa12 = np.around(cart2pol(best_fit[0],best_fit[1]),decimals=4)
 sep13,pa13 = np.around(cart2pol(best_fit[2],best_fit[3]),decimals=4)
-f = open("/Users/tgardne/ARMADA_epochs/%s/%s_%s_triple.txt"%(target_id,target_id,date),"w+")
+sep14,pa14 = np.around(cart2pol(best_fit[4],best_fit[5]),decimals=4)
+f = open("/Users/tgardne/ARMADA_epochs/%s/%s_%s_quad.txt"%(target_id,target_id,date),"w+")
 f.write("# date mjd sep12(mas) pa12(Deg) sep13(mas) pa13(Deg) err_maj12(mas) err_min12(mas) err_pa12(deg) err_maj13(mas) err_min13(mas) err_pa13(deg)\r\n")
-f.write("%s %s %s %s %s %s %s %s %s %s %s %s"%(date,t,sep12,pa12,ellipse_params[0],ellipse_params[1],ellipse_params[2],sep13,pa13,ellipse_params2[0],ellipse_params2[1],ellipse_params2[2]))
+f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s"%(date,t,sep12,pa12,ellipse_params[0],ellipse_params[1],ellipse_params[2],sep13,pa13,ellipse_params2[0],ellipse_params2[1],ellipse_params2[2],sep14,pa14,ellipse_params3[0],ellipse_params3[1],ellipse_params3[2]))
 f.close()

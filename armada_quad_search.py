@@ -777,26 +777,30 @@ params.add('e', value= e_start, min=0, max=0.99)
 params.add('a', value= a_start, min=0)
 params.add('P', value= P_start, min=0)
 params.add('T', value= T_start, min=0)
-params.add('w2',   value= 0, vary=False)
+
+params.add('w2',   value= 100, min=0, max=360)#vary=False)
 params.add('bigw2', value= 100, min=0, max=360)
 params.add('inc2', value= 45, min=0, max=180)
-params.add('e2', value= 0, vary=False)
+params.add('e2', value= 0.1, min=0,max=0.99)#vary=False)
 params.add('a2', value= a2, min=0)
 params.add('P2', value= 1, vary=False)
 params.add('T2', value= 1, min=0)
         
-params.add('w3',   value= 0, vary=False)
+params.add('w3',   value= 100, min=0, max=360)# vary=False)
 params.add('bigw3', value= 100, min=0, max=360)
 params.add('inc3', value= 45, min=0, max=180)
-params.add('e3', value= 0, vary=False)
+params.add('e3', value= 0.1, min=0, max=0.99)# vary=False)
 params.add('a3', value= a2, min=0)
 params.add('P3', value= 1, vary=False)
 params.add('T3', value= 1, min=0)
 
 ## randomize orbital elements
+w2 = np.random.uniform(0,360,niter)
 bigw2 = np.random.uniform(0,360,niter)
 inc2 = np.random.uniform(0,180,niter)
 T2 = np.random.uniform(58000,59000,niter)
+
+w3 = np.random.uniform(0,360,niter)
 bigw3 = np.random.uniform(0,360,niter)
 inc3 = np.random.uniform(0,180,niter)
 T3 = np.random.uniform(58000,59000,niter)
@@ -809,12 +813,14 @@ else:
 for period1 in tqdm(P2):
     for period2 in P3:
         for i in np.arange(niter):
-
+            
+            params['w2'].value = w2[i]
             params['bigw2'].value = bigw2[i]
             params['inc2'].value = inc2[i]
             params['P2'].value = period1
             params['T2'].value= T2[i]
         
+            params['w3'].value = w3[i]
             params['bigw3'].value = bigw3[i]
             params['inc3'].value = inc3[i]
             params['P3'].value = period2
@@ -903,17 +909,17 @@ params.add('e', value= params_outer_quad[:,2][idx], min=0, max=0.99)
 params.add('a', value=params_outer_quad[:,1][idx], min=0)
 params.add('P', value= params_outer_quad[:,0][idx], min=0)
 params.add('T', value= params_outer_quad[:,6][idx], min=0)
-params.add('w2',   value= 0, vary=False)#w2, min=0, max=360)
+params.add('w2',   value= params_inner2[:,3][idx], min=0, max=360)
 params.add('bigw2', value= params_inner2[:,4][idx], min=0, max=360)
 params.add('inc2', value= params_inner2[:,5][idx], min=0, max=180)
-params.add('e2', value= 0, vary=False)#0.1, min=0,max=0.99)
+params.add('e2', value= params_inner2[:,2][idx], min=0,max=0.99)
 params.add('a2', value= params_inner2[:,1][idx], min=0)
 params.add('P2', value= period2_best, min=0)
 params.add('T2', value= params_inner2[:,6][idx], min=0)
-params.add('w3',   value= 0, vary=False)#w2, min=0, max=360)
+params.add('w3',   value= params_inner3[:,3][idx], min=0, max=360)
 params.add('bigw3', value= params_inner3[:,4][idx], min=0, max=360)
 params.add('inc3', value= params_inner3[:,5][idx], min=0, max=180)
-params.add('e3', value= 0, vary=False)#0.1, min=0,max=0.99)
+params.add('e3', value= params_inner3[:,2][idx], min=0,max=0.99)
 params.add('a3', value= params_inner3[:,1][idx], min=0)
 params.add('P3', value= period3_best, min=0)
 params.add('T3', value= params_inner3[:,6][idx], min=0)
