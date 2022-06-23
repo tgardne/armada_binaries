@@ -8,7 +8,7 @@
 
 from chara_uvcalc import uv_calc
 from binary_disks_vector import binary_disks_vector
-from read_oifits import read_chara,read_vlti
+from read_oifits import read_chara,read_vlti,read_chara_old
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy import units as u
@@ -652,9 +652,9 @@ for ra_try in tqdm(ra_grid):
 
         #do fit, minimizer uses LM for least square fitting of model to data
         chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+        raw_chi2 = np.nansum(chi**2)#/(len(np.ndarray.flatten(t3phi))-len(params))
 
-        chi_sq.append(red_chi2)
+        chi_sq.append(raw_chi2)
         ra_results.append(ra_try)
         dec_results.append(dec_try)
 
@@ -684,7 +684,7 @@ index = np.argmin(chi_sq)
 print('-----RESULTS-------')
 print('ra12 = %s'%ra_results[index])
 print('dec12 = %s'%dec_results[index])
-print('redchi12 = %s'%chi_sq[index])
+print('rawchi12 = %s'%chi_sq[index])
 print('-------------------')
 
 ## plot chisq surface grid
@@ -751,9 +751,9 @@ for ra_try in tqdm(ra_grid):
 
         #do fit, minimizer uses LM for least square fitting of model to data
         chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+        raw_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
 
-        chi_sq.append(red_chi2)
+        chi_sq.append(raw_chi2)
         ra_results.append(ra_try)
         dec_results.append(dec_try)
     if plot_grid=='y':
@@ -782,7 +782,7 @@ index = np.argmin(chi_sq)
 print('-----RESULTS-------')
 print('ra13 = %s'%ra_results[index])
 print('dec13 = %s'%dec_results[index])
-print('redchi13 = %s'%chi_sq[index])
+print('rawchi13 = %s'%chi_sq[index])
 print('-------------------')
 
 ## plot chisq surface grid

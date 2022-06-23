@@ -240,6 +240,10 @@ def read_wds(file,weight,dtype):
             degrees_wds.append(float(line.split()[1]))
             t_wds.append(float(line.split()[0]))
 
+            #error_maj_wds.append(1)
+            #error_min_wds.append(1)
+            #error_pa_wds.append(0)
+
             if line.split('\s+')[0][111]=='S':
                 error_maj_wds.append(1)
                 error_min_wds.append(1)

@@ -32,7 +32,7 @@ if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs,flux_data,flux_err = read_vlti(dir,interact)
 if dtype=='chara_old':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
-print(t3phi.shape)
+print(t3phi.shape,u_coords.shape,ucoord.shape,eff_wave.shape,tels.shape,time_obs.shape)
 print(eff_wave.shape)
 unique_tels = np.unique(tels,axis=0)
 unique_vistels = np.unique(vistels,axis=0)

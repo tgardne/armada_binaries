@@ -76,13 +76,13 @@ plt.show()
 ## New test -- try period spacing from PHASES III paper
 time_span = max(t) - min(t)
 print('Time span of data = %s days'%time_span)
-f = 5
+f = 3
 min_per = float(input('minimum period to search (days) = '))
 #min_per = 2
 max_k = int(2*f*time_span / min_per)
 k_range = np.arange(max_k)[:-1] + 1
 P2 = 2*f*time_span / k_range
-#P2 = np.logspace(np.log10(1),np.log10(50),1000)
+P2 = np.logspace(np.log10(1),np.log10(2000),5000)
 print('Min/Max period (days) = %s / %s ; %s steps'%(min(P2),max(P2),len(k_range)))
 
 print('Grid Searching over period')
@@ -96,9 +96,19 @@ T_guess = np.random.uniform(min(t),max(t),niter)
 K_guess = np.random.uniform(1,50,niter)
 gamma_guess = np.random.uniform(-20,20,niter)
 
+circular = input("Circular? ([y]/n): ")
+if circular=='n':
+    w_guess = np.random.uniform(0,360,niter)
+    e_guess = np.random.uniform(0,0.5,niter)
+
 params = Parameters()
-params.add('w',   value= 0, vary=False)
-params.add('e', value= 0, vary=False)
+if circular=='n':
+    params.add('w',   value= 1, min=0,max=360)
+    params.add('e', value= 0.1, min=0,max=0.99)
+else:
+    params.add('w',   value= 0, vary=False)
+    params.add('e', value= 0, vary=False)
+
 params.add('P', value= 1, vary=False)
 params.add('T', value= 1, min=0)
 params.add('K',value=1,min=0)
@@ -117,11 +127,20 @@ for period in tqdm(P2):
         params['K'].value = K_guess[i]
         params['gamma'].value = gamma_guess[i]
         params['P'].value = period
+        if circular=='n':
+            params['w'].value = w_guess[i]
+            params['e'].value = e_guess[i]
 
         #do fit, minimizer uses LM for least square fitting of model to data
-        minner = Minimizer(rv_model_circular, params, fcn_args=(rv,t,err),
-                          nan_policy='omit')
-        result = minner.leastsq(xtol=1e-5,ftol=1e-5)
+        if circular=='n':
+            minner = Minimizer(rv_model, params, fcn_args=(rv,t,err),
+                            nan_policy='omit')
+            result = minner.leastsq(xtol=1e-5,ftol=1e-5)
+        else:
+            minner = Minimizer(rv_model_circular, params, fcn_args=(rv,t,err),
+                              nan_policy='omit')
+            result = minner.leastsq(xtol=1e-5,ftol=1e-5)
+        
         params_n.append([period,result.params['e'],result.params['w']
                             ,result.params['T'],result.params['K'],result.params['gamma']])
         #chi2_n.append(result.redchi)
@@ -162,17 +181,27 @@ print('Best inner period = %s'%period_best)
 
 ## Do a fit at best period
 params = Parameters()
-params.add('w',   value= params_inner[:,2][idx], vary=False)
-params.add('e', value= params_inner[:,1][idx], vary=False)
+if circular=='n':
+    params.add('w',   value= params_inner[:,2][idx], min=0,max=360)
+    params.add('e', value= params_inner[:,1][idx], min=0,max=0.99)
+else:
+    params.add('w',   value= params_inner[:,2][idx], vary=False)
+    params.add('e', value= params_inner[:,1][idx], vary=False)
 params.add('P', value= params_inner[:,0][idx], min=0)
 params.add('T', value= params_inner[:,3][idx], min=0)
 params.add('K', value= params_inner[:,4][idx], min=0)
 params.add('gamma', value= params_inner[:,5][idx])
 
 #do fit, minimizer uses LM for least square fitting of model to data
-minner = Minimizer(rv_model_circular, params, fcn_args=(rv,t,err),
-                  nan_policy='omit')
-result = minner.minimize()
+if circular=='n':
+    minner = Minimizer(rv_model, params, fcn_args=(rv,t,err),
+                    nan_policy='omit')
+    result = minner.minimize()
+else:
+    minner = Minimizer(rv_model_circular, params, fcn_args=(rv,t,err),
+                      nan_policy='omit')
+    result = minner.minimize()
+    
 best = [result.params['P'],result.params['e'],result.params['w']
                     ,result.params['T'],result.params['K'],result.params['gamma']]
 try:

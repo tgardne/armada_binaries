@@ -47,7 +47,8 @@ note = input('Note for save file: ')
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
-corrected = input('Bootstrap errors? (y/n)')
+corrected = 'n'
+file_input = input('Drag in own file? (y/[n]) ')
 
 query = Simbad.query_objectids('HD %s'%target_hd)
 for item in query:
@@ -62,12 +63,16 @@ for item in query:
 ###########################################
 ## Read in ARMADA data
 ###########################################
-if corrected == 'y':
-    print('reading boostrap errors')
-    file=open('%s/HD_%s_bootstrap.txt'%(path,target_hd))
+if file_input=='y':
+    file = input('Drag in file: ')
+    file = open(file)
 else:
-    print('reading chi2 errors')
-    file=open('%s/HD_%s_chi2err.txt'%(path,target_hd))
+    if corrected == 'y':
+        print('reading boostrap errors')
+        file=open('%s/HD_%s_bootstrap.txt'%(path,target_hd))
+    else:
+        print('reading chi2 errors')
+        file=open('%s/HD_%s_chi2err.txt'%(path,target_hd))
 weight=1
 
 t,p,theta,error_maj,error_min,error_pa,error_deg = read_data(file,weight)
@@ -493,11 +498,72 @@ if len(vlti_idx)>0:
 else:
     resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
                                 error_min,error_pa)
+resids_wds = astrometry_model(result.params,xpos_all[len(xpos):],ypos_all[len(xpos):],t_all[len(xpos):],
+                            error_maj_all[len(xpos):],error_min_all[len(xpos):],error_pa_all[len(xpos):])
 ndata_armada = 2*sum(~np.isnan(xpos))
-chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-7)
+ndata_wds = 2*sum(~np.isnan(xpos_all[len(xpos):]))
+chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
+chi2_wds = np.nansum(resids_wds**2)/(ndata_wds-len(result.params))
 print('-'*10)
 print('chi2 armada = %s'%chi2_armada)
+print('chi2 WDS = %s'%chi2_wds)
 print('-'*10)
+
+rescale = input('Rescale errors based off chi2? (y/n): ')
+while rescale=='y':
+
+    ## we don't want to raise armada errors
+    if chi2_armada<0:
+        chi2_armada=1.0
+    if chi2_wds<0:
+        chi2_wds=1.0
+
+    error_maj*=np.sqrt(chi2_armada)
+    error_min*=np.sqrt(chi2_armada)
+
+    error_maj_all[:len(xpos)]*=np.sqrt(chi2_armada)
+    error_maj_all[len(xpos):]*=np.sqrt(chi2_wds)
+    error_min_all[:len(xpos)]*=np.sqrt(chi2_armada)
+    error_min_all[len(xpos):]*=np.sqrt(chi2_wds)
+
+    ###########################################
+    ## Do a least-squares fit
+    ###########################################
+    params = Parameters()
+    params.add('w',   value= omega, min=0, max=360)
+    params.add('bigw', value= bigomega, min=0, max=360)
+    params.add('inc', value= inc, min=0, max=180)
+    params.add('e', value= e, min=0, max=0.99)
+    params.add('a', value= a, min=0)
+    params.add('P', value= P, min=0)
+    params.add('T', value= T, min=0)
+    if len(vlti_idx)>0:
+        params.add('mirc_scale', value=1)
+    else:
+        params.add('mirc_scale',value=1,vary=False)
+
+    result = ls_fit(params,xpos_all,ypos_all,t_all,error_maj_all,error_min_all,error_pa_all)
+
+    if len(vlti_idx)>0:
+        resids_armada = astrometry_model_vlti(result.params,xpos[vlti_mask],ypos[vlti_mask],t[vlti_mask],error_maj[vlti_mask],
+                                    error_min[vlti_mask],error_pa[vlti_mask],
+                                    xpos[vlti_idx],ypos[vlti_idx],t[vlti_idx],
+                                    error_maj[vlti_idx],error_min[vlti_idx],error_pa[vlti_idx])
+    else:
+        resids_armada = astrometry_model(result.params,xpos,ypos,t,error_maj,
+                                    error_min,error_pa)
+
+    resids_wds = astrometry_model(result.params,xpos_all[len(xpos):],ypos_all[len(xpos):],t_all[len(xpos):],
+                                error_maj_all[len(xpos):],error_min_all[len(xpos):],error_pa_all[len(xpos):])
+    ndata_armada = 2*sum(~np.isnan(xpos))
+    ndata_wds = 2*sum(~np.isnan(xpos_all[len(xpos):]))
+    chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-len(result.params))
+    chi2_wds = np.nansum(resids_wds**2)/(ndata_wds-len(result.params))
+    print('-'*10)
+    print('chi2 armada = %s'%chi2_armada)
+    print('chi2 WDS = %s'%chi2_wds)
+    print('-'*10)
+    rescale = input('Rescale errors based off chi2? (y/n): ')
 
 if corrected == 'y':
     directory='%s/HD%s_bootstrap_triple/'%(path,target_hd)

@@ -7,8 +7,8 @@ import numpy as np
 from PyAstronomy import pyasl
 ks=pyasl.MarkleyKESolver()
 
-def orbit_model(a,e,inc,w,bigw,P,T,tepoch,tmodel='None'):
-    if tmodel=='None':
+def orbit_model(a,e,inc,w,bigw,P,T,tepoch,tmodel=[]):
+    if len(tmodel)==0:
         tmodel=np.linspace(tepoch[0],tepoch[0]+P,1000)
     #Calculate the mean anamoly for each t in model:
     ## other method:
@@ -25,8 +25,8 @@ def orbit_model(a,e,inc,w,bigw,P,T,tepoch,tmodel='None'):
     
     return(ra,dec,rapoints,decpoints)
 
-def triple_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,tepoch,tmodel='None'):
-    if tmodel=='None':
+def triple_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,tepoch,tmodel=[]):
+    if len(tmodel)==0:
         tmodel=np.linspace(tepoch[0],tepoch[0]+P,1000)
     ## other method:
     ke = pyasl.KeplerEllipse(a,P,e=e,Omega=bigw,i=inc,w=w,tau=T)
@@ -47,9 +47,9 @@ def triple_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,tepoch,tmode
     
     return(ra,dec,rapoints,decpoints)
 
-def quad_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,a3,e3,inc3,w3,bigw3,P3,T3,t,tmodel='None'):
+def quad_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,a3,e3,inc3,w3,bigw3,P3,T3,t,tmodel=[]):
 
-    if tmodel=='None':
+    if len(tmodel)==0:
         t0=np.linspace(t[0],t[0]+P,1000)
     else:
         t0=tmodel

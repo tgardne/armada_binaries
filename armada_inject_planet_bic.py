@@ -470,8 +470,12 @@ rescale = input('Rescale errors based off chi2? (y/n): ')
 while rescale=='y':
 
     ## we don't want to raise armada errors
-    if chi2_armada>1:
+    #if chi2_armada>1:
+    #    chi2_armada=1.0
+    if chi2_armada<0:
         chi2_armada=1.0
+    if chi2_wds<0:
+        chi2_wds=1.0
 
     error_maj*=np.sqrt(chi2_armada)
     error_min*=np.sqrt(chi2_armada)
@@ -617,10 +621,11 @@ f.close()
 #####################################################################
 #ps = float(input('period search start (days): '))
 #pe = float(input('period search end (days): '))
-ps = 10
-pe = 1000
+ps = 2
+## end at third the outer binary period?
+pe = P_start / 3
 P2 = np.logspace(np.log10(ps),np.log10(pe),20)
-a2 = np.logspace(np.log10(0.01),np.log10(1),20)
+a2 = np.logspace(np.log10(0.01),np.log10(10),20)
 
 #z_max = float(input("Enter z(P) max from real data = "))
 print('Grid Searching over period -- adding planets at each step')

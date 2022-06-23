@@ -131,7 +131,7 @@ beam_map = {1:'S1',2:'S2',3:'E1',4:'E2',5:'W1',6:'W2'}
 #start = 2
 #end = 30
 start = 1
-end = 8
+end = 11
 
 if ftype=='chara':
     for file in sorted(os.listdir(dir)):
@@ -395,14 +395,26 @@ if rid_error == 'y':
 #bw_guess = float(input('bw smearing (0.004): '))
 #ud_guess = float(input('UD (mas): '))
 
-P_guess=4.617111
-T_guess=50033.55
-e_guess=0.012
-omega_guess=224.11
-ratio_guess = 5000
+#P_guess=4.617111
+#T_guess=50033.55
+#e_guess=0.012
+#omega_guess=224.11
+#ratio_guess = 5000
+#bw_guess = 0.02
+#ud_guess = 1.097
+#ud2_guess = 0.1
+
+## Tau Boo b
+P_guess=3.3124568
+T_guess= 59673.15
+e_guess=0.011
+omega_guess=113.4
+ratio_guess = 3000
 bw_guess = 0.02
-ud_guess = 1.097
+ud_guess = 0.814
 ud2_guess = 0.1
+## semi-major should be 3.1mas
+## inclination 43.5deg (Pelletier et al, 2021)
 
 #P_guess=10.21296
 #T_guess=52997.6813
@@ -429,8 +441,8 @@ nbigw_guess = int(input('Nsteps (e.g. 75): '))
 
 fix_a = input('Fix semi-major? y/[n]: ')
 if fix_a=='y':
-    print('Fixing a to 4.4mas')
-    a_grid = [4.4]
+    afix = float(input("Semi-major (mas)? "))
+    a_grid = [afix]
 else:
     a_start = float(input('a start (mas): '))
     a_end = float(input('a end (mas): '))

@@ -338,6 +338,15 @@ if 'dphase' in fitting_vars:
 else:
     visphi_new = visphi
 
+correct = input('Correct t3phi? (y/[n]): ')
+if correct == 'y':
+    correction_file = input('File with corrected t3phi: ')
+    t3phi_corrected = np.load(correction_file)
+    print(t3phi.shape)
+    print(t3phi_corrected.shape)
+    print('Using corrected t3phi')
+    t3phi = t3phi_corrected
+
 ######################################################################
 ## USER GIVES STARTING VALUES FOR FITS
 ######################################################################
@@ -348,13 +357,13 @@ grid_size = float(input('search grid size (mas): '))
 steps = int(input('steps in grid: '))
 a3 = float(input('flux ratio (f1/f2): '))
 
-a4 = 0.5 #float(input('UD1 (mas): '))
-a5 = 0.5 #float(input('UD2 (mas): '))
-if dtype == "chara":
-    a6 = 0.005
-else:
-    a6 = 0.00001
-#a6 = float(input('bw smearing (1/R): '))
+a4 = float(input('UD1 (mas): '))
+a5 = float(input('UD2 (mas): '))
+#if dtype == "chara":
+#    a6 = 0.005
+#else:
+#    a6 = 0.00001
+a6 = float(input('bw smearing (1/R): '))
 
 vary_ratio = input('vary fratio on grid? (y/n) ')
 plot_grid = input('plot grid (y/n)? ')
@@ -426,7 +435,7 @@ for ra_try in tqdm(ra_grid):
             params.add('ra',   value= ra_try, vary=False)
             params.add('dec', value= dec_try, vary=False)
             params.add('ratio', value= a3, min=1.0)
-            params.add('ud1',   value= a4, vary=False)#min=0.0,max=3.0)
+            params.add('ud1',   value= a4, vary=False)#min=0.0,max=2.0)
             params.add('ud2', value= a5, vary=False)
             params.add('bw', value=a6, vary=False)#min=0.0, max=0.1)
 
@@ -557,7 +566,8 @@ minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_n
 result = minner.minimize()
 report_fit(result)
 
-chi_sq_best = result.redchi
+redchi_sq_best = result.redchi
+chi_sq_best = result.chisq
 ra_best = result.params['ra'].value
 dec_best = result.params['dec'].value
 ratio_best = result.params['ratio'].value
@@ -603,7 +613,7 @@ best_params.add('f4',value=f4_best)
 best_params.add('f5',value=f5_best)
 best_params.add('f6',value=f6_best)
 
-best_fit = np.around(np.array([ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best,chi_sq_best]),decimals=4)
+best_fit = np.around(np.array([ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best,redchi_sq_best]),decimals=4)
 
 ##### Just a grid plot ######
 #plt.scatter(ra_results, dec_results, c=1/chi_sq, cmap=cm.inferno)
@@ -739,6 +749,7 @@ xfit=np.array(xfit)
 yfit=np.array(yfit)
 
 ## plot results
+full_plot='y'
 with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":target_id,"2":date}) as pdf:
     
     ## first page - chisq grid
@@ -752,202 +763,217 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
     pdf.savefig()
     plt.close()
 
-    ## regroup data by measurements
-    if dtype=='chara' or dtype=='chara_old':
-        ntri=20
-        nbl=15
-    if dtype=='vlti':
-        ntri=4
-        nbl=6
+    if full_plot=='n':
+        ## next page - reduction and fit parameters
+        textfig = plt.figure(figsize=(11.69,8.27))
+        textfig.clf()
+        txt_fit_cp = ('Best fit (ra,dec,ratio,ud1,ud2,bw,redchi2): %s'%best_fit)
+        reduction = ('Reduction params (ncoh,nbs,ncs,int):%s'%reduction_params)
+        textfig.text(0.5,0.75,txt_fit_cp,size=12,ha="center")
+        textfig.text(0.5,0.5,reduction,size=12,ha="center")
+        textfig.text(0.5,0.25,reduction_params,size=12,ha='center')
+        pdf.savefig()
+        plt.close()
 
-    n_cp = len(t3phi)/ntri
-    n_vp = len(visphi)/nbl
-    n_v2 = len(vis2)/nbl
-    t3phi_plot = np.array(np.array_split(t3phi,n_cp))
-    t3phierr_plot = np.array(np.array_split(t3phierr,n_cp))
-    cp_model_plot = np.array_split(cp_model,n_cp)
-    visphi_new_plot = np.array_split(visphi_new,n_vp)
-    visphierr_plot = np.array_split(visphierr,n_vp)
-    visphi_model_plot = np.array_split(visphi_model,n_vp)
-    visamp_plot = np.array_split(visamp,n_vp)
-    visamperr_plot = np.array_split(visamperr,n_vp)
-    visamp_model_plot = np.array_split(visamp_model,n_vp)
-    vis2_plot = np.array(np.array_split(vis2,n_v2))
-    vis2err_plot = np.array(np.array_split(vis2err,n_v2))
-    vis2_model_plot = np.array(np.array_split(vis2_model,n_v2))
-    if dtype=='vlti':
-        flux_plot = np.array(np.array_split(flux,n_v2))
-        fluxerr_plot = np.array(np.array_split(fluxerr,n_v2))
-    
-    ## next pages - cp model fits
-    index = np.arange(ntri)
-    for t3data,t3errdata,modeldata in zip(t3phi_plot,t3phierr_plot,cp_model_plot):
+    else:
 
-        label_size = 4
-        mpl.rcParams['xtick.labelsize'] = label_size
-        mpl.rcParams['ytick.labelsize'] = label_size
-
+        ## regroup data by measurements
         if dtype=='chara' or dtype=='chara_old':
-            fig,axs = plt.subplots(4,5,figsize=(10,7),facecolor='w',edgecolor='k')
+            ntri=20
+            nbl=15
         if dtype=='vlti':
-            fig,axs = plt.subplots(2,2,figsize=(10,7),facecolor='w',edgecolor='k')
-        fig.subplots_adjust(hspace=0.5,wspace=.001)
-        axs=axs.ravel()
+            ntri=4
+            nbl=6
 
-        for ind,y,yerr,m,tri in zip(index,t3data,t3errdata,modeldata,tels[:ntri]):
-            x=eff_wave[0]
-            axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
-            axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
-            axs[int(ind)].set_title(str(tri))
-
-        fig.suptitle('%s Closure Phase'%target_id)
-        fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
-        fig.text(0.05, 0.5, 'CP (deg)', va='center', rotation='vertical')
-        pdf.savefig()
-        plt.close()
-
-    ## next pages - visphi fits
-    index = np.arange(nbl)
-    for visdata,viserrdata,modeldata in zip(visphi_new_plot,visphierr_plot,visphi_model_plot):
-
-        label_size = 4
-        mpl.rcParams['xtick.labelsize'] = label_size
-        mpl.rcParams['ytick.labelsize'] = label_size
-
-        if dtype=='chara' or dtype=='chara_old':
-            fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
+        n_cp = len(t3phi)/ntri
+        n_vp = len(visphi)/nbl
+        n_v2 = len(vis2)/nbl
+        t3phi_plot = np.array(np.array_split(t3phi,n_cp))
+        t3phierr_plot = np.array(np.array_split(t3phierr,n_cp))
+        cp_model_plot = np.array_split(cp_model,n_cp)
+        visphi_new_plot = np.array_split(visphi_new,n_vp)
+        visphierr_plot = np.array_split(visphierr,n_vp)
+        visphi_model_plot = np.array_split(visphi_model,n_vp)
+        visamp_plot = np.array_split(visamp,n_vp)
+        visamperr_plot = np.array_split(visamperr,n_vp)
+        visamp_model_plot = np.array_split(visamp_model,n_vp)
+        vis2_plot = np.array(np.array_split(vis2,n_v2))
+        vis2err_plot = np.array(np.array_split(vis2err,n_v2))
+        vis2_model_plot = np.array(np.array_split(vis2_model,n_v2))
         if dtype=='vlti':
-            fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
-        fig.subplots_adjust(hspace=0.5,wspace=.001)
-        axs=axs.ravel()
+            flux_plot = np.array(np.array_split(flux,n_v2))
+            fluxerr_plot = np.array(np.array_split(fluxerr,n_v2))
 
-        for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
-            x=eff_wave[0]
-            axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
-            axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
-            axs[int(ind)].set_title(str(tri))
+        ## next pages - cp model fits
+        index = np.arange(ntri)
+        for t3data,t3errdata,modeldata in zip(t3phi_plot,t3phierr_plot,cp_model_plot):
 
-        fig.suptitle('%s VisPhi'%target_id)
-        fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
-        fig.text(0.05, 0.5, 'visphi (deg)', va='center', rotation='vertical')
-        pdf.savefig()
-        plt.close()
+            label_size = 4
+            mpl.rcParams['xtick.labelsize'] = label_size
+            mpl.rcParams['ytick.labelsize'] = label_size
 
-    ## next pages - vis2 fits
-    index = np.arange(nbl)
-    for visdata,viserrdata,modeldata in zip(vis2_plot,vis2err_plot,vis2_model_plot):
+            if dtype=='chara' or dtype=='chara_old':
+                fig,axs = plt.subplots(4,5,figsize=(10,7),facecolor='w',edgecolor='k')
+            if dtype=='vlti':
+                fig,axs = plt.subplots(2,2,figsize=(10,7),facecolor='w',edgecolor='k')
+            fig.subplots_adjust(hspace=0.5,wspace=.001)
+            axs=axs.ravel()
 
-        label_size = 4
-        mpl.rcParams['xtick.labelsize'] = label_size
-        mpl.rcParams['ytick.labelsize'] = label_size
+            for ind,y,yerr,m,tri in zip(index,t3data,t3errdata,modeldata,tels[:ntri]):
+                x=eff_wave[0]
+                axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
+                axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
+                axs[int(ind)].set_title(str(tri))
 
-        if dtype=='chara' or dtype=='chara_old':
-            fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
+            fig.suptitle('%s Closure Phase'%target_id)
+            fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
+            fig.text(0.05, 0.5, 'CP (deg)', va='center', rotation='vertical')
+            pdf.savefig()
+            plt.close()
+
+        ## next pages - visphi fits
+        index = np.arange(nbl)
+        for visdata,viserrdata,modeldata in zip(visphi_new_plot,visphierr_plot,visphi_model_plot):
+
+            label_size = 4
+            mpl.rcParams['xtick.labelsize'] = label_size
+            mpl.rcParams['ytick.labelsize'] = label_size
+
+            if dtype=='chara' or dtype=='chara_old':
+                fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
+            if dtype=='vlti':
+                fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
+            fig.subplots_adjust(hspace=0.5,wspace=.001)
+            axs=axs.ravel()
+
+            for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
+                x=eff_wave[0]
+                axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
+                axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
+                axs[int(ind)].set_title(str(tri))
+
+            fig.suptitle('%s VisPhi'%target_id)
+            fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
+            fig.text(0.05, 0.5, 'visphi (deg)', va='center', rotation='vertical')
+            pdf.savefig()
+            plt.close()
+
+        ## next pages - vis2 fits
+        index = np.arange(nbl)
+        for visdata,viserrdata,modeldata in zip(vis2_plot,vis2err_plot,vis2_model_plot):
+
+            label_size = 4
+            mpl.rcParams['xtick.labelsize'] = label_size
+            mpl.rcParams['ytick.labelsize'] = label_size
+
+            if dtype=='chara' or dtype=='chara_old':
+                fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
+            if dtype=='vlti':
+                fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
+            fig.subplots_adjust(hspace=0.5,wspace=.001)
+            axs=axs.ravel()
+
+            for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
+                x=eff_wave[0]
+                axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
+                axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
+                axs[int(ind)].set_title(str(tri))
+
+            fig.suptitle('%s Vis2'%target_id)
+            fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
+            fig.text(0.05, 0.5, 'vis2', va='center', rotation='vertical')
+            pdf.savefig()
+            plt.close()
+
+        ## next pages - visamp fits
+        index = np.arange(nbl)
+        for visdata,viserrdata,modeldata in zip(visamp_plot,visamperr_plot,visamp_model_plot):
+
+            label_size = 4
+            mpl.rcParams['xtick.labelsize'] = label_size
+            mpl.rcParams['ytick.labelsize'] = label_size
+
+            if dtype=='chara' or dtype=='chara_old':
+                fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
+            if dtype=='vlti':
+                fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
+            fig.subplots_adjust(hspace=0.5,wspace=.001)
+            axs=axs.ravel()
+
+            for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
+                x=eff_wave[0]
+                axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
+                axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
+                axs[int(ind)].set_title(str(tri))
+
+            fig.suptitle('%s VisAmp'%target_id)
+            fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
+            fig.text(0.05, 0.5, 'visamp', va='center', rotation='vertical')
+            pdf.savefig()
+            plt.close()
+
         if dtype=='vlti':
-            fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
-        fig.subplots_adjust(hspace=0.5,wspace=.001)
-        axs=axs.ravel()
 
-        for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
-            x=eff_wave[0]
-            axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
-            axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
-            axs[int(ind)].set_title(str(tri))
+            plt.figure(figsize=(10, 7))
 
-        fig.suptitle('%s Vis2'%target_id)
-        fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
-        fig.text(0.05, 0.5, 'vis2', va='center', rotation='vertical')
+            y1=np.nanmean(flux_plot,axis=0)[0,:] / np.max(np.nanmean(flux_plot,axis=0))
+            y2=np.nanmean(flux_plot,axis=0)[1,:] / np.max(np.nanmean(flux_plot,axis=0))
+            y3=np.nanmean(flux_plot,axis=0)[2,:] / np.max(np.nanmean(flux_plot,axis=0))
+            y4=np.nanmean(flux_plot,axis=0)[3,:] / np.max(np.nanmean(flux_plot,axis=0))
+
+            plt.plot(x,y1,'.-',label='tel1')
+            plt.plot(x,y2,'.-',label='tel2')
+            plt.plot(x,y3,'.-',label='tel3')
+            plt.plot(x,y4,'.-',label='tel4')
+
+            plt.axvline(x=2.16612e-6)
+            plt.xlim(xmin=2.16e-6,xmax=2.17e-6)
+            plt.title('Calibration Check')
+            plt.xlabel('Wavelength (m)')
+            plt.ylabel('Normalized Flux')    
+            plt.legend() 
+            pdf.savefig()
+            plt.close()
+
+        ## next page -- tel drop
+        if dtype=='chara':
+            spread = np.sqrt((xfit-xfit[0])**2+(yfit-yfit[0])**2)
+            for x,y,label in zip(xfit,yfit,['none','E1','W2','W1','S2','S1','E2']):
+                if label=='none':
+                    plt.scatter(x, y, marker='*', zorder=2, label=label)
+                else:
+                    plt.scatter(x, y, marker='o', label=label)
+
+            plt.title('STDEV = %s mas'%np.around(np.std(spread),4))
+            plt.xlabel('d_RA (mas)')
+            plt.ylabel('d_DE (mas)')
+            plt.gca().invert_xaxis()
+            plt.axis('equal')
+            plt.legend()
+            pdf.savefig()  
+            plt.close()
+
+        ## next page - reduction and fit parameters
+        textfig = plt.figure(figsize=(11.69,8.27))
+        textfig.clf()
+        txt_fit_cp = ('Best fit (ra,dec,ratio,ud1,ud2,bw,redchi2): %s'%best_fit)
+        reduction = ('Reduction params (ncoh,nbs,ncs,int):%s'%reduction_params)
+        textfig.text(0.5,0.75,txt_fit_cp,size=12,ha="center")
+        textfig.text(0.5,0.5,reduction,size=12,ha="center")
+        textfig.text(0.5,0.25,reduction_params,size=12,ha='center')
         pdf.savefig()
         plt.close()
-
-    ## next pages - visamp fits
-    index = np.arange(nbl)
-    for visdata,viserrdata,modeldata in zip(visamp_plot,visamperr_plot,visamp_model_plot):
-
-        label_size = 4
-        mpl.rcParams['xtick.labelsize'] = label_size
-        mpl.rcParams['ytick.labelsize'] = label_size
-
-        if dtype=='chara' or dtype=='chara_old':
-            fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
-        if dtype=='vlti':
-            fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
-        fig.subplots_adjust(hspace=0.5,wspace=.001)
-        axs=axs.ravel()
-
-        for ind,y,yerr,m,tri in zip(index,visdata,viserrdata,modeldata,vistels[:nbl]):
-            x=eff_wave[0]
-            axs[int(ind)].errorbar(x,y,yerr=yerr,fmt='.-',zorder=1)
-            axs[int(ind)].plot(x,m,'+--',color='r',zorder=2)
-            axs[int(ind)].set_title(str(tri))
-
-        fig.suptitle('%s VisAmp'%target_id)
-        fig.text(0.5, 0.05, 'Wavelength (m)', ha='center')
-        fig.text(0.05, 0.5, 'visamp', va='center', rotation='vertical')
-        pdf.savefig()
-        plt.close()
-
-    if dtype=='vlti':
-
-        plt.figure(figsize=(10, 7))
-
-        y1=np.nanmean(flux_plot,axis=0)[0,:] / np.max(np.nanmean(flux_plot,axis=0))
-        y2=np.nanmean(flux_plot,axis=0)[1,:] / np.max(np.nanmean(flux_plot,axis=0))
-        y3=np.nanmean(flux_plot,axis=0)[2,:] / np.max(np.nanmean(flux_plot,axis=0))
-        y4=np.nanmean(flux_plot,axis=0)[3,:] / np.max(np.nanmean(flux_plot,axis=0))
-
-        plt.plot(x,y1,'.-',label='tel1')
-        plt.plot(x,y2,'.-',label='tel2')
-        plt.plot(x,y3,'.-',label='tel3')
-        plt.plot(x,y4,'.-',label='tel4')
-
-        plt.axvline(x=2.16612e-6)
-        plt.xlim(xmin=2.16e-6,xmax=2.17e-6)
-        plt.title('Calibration Check')
-        plt.xlabel('Wavelength (m)')
-        plt.ylabel('Normalized Flux')    
-        plt.legend() 
-        pdf.savefig()
-        plt.close()
-
-    ## next page -- tel drop
-    if dtype=='chara':
-        spread = np.sqrt((xfit-xfit[0])**2+(yfit-yfit[0])**2)
-        for x,y,label in zip(xfit,yfit,['none','E1','W2','W1','S2','S1','E2']):
-            if label=='none':
-                plt.scatter(x, y, marker='*', zorder=2, label=label)
-            else:
-                plt.scatter(x, y, marker='o', label=label)
-
-        plt.title('STDEV = %s mas'%np.around(np.std(spread),4))
-        plt.xlabel('d_RA (mas)')
-        plt.ylabel('d_DE (mas)')
-        plt.gca().invert_xaxis()
-        plt.axis('equal')
-        plt.legend()
-        pdf.savefig()  
-        plt.close()
-
-    ## next page - reduction and fit parameters
-    textfig = plt.figure(figsize=(11.69,8.27))
-    textfig.clf()
-    txt_fit_cp = ('Best fit (ra,dec,ratio,ud1,ud2,bw,redchi2): %s'%best_fit)
-    reduction = ('Reduction params (ncoh,nbs,ncs,int):%s'%reduction_params)
-    textfig.text(0.5,0.75,txt_fit_cp,size=12,ha="center")
-    textfig.text(0.5,0.5,reduction,size=12,ha="center")
-    textfig.text(0.5,0.25,reduction_params,size=12,ha='center')
-    pdf.savefig()
-    plt.close()
 
 ###########################################################
 ### Now do errors
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
-size = 0.5
 if dtype=='vlti':
-    steps = 100
+    size = 0.5
+    steps = 50
 else:
-    steps = 200
+    size = 0.5
+    steps = 100
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
 chi_sq = []
@@ -990,9 +1016,9 @@ for ra_try in tqdm(ra_grid):
 
         minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
         result = minner.minimize()
-        red_chi2 = result.redchi
+        raw_chi2 = result.chisq
         
-        chi_sq.append(red_chi2)
+        chi_sq.append(raw_chi2)
         ra_results.append(ra_try)
         dec_results.append(dec_try)
 
@@ -1028,7 +1054,7 @@ plt.close()
 #chi2_best = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
 chi2_best = chi_sq_best
 
-index_err = np.where(chi_sq < (chi2_best+1) )
+index_err = np.where(chi_sq < (chi2_best+2.296) )
 chi_err = chi_sq[index_err]
 ra_err = ra_results[index_err]
 dec_err = dec_results[index_err]
@@ -1044,6 +1070,8 @@ angle = theta*180/np.pi
 angle_new = 90-angle
 if angle_new<0:
     angle_new=360+angle_new
+angle_new = 360-angle_new
+angle = 360-angle
 ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
 ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
 plt.gca().add_patch(ell)
