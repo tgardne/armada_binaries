@@ -757,8 +757,8 @@ plt.axis('equal')
 plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
-## isolate region where delta_chisq < 1
-index_err = np.where(chi_sq < (chi_sq[index]+1) )
+## isolate region where delta_chisq < 2.296
+index_err = np.where(chi_sq < (chi_sq[index]+2.296) )
 chi_err = chi_sq[index_err]
 ra_err = ra_results[index_err]
 dec_err = dec_results[index_err]
@@ -854,8 +854,8 @@ plt.axis('equal')
 plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
-## isolate region where delta_chisq < 1
-index_err = np.where(chi_sq < (chi_sq[index]+1) )
+## isolate region where delta_chisq < 2.296
+index_err = np.where(chi_sq < (chi_sq[index]+2.296) )
 chi_err = chi_sq[index_err]
 ra_err = ra_results[index_err]
 dec_err = dec_results[index_err]

@@ -1048,7 +1048,7 @@ plt.gca().invert_xaxis()
 plt.axis('equal')
 plt.savefig("/Users/tgardne/ARMADA_epochs/%s/%s_%s_chisq.pdf"%(target_id,target_id,date))
 plt.close()
-## isolate region where delta_chisq < 1
+## isolate region where delta_chisq < 2.296
 #params = [ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best]
 #chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
 #chi2_best = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))

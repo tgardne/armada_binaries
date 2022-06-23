@@ -696,8 +696,8 @@ plt.axis('equal')
 plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
-## isolate region where delta_chisq < 1
-index_err = np.where(chi_sq < (chi_sq[index]+1) )
+## isolate region where delta_chisq < 2.296
+index_err = np.where(chi_sq < (chi_sq[index]+2.296) )
 chi_err = chi_sq[index_err]
 ra_err = ra_results[index_err]
 dec_err = dec_results[index_err]
@@ -751,7 +751,7 @@ for ra_try in tqdm(ra_grid):
 
         #do fit, minimizer uses LM for least square fitting of model to data
         chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-        raw_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+        raw_chi2 = np.nansum(chi**2)#/(len(np.ndarray.flatten(t3phi))-len(params))
 
         chi_sq.append(raw_chi2)
         ra_results.append(ra_try)
@@ -794,8 +794,8 @@ plt.axis('equal')
 plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
-## isolate region where delta_chisq < 1
-index_err = np.where(chi_sq < (chi_sq[index]+1) )
+## isolate region where delta_chisq < 2.296
+index_err = np.where(chi_sq < (chi_sq[index]+2.296) )
 chi_err = chi_sq[index_err]
 ra_err = ra_results[index_err]
 dec_err = dec_results[index_err]
