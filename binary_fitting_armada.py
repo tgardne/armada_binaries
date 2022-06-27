@@ -567,7 +567,7 @@ result = minner.minimize()
 report_fit(result)
 
 redchi_sq_best = result.redchi
-chi_sq_best = result.chisq
+chi_sq_best = result.chisqr
 ra_best = result.params['ra'].value
 dec_best = result.params['dec'].value
 ratio_best = result.params['ratio'].value
@@ -969,11 +969,11 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1":
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
 if dtype=='vlti':
-    size = 0.5
-    steps = 50
-else:
-    size = 0.5
+    size = 0.05
     steps = 100
+else:
+    size = 0.05
+    steps = 500
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
 chi_sq = []
@@ -996,10 +996,10 @@ for ra_try in tqdm(ra_grid):
         params = Parameters()
         params.add('ra',   value= ra_try, vary=False)
         params.add('dec', value= dec_try, vary=False)
-        params.add('ratio', value= ratio_best, vary=False)#min=1.0)
+        params.add('ratio', value= ratio_best, min=1.0)
         params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=3.0)
         params.add('ud2', value= ud2_best, vary=False)
-        params.add('bw', value=bw_best, vary=False)#min=0.0, max=0.1)
+        params.add('bw', value=bw_best, min=0.0, max=0.1)
 
         params.add('v1',value=v1_best,vary=False)
         params.add('v2',value=v2_best,vary=False)
@@ -1016,7 +1016,7 @@ for ra_try in tqdm(ra_grid):
 
         minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
         result = minner.minimize()
-        raw_chi2 = result.chisq
+        raw_chi2 = result.chisqr
         
         chi_sq.append(raw_chi2)
         ra_results.append(ra_try)
@@ -1070,8 +1070,8 @@ angle = theta*180/np.pi
 angle_new = 90-angle
 if angle_new<0:
     angle_new=360+angle_new
-angle_new = 360-angle_new
-angle = 360-angle
+#angle_new = 360-angle_new
+#angle = 360-angle
 ellipse_params = np.around(np.array([a,b,angle_new]),decimals=4)
 ell = Ellipse(xy=(ra_mean,dec_mean),width=2*a,height=2*b,angle=angle,facecolor='lightgrey')
 plt.gca().add_patch(ell)

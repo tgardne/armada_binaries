@@ -619,7 +619,7 @@ rescale = input('Rescale errors based off chi2? (y/n): ')
 while rescale=='y':
 
     ## we don't want to raise armada errors
-    if chi2_armada<0:
+    if chi2_armada<0 or chi2_armada>1:
         chi2_armada=1.0
     if chi2_wds<0:
         chi2_wds=1.0

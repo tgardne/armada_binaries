@@ -1,0 +1,8 @@
+
+Start time     : 2021-09-11T03:37:23
+Program name   : esorex
+Severity level : [ INFO  ] 
+
+03:37:23 [ INFO  ] : This is EsoRex, version 3.13.5
+03:37:23 [ INFO  ] : using the libraries: CPL = 7.1.4, CFITSIO = 3.49, WCSLIB = 7.4, FFTW (normal precision) = 3.3.9-sse2, FFTW (single precision) = 3.3.9-sse2, CPL FLOP counting is unavailable, enable with -DCPL_ADD_FLOPS
+03:37:23 [ INFO  ] : Invocation command line was: esorex -h gravity_vis
