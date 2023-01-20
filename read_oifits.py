@@ -36,8 +36,8 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
     ucoords=[]
     vcoords=[]
 
-    start = 1
-    end = -1
+    #start = 1
+    #end = -1
     for file in os.listdir(dir):
         if file.endswith("_oifits.fits") or file.endswith("_viscal.fits") or file.endswith("_uvfix.fits"):
 
@@ -52,7 +52,7 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                 oi_vis2 = hdu['OI_VIS2'].data
                 oi_vis = hdu['OI_VIS'].data
 
-                eff_wave.append(hdu['OI_WAVELENGTH'].data['EFF_WAVE'][start:end])
+                eff_wave.append(hdu['OI_WAVELENGTH'].data['EFF_WAVE'])
                 time_obs.append(oi_mjd)
 
                 az.append(hdu[0].header['AZ'])
@@ -63,8 +63,8 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                     if exclude in stations:
                         phases_empty = np.empty(oi_t3[i]['T3PHI'].shape)
                         phases_empty[:] = np.nan
-                        t3phi.append(phases_empty[start:end])
-                        t3phierr.append(phases_empty[start:end])
+                        t3phi.append(phases_empty)
+                        t3phierr.append(phases_empty)
                         tels.append([beam_map[a] for a in oi_t3[i]['STA_INDEX']])
                         u1coord = np.nan
                         v1coord = np.nan
@@ -89,8 +89,8 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                         if bl>250:
                             phases_empty = np.empty(oi_t3[i]['T3PHI'].shape)
                             phases_empty[:] = np.nan
-                            t3phi.append(phases_empty[start:end])
-                            t3phierr.append(phases_empty[start:end])
+                            t3phi.append(phases_empty)
+                            t3phierr.append(phases_empty)
                             tels.append([beam_map[a] for a in oi_t3[i]['STA_INDEX']])
                             u1coord = np.nan
                             v1coord = np.nan
@@ -107,8 +107,8 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                     t3flag = np.where(oi_t3[i].field('FLAG')==True)
                     t3[t3flag] = np.nan
                     t3err[t3flag] = np.nan
-                    t3phi.append(t3[start:end])
-                    t3phierr.append(t3err[start:end])
+                    t3phi.append(t3)
+                    t3phierr.append(t3err)
                     tels.append([beam_map[a] for a in oi_t3[i]['STA_INDEX']])
                     u_coords.append([u1coord,u2coord,u3coord])
                     v_coords.append([v1coord,v2coord,v3coord])
@@ -119,8 +119,8 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                     if exclude in stations:
                         phases_empty = np.empty(oi_vis2[i]['VIS2DATA'].shape)
                         phases_empty[:] = np.nan
-                        vis2.append(phases_empty[start:end])
-                        vis2err.append(phases_empty[start:end])
+                        vis2.append(phases_empty)
+                        vis2err.append(phases_empty)
                         continue
                     if bl_drop=='y':
                         uc = oi_vis2[i]['UCOORD']
@@ -128,16 +128,16 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                         if np.sqrt(uc**2+vc**2)>250:
                             phases_empty = np.empty(oi_vis2[i]['VIS2DATA'].shape)
                             phases_empty[:] = np.nan
-                            vis2.append(phases_empty[start:end])
-                            vis2err.append(phases_empty[start:end])
+                            vis2.append(phases_empty)
+                            vis2err.append(phases_empty)
                             continue
                     v2 = oi_vis2[i]['VIS2DATA']
                     v2err = oi_vis2[i]['VIS2ERR']
                     v2flag = np.where(oi_vis2[i].field('FLAG')==True)
                     v2[v2flag] = np.nan
                     v2err[v2flag] = np.nan
-                    vis2.append(v2[start:end])
-                    vis2err.append(v2err[start:end])
+                    vis2.append(v2)
+                    vis2err.append(v2err)
 
                 for i in eachindex(oi_vis):
                     ## use this to exclude a telescope
@@ -145,10 +145,10 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                     if exclude in stations:
                         phases_empty = np.empty(oi_vis[i]['VISPHI'].shape)
                         phases_empty[:] = np.nan
-                        visphi.append(phases_empty[start:end])
-                        visphierr.append(phases_empty[start:end])
-                        visamp.append(phases_empty[start:end])
-                        visamperr.append(phases_empty[start:end])
+                        visphi.append(phases_empty)
+                        visphierr.append(phases_empty)
+                        visamp.append(phases_empty)
+                        visamperr.append(phases_empty)
                         vistels.append([beam_map[a] for a in oi_vis[i]['STA_INDEX']])
                         ucoords.append(np.nan)
                         vcoords.append(np.nan)
@@ -159,10 +159,10 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                         if np.sqrt(uc**2+vc**2)>250:
                             phases_empty = np.empty(oi_vis[i]['VISPHI'].shape)
                             phases_empty[:] = np.nan
-                            visphi.append(phases_empty[start:end])
-                            visphierr.append(phases_empty[start:end])
-                            visamp.append(phases_empty[start:end])
-                            visamperr.append(phases_empty[start:end])
+                            visphi.append(phases_empty)
+                            visphierr.append(phases_empty)
+                            visamp.append(phases_empty)
+                            visamperr.append(phases_empty)
                             vistels.append([beam_map[a] for a in oi_vis[i]['STA_INDEX']])
                             ucoords.append(np.nan)
                             vcoords.append(np.nan)
@@ -176,10 +176,10 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                     viserr[visflag] = np.nan
                     vamp[visflag] = np.nan
                     vamperr[visflag] = np.nan
-                    visphi.append(vis[start:end])
-                    visphierr.append(viserr[start:end])
-                    visamp.append(vamp[start:end])
-                    visamperr.append(vamperr[start:end])
+                    visphi.append(vis)
+                    visphierr.append(viserr)
+                    visamp.append(vamp)
+                    visamperr.append(vamperr)
                     vistels.append([beam_map[a] for a in oi_vis[i]['STA_INDEX']])
                     ucoords.append(oi_vis[i]['UCOORD'])
                     vcoords.append(oi_vis[i]['VCOORD'])
@@ -540,8 +540,8 @@ def read_chara_old(file,interact='n',exclude=''):
     print(file)
     hdu = fits.open(file)
 
-    start = 1
-    end = -1
+    #start = 1
+    #end = -1
     for table in hdu:
 
         #print(table.name)
@@ -553,8 +553,8 @@ def read_chara_old(file,interact='n',exclude=''):
                 if exclude in stations:
                     phases_empty = np.empty(table.data[i]['T3PHI'].shape)
                     phases_empty[:] = np.nan
-                    t3phi.append(phases_empty[start:end])
-                    t3phierr.append(phases_empty[start:end])
+                    t3phi.append(phases_empty)
+                    t3phierr.append(phases_empty)
                     tels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
                     u1coord = np.nan
                     v1coord = np.nan
@@ -570,8 +570,8 @@ def read_chara_old(file,interact='n',exclude=''):
                 t3flag = np.where(table.data[i].field('FLAG')==True)
                 t3[t3flag] = np.nan
                 t3err[t3flag] = np.nan
-                t3phi.append(t3[start:end])
-                t3phierr.append(t3err[start:end])
+                t3phi.append(t3)
+                t3phierr.append(t3err)
                 tels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
                 u1coord = table.data[i]['U1COORD']
                 v1coord = table.data[i]['V1COORD']
@@ -582,7 +582,7 @@ def read_chara_old(file,interact='n',exclude=''):
                 u_coords.append([u1coord,u2coord,u3coord])
                 v_coords.append([v1coord,v2coord,v3coord])
                 time_obs.append(table.data[i]['MJD'])
-                eff_wave.append(hdu['OI_WAVELENGTH',wl_i].data['EFF_WAVE'][start:end])
+                eff_wave.append(hdu['OI_WAVELENGTH',wl_i].data['EFF_WAVE'])
             wl_i+=1
 
         if table.name=='OI_VIS2':
@@ -592,8 +592,8 @@ def read_chara_old(file,interact='n',exclude=''):
                 if exclude in stations:
                     phases_empty = np.empty(table.data[i]['VIS2DATA'].shape)
                     phases_empty[:] = np.nan
-                    vis2.append(phases_empty[start:end])
-                    vis2err.append(phases_empty[start:end])
+                    vis2.append(phases_empty)
+                    vis2err.append(phases_empty)
                     vistels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
                     ucoords.append(np.nan)
                     vcoords.append(np.nan)
@@ -603,8 +603,8 @@ def read_chara_old(file,interact='n',exclude=''):
                 v2flag = np.where(table.data[i].field('FLAG')==True)
                 v2[v2flag] = np.nan
                 v2err[v2flag] = np.nan
-                vis2.append(v2[start:end])
-                vis2err.append(v2err[start:end])
+                vis2.append(v2)
+                vis2err.append(v2err)
                 vistels.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
                 ucoords.append(table.data[i]['UCOORD'])
                 vcoords.append(table.data[i]['VCOORD'])
@@ -616,10 +616,10 @@ def read_chara_old(file,interact='n',exclude=''):
                 if exclude in stations:
                     phases_empty = np.empty(table.data[i]['VISPHI'].shape)
                     phases_empty[:] = np.nan
-                    visphi.append(phases_empty[start:end])
-                    visphierr.append(phases_empty[start:end])
-                    visamp.append(phases_empty[start:end])
-                    visamperr.append(phases_empty[start:end])
+                    visphi.append(phases_empty)
+                    visphierr.append(phases_empty)
+                    visamp.append(phases_empty)
+                    visamperr.append(phases_empty)
                     continue
 
                 vis = table.data[i]['VISPHI']
@@ -631,10 +631,10 @@ def read_chara_old(file,interact='n',exclude=''):
                 viserr[visflag] = np.nan
                 vamp[visflag] = np.nan
                 vamperr[visflag] = np.nan
-                visphi.append(vis[start:end])
-                visphierr.append(viserr[start:end])
-                visamp.append(vamp[start:end])
-                visamperr.append(vamperr[start:end])
+                visphi.append(vis)
+                visphierr.append(viserr)
+                visamp.append(vamp)
+                visamperr.append(vamperr)
 
     hdu.close()
 
