@@ -54,10 +54,11 @@ def add_planet(period,wobble,bigomega,inc,t0,epochs):
 
 if os.getcwd()[7:14] == 'tgardne':
     ## setup paths for user
-    path = '/Users/tgardne/ARMADA_orbits'
-    path_etalon = '/Users/tgardne/etalon_epochs/etalon_fits/etalon_factors_fit.txt'
-    path_wds = '/Users/tgardne/wds_targets'
-    path_orb6 = '/Users/tgardne/catalogs/orb6orbits.sql.txt'
+    path = '/Users/tgardner/ARMADA_orbits'
+    path_etalon = '/Users/tgardner/etalon_epochs/etalon_fits/etalon_factors_fit.txt'
+    path_wds = '/Users/tgardner/wds_targets'
+    path_orb6 = '/Users/tgardner/catalogs/orb6orbits.sql.txt'
+    path_orb6 = '/Users/tgardner/catalogs/orb6orbits.sql.txt'
     
 elif os.getcwd()[7:19] == 'adam.scovera':
     ## Adam's path
@@ -624,8 +625,8 @@ f.close()
 ps = 2
 ## end at third the outer binary period?
 pe = P_start / 3
-P2 = np.logspace(np.log10(ps),np.log10(pe),20)
-a2 = np.logspace(np.log10(0.01),np.log10(10),20)
+P2 = np.logspace(np.log10(ps),np.log10(pe),50)
+a2 = np.logspace(np.log10(0.01),np.log10(1),50)
 
 #z_max = float(input("Enter z(P) max from real data = "))
 print('Grid Searching over period -- adding planets at each step')

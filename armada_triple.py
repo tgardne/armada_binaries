@@ -27,10 +27,10 @@ import random
 
 if os.getcwd()[7:14] == 'tgardne':
     ## setup paths for user
-    path = '/Users/tgardne/ARMADA_orbits'
-    path_etalon = '/Users/tgardne/etalon_epochs/etalon_fits/etalon_factors_fit.txt'
-    path_wds = '/Users/tgardne/wds_targets'
-    path_orb6 = '/Users/tgardne/catalogs/orb6orbits.sql.txt'
+    path = '/Users/tgardner/ARMADA_orbits'
+    path_etalon = '/Users/tgardner/etalon_epochs/etalon_fits/etalon_factors_fit.txt'
+    path_wds = '/Users/tgardner/wds_targets'
+    path_orb6 = '/Users/tgardner/catalogs/orb6orbits.sql.txt'
     
 elif os.getcwd()[7:19] == 'adam.scovera':
     ## Adam's path

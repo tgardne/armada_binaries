@@ -31,10 +31,10 @@ ks=pyasl.MarkleyKESolver()
 
 if os.getcwd()[7:14] == 'tgardne':
     ## setup paths for user
-    path = '/Users/tgardne/ARMADA_orbits'
-    path_etalon = '/Users/tgardne/etalon_epochs/etalon_fits/etalon_factors_fit.txt'
-    path_wds = '/Users/tgardne/wds_targets'
-    path_orb6 = '/Users/tgardne/catalogs/orb6orbits.sql.txt'
+    path = '/Users/tgardner/ARMADA_orbits'
+    path_etalon = '/Users/tgardner/etalon_epochs/etalon_fits/etalon_factors_fit.txt'
+    path_wds = '/Users/tgardner/wds_targets'
+    path_orb6 = '/Users/tgardner/catalogs/orb6orbits.sql.txt'
     
 elif os.getcwd()[7:19] == 'adam.scovera':
     ## Adam's path
@@ -82,7 +82,7 @@ min_per = float(input('minimum period to search (days) = '))
 max_k = int(2*f*time_span / min_per)
 k_range = np.arange(max_k)[:-1] + 1
 P2 = 2*f*time_span / k_range
-P2 = np.logspace(np.log10(1),np.log10(2000),5000)
+#P2 = np.logspace(np.log10(1),np.log10(2000),5000)
 print('Min/Max period (days) = %s / %s ; %s steps'%(min(P2),max(P2),len(k_range)))
 
 print('Grid Searching over period')

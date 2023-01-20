@@ -183,7 +183,7 @@ def binary_model_combined(params, data_x, data_y, t, error_maj, error_min, error
     #mratio = params['mratio']
 
     ## other method:
-    ke = pyasl.KeplerEllipse(a,P,e=e,Omega=bigw,i=inc,w=w-180,tau=T)
+    ke = pyasl.KeplerEllipse(a,P,e=e,Omega=bigw,i=inc,w=w,tau=T)
     pos = ke.xyzPos(t)
     model_x = pos[::,1]
     model_y = pos[::,0]
@@ -209,7 +209,7 @@ def binary_model_combined(params, data_x, data_y, t, error_maj, error_min, error
 
     #Find velocity for model, compare to v1
     v = 2*np.arctan(np.sqrt((1+e)/(1-e))*np.tan(E/2))
-    w_rv = (w)*np.pi/180
+    w_rv = (w+180)*np.pi/180
     model = K*(np.cos(w_rv+v)+e*np.cos(w_rv))+gamma
     
     major_vector_x=np.sin(error_pa)

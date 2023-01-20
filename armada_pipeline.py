@@ -42,10 +42,10 @@ def cart2pol(x,y):
 
 if os.getcwd()[7:14] == 'tgardne':
     ## setup paths for user
-    path = '/Users/tgardne/ARMADA_orbits'
-    path_etalon = '/Users/tgardne/etalon_epochs/etalon_fits/etalon_factors_fit.txt'
-    path_wds = '/Users/tgardne/wds_targets'
-    path_orb6 = '/Users/tgardne/catalogs/orb6orbits.sql.txt'
+    path = '/Users/tgardner/ARMADA_orbits'
+    path_etalon = '/Users/tgardner/etalon_epochs/etalon_fits/etalon_factors_fit.txt'
+    path_wds = '/Users/tgardner/wds_targets'
+    path_orb6 = '/Users/tgardner/catalogs/orb6orbits.sql.txt'
     
 elif os.getcwd()[7:19] == 'adam.scovera':
     ## Adam's path
@@ -619,7 +619,7 @@ rescale = input('Rescale errors based off chi2? (y/n): ')
 while rescale=='y':
 
     ## we don't want to raise armada errors
-    if chi2_armada<0 or chi2_armada>1:
+    if chi2_armada<0: # or chi2_armada>1:
         chi2_armada=1.0
     if chi2_wds<0:
         chi2_wds=1.0
@@ -802,6 +802,22 @@ theta_wds_new = np.array(theta_wds_new)
 f = open("%s/HD_%s_wds.txt"%(directory,target_hd),"w+")
 f.write("# date mjd sep pa err_maj err_min err_pa\r\n")
 for i,j,k,l,m,n in zip(t_wds,p_wds_new,theta_wds_new,error_maj_all[len(xpos):],error_min_all[len(xpos):],error_deg_all[len(xpos):]):
+    f.write("-- %s %s %s %s %s %s\r\n"%(i,j,k,l,m,n))
+f.write('#')
+f.close()
+
+## Save txt file with armada orbit
+p_armada_new=[]
+theta_armada_new = []
+for i,j in zip(xpos_all[:len(xpos)],ypos_all[:len(xpos)]):
+    pnew,tnew = cart2pol(i,j)
+    p_armada_new.append(pnew)
+    theta_armada_new.append(tnew)
+p_armada_new = np.array(p_armada_new)
+theta_armada_new = np.array(theta_armada_new)
+f = open("%s/HD_%s_armada.txt"%(directory,target_hd),"w+")
+f.write("# date mjd sep pa err_maj err_min err_pa\r\n")
+for i,j,k,l,m,n in zip(t,p_armada_new,theta_armada_new,error_maj_all[:len(xpos)],error_min_all[:len(xpos)],error_deg_all[:len(xpos)]):
     f.write("-- %s %s %s %s %s %s\r\n"%(i,j,k,l,m,n))
 f.write('#')
 f.close()

@@ -411,7 +411,6 @@ if dtype=='vlti':
         nloop+=1
 
 chi_sq = []
-redchi_sq = []
 ra_results = []
 dec_results = []
 ratio_results = []
@@ -461,7 +460,6 @@ for ra_try in tqdm(ra_grid):
                 result = minner.minimize()
 
             chi2 = result.chisqr
-            redchi2 = result.redchi
             ra_result = result.params['ra'].value
             dec_result = result.params['dec'].value
             ratio_result = result.params['ratio'].value
@@ -476,7 +474,6 @@ for ra_try in tqdm(ra_grid):
             else:
                 chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars)
             chi2 = np.nansum(chi**2)
-            redchi2 = np.nansum(chi**2) / (len(np.ndarray.flatten(t3phi))-len(params))
             #print(chi2)
             ra_result = ra_try
             dec_result = dec_try
@@ -486,7 +483,6 @@ for ra_try in tqdm(ra_grid):
             bw_result = a6
 
         chi_sq.append(chi2)
-        redchi_sq.append(redchi2)
         ra_results.append(ra_result)
         dec_results.append(dec_result)
         ratio_results.append(ratio_result)
@@ -515,13 +511,11 @@ ra_results = np.array(ra_results)
 dec_results = np.array(dec_results)
 ratio_results = np.array(ratio_results)
 chi_sq = np.array(chi_sq)
-redchi_sq = np.array(redchi_sq)
 
 np.save("/Users/tgardner/ARMADA_epochs/%s/%s_%s_ra.npy"%(target_id,target_id,date),ra_results)
 np.save("/Users/tgardner/ARMADA_epochs/%s/%s_%s_dec.npy"%(target_id,target_id,date),dec_results)
 np.save("/Users/tgardner/ARMADA_epochs/%s/%s_%s_ratio.npy"%(target_id,target_id,date),ratio_results)
 np.save("/Users/tgardner/ARMADA_epochs/%s/%s_%s_chisq.npy"%(target_id,target_id,date),chi_sq)
-np.save("/Users/tgardner/ARMADA_epochs/%s/%s_%s_redchisq.npy"%(target_id,target_id,date),redchi_sq)
 
 index = np.argmin(chi_sq)
 
@@ -975,15 +969,14 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
 if dtype=='vlti':
-    size = 0.5
+    size = 0.05
     steps = 100
 else:
-    size = 1.0
+    size = 0.05
     steps = 500
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
 chi_sq = []
-redchi_sq = []
 ra_results = []
 dec_results = []
 ## draw plot
@@ -995,40 +988,37 @@ if plot_grid=='y':
 for ra_try in tqdm(ra_grid):
     for dec_try in dec_grid:
         ##create a set of Parameters
-        params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
+        #params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
         ##do fit, minimizer uses LM for least square fitting of model to data
-        chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars)
-        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
-        raw_chi2 = np.nansum(chi**2)
+        #chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+        #red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
         
-        #params = Parameters()
-        #params.add('ra',   value= ra_try, vary=False)
-        #params.add('dec', value= dec_try, vary=False)
-        #params.add('ratio', value= ratio_best, min=1.0)
-        #params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=3.0)
-        #params.add('ud2', value= ud2_best, vary=False)
-        #params.add('bw', value=bw_best, min=0.0, max=0.1)
+        params = Parameters()
+        params.add('ra',   value= ra_try, vary=False)
+        params.add('dec', value= dec_try, vary=False)
+        params.add('ratio', value= ratio_best, min=1.0)
+        params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=3.0)
+        params.add('ud2', value= ud2_best, vary=False)
+        params.add('bw', value=bw_best, min=0.0, max=0.1)
 
-        #params.add('v1',value=v1_best,vary=False)
-        #params.add('v2',value=v2_best,vary=False)
-        #params.add('v3',value=v3_best,vary=False)
-        #params.add('v4',value=v4_best,vary=False)
-        #params.add('v5',value=v5_best,vary=False)
-        #params.add('v6',value=v6_best,vary=False)
-        #params.add('f1',value=f1_best,vary=False)
-        #params.add('f2',value=f2_best,vary=False)
-        #params.add('f3',value=f3_best,vary=False)
-        #params.add('f4',value=f4_best,vary=False)
-        #params.add('f5',value=f5_best,vary=False)
-        #params.add('f6',value=f6_best,vary=False)
+        params.add('v1',value=v1_best,vary=False)
+        params.add('v2',value=v2_best,vary=False)
+        params.add('v3',value=v3_best,vary=False)
+        params.add('v4',value=v4_best,vary=False)
+        params.add('v5',value=v5_best,vary=False)
+        params.add('v6',value=v6_best,vary=False)
+        params.add('f1',value=f1_best,vary=False)
+        params.add('f2',value=f2_best,vary=False)
+        params.add('f3',value=f3_best,vary=False)
+        params.add('f4',value=f4_best,vary=False)
+        params.add('f5',value=f5_best,vary=False)
+        params.add('f6',value=f6_best,vary=False)
 
-        #minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
-        #result = minner.minimize()
-        #raw_chi2 = result.chisqr
-        #red_chi2 = result.redchi
+        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars),nan_policy='omit')
+        result = minner.minimize()
+        raw_chi2 = result.chisqr
         
         chi_sq.append(raw_chi2)
-        redchi_sq.append(red_chi2)
         ra_results.append(ra_try)
         dec_results.append(dec_try)
 
@@ -1049,10 +1039,8 @@ if plot_grid=='y':
 ra_results = np.array(ra_results)
 dec_results = np.array(dec_results)
 chi_sq = np.array(chi_sq)
-redchi_sq = np.array(redchi_sq)
 ## plot chisq surface grid
-#plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
-plt.scatter(ra_results, dec_results, c=redchi_sq, cmap=cm.inferno_r)
+plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
 plt.colorbar()
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
@@ -1064,13 +1052,10 @@ plt.close()
 #params = [ra_best,dec_best,ratio_best,ud1_best,ud2_best,bw_best]
 #chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
 #chi2_best = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
-#chi2_best = chi_sq_best
-chi2_best = redchi_sq_best
+chi2_best = chi_sq_best
 
-#index_err = np.where(chi_sq < (chi2_best+2.296) )
-index_err = np.where(redchi_sq < (chi2_best+1) )
-#chi_err = chi_sq[index_err]
-chi_err = redchi_sq[index_err]
+index_err = np.where(chi_sq < (chi2_best+2.296) )
+chi_err = chi_sq[index_err]
 ra_err = ra_results[index_err]
 dec_err = dec_results[index_err]
 ## save arrays
