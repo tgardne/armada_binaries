@@ -335,6 +335,21 @@ t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,
 print('number measurements = %s'%str(int(t3phi.shape[0]/20)))
 ########################################################
 
+edge_purge = input("Purge edge channels (y / [n]): ")
+if edge_purge == 'y':
+    print("PURGING EDGE CHANNELS")
+    t3phi = t3phi[:,1:-1]
+    t3phierr = t3phierr[:,1:-1]
+    vis2 = vis2[:,1:-1]
+    vis2err = vis2err[:,1:-1]
+    visphi = visphi[:,1:-1]
+    visphierr = visphierr[:,1:-1]
+    visamp = visamp[:,1:-1]
+    visamperr = visamperr[:,1:-1]
+    eff_wave = eff_wave[:,1:-1]
+    print("New T3phi shape = ", t3phi.shape)
+    print("New Vis2 shape = ", visphi.shape)
+
 ### Split spectrum in half
 #side = input('red or blue? ')
 #if side=='blue':

@@ -293,6 +293,21 @@ if dtype=='chara_old':
 print("T3phi shape = ", t3phi.shape)
 print("Vis2 shape = ", visphi.shape)
 
+edge_purge = input("Purge edge channels (y / [n]): ")
+if edge_purge == 'y':
+    print("PURGING EDGE CHANNELS")
+    t3phi = t3phi[:,1:-1]
+    t3phierr = t3phierr[:,1:-1]
+    vis2 = vis2[:,1:-1]
+    vis2err = vis2err[:,1:-1]
+    visphi = visphi[:,1:-1]
+    visphierr = visphierr[:,1:-1]
+    visamp = visamp[:,1:-1]
+    visamperr = visamperr[:,1:-1]
+    eff_wave = eff_wave[:,1:-1]
+    print("New T3phi shape = ", t3phi.shape)
+    print("New Vis2 shape = ", visphi.shape)
+
 ### Split spectrum in half
 ##side = input('red or blue? ')
 #side = ''
@@ -975,11 +990,11 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
 if dtype=='vlti':
-    size = 0.5
+    size = 1.0
     steps = 100
 else:
-    size = 1.0
-    steps = 500
+    size = 0.5
+    steps = 250
 ra_grid = np.linspace(ra_best-size,ra_best+size,steps)
 dec_grid = np.linspace(dec_best-size,dec_best+size,steps)
 chi_sq = []
