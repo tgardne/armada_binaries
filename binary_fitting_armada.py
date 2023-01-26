@@ -589,6 +589,7 @@ report_fit(result)
 
 redchi_sq_best = result.redchi
 chi_sq_best = result.chisqr
+nfree = result.nfree
 ra_best = result.params['ra'].value
 dec_best = result.params['dec'].value
 ratio_best = result.params['ratio'].value
@@ -1013,7 +1014,7 @@ for ra_try in tqdm(ra_grid):
         params = [ra_try,dec_try,ratio_best,ud1_best,ud2_best,bw_best]
         ##do fit, minimizer uses LM for least square fitting of model to data
         chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars)
-        red_chi2 = np.nansum(chi**2)/(len(np.ndarray.flatten(t3phi))-len(params))
+        red_chi2 = np.nansum(chi**2) / nfree #(len(np.ndarray.flatten(t3phi))-len(params))
         raw_chi2 = np.nansum(chi**2)
         
         #params = Parameters()

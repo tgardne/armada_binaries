@@ -21,6 +21,9 @@ from orbit_plotting import orbit_model,triple_orbit_model
 from astroquery.simbad import Simbad
 from astropy.coordinates import SkyCoord
 import random
+import emcee
+import corner
+from PyAstronomy import pyasl
 
 def cart2pol(x,y):
     x=-x
@@ -773,6 +776,129 @@ plt.ylabel('residual (mas)')
 plt.title('Residuals vs Time')
 plt.savefig('%s/HD%s_%s_resid_time.pdf'%(directory,target_hd,date))
 plt.close()
+
+## Option to run MCMC routine for errors
+mcmc_option = input("Run MCMC on outer orbit? (y / [n]): ")
+if mcmc_option == 'y':
+    ## Run mcmc
+    emcee_params = result.params.copy()
+    nwalkers = 2*len(emcee_params)
+    steps = 50000
+    burn = 10000
+    thin = 100
+
+    if len(vlti_idx)>0:
+        minner = Minimizer(astrometry_model_vlti, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
+                                                        error_maj_all[vlti_mask_all],error_min_all[vlti_mask_all],error_pa_all[vlti_mask_all],
+                                                        xpos_all[vlti_idx],ypos_all[vlti_idx],t_all[vlti_idx],
+                                                        error_maj_all[vlti_idx],error_min_all[vlti_idx],error_pa_all[vlti_idx]),
+                                nan_policy='omit')
+        result = minner.minimize(method='emcee',steps=steps,burn=burn,thin=thin,nwalkers=nwalkers)
+    else:
+        minner = Minimizer(astrometry_model, params, fcn_args=(xpos_all,ypos_all,t_all,
+                                                        error_maj_all,error_min_all,error_pa_all),
+                                nan_policy='omit')
+        result = minner.minimize(method='emcee',steps=steps,burn=burn,thin=thin,nwalkers=nwalkers)
+    print(report_fit(result))
+    chains = result.flatchain
+    ## save chains
+    print(chains.shape)
+    np.save("%s/HD%s_%s_chains.npy"%(directory,target_hd,date),chains)
+    ## load chains
+    chains = np.load("%s/HD%s_%s_chains.npy"%(directory,target_hd,date))
+
+    try:
+        emcee_plot = corner.corner(chains,labels=result.var_names)
+                            #truths=list(result.params.valuesdict().values()))
+        plt.savefig('%s/HD%s_%s_corner.pdf'%(directory,target_hd,date))
+    except:
+        print(result.var_names)
+        emcee_plot = corner.corner(chains)
+        plt.savefig('%s/HD%s_%s_corner.pdf'%(directory,target_hd,date))
+
+    w_chain = chains[:,0]
+    bigw_chain = chains[:,1]
+    inc_chain = chains[:,2]
+    e_chain = chains[:,3]
+    a_chain = chains[:,4]
+    P_chain = chains[:,5]
+    T_chain = chains[:,6]
+    
+    w_mcmc = np.std(chains[:,0])
+    bigw_mcmc = np.std(chains[:,1])
+    inc_mcmc = np.std(chains[:,2])
+    e_mcmc = np.std(chains[:,3])
+    a_mcmc = np.std(chains[:,4])
+    P_mcmc = np.std(chains[:,5])
+    T_mcmc = np.std(chains[:,6])
+
+    ## select random orbits from chains
+    idx = np.random.randint(0,len(chains),size=100)
+    fig,ax=plt.subplots()
+
+    for orbit in idx:
+        tmod = np.linspace(min(t_all),min(t_all)+2*P_start.value,1000)
+        ra,dec,rapoints,decpoints = orbit_model(a_chain[orbit],e_chain[orbit],inc_chain[orbit],
+                                                    w_chain[orbit],bigw_chain[orbit],P_chain[orbit],
+                                                    T_chain[orbit],t_all,tmod)
+        ax.plot(ra, dec, '--',color='lightgrey')
+
+    tmod = np.linspace(min(t_all),min(t_all)+P_start.value,1000)
+    ra,dec,rapoints,decpoints = orbit_model(a_start.value,e_start.value,inc_start.value,
+                                            w_start.value,bigw_start.value,P_start.value,
+                                            T_start.value,t_all,tmod)
+
+    ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS',color='grey')
+    if len(vlti_idx)>0:
+        ax.plot(xpos[vlti_idx],ypos[vlti_idx],'*', label='ARMADA-VLTI',color='red')
+        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'+', label='ARMADA-CHARA',color='blue')
+    else:
+        ax.plot(xpos,ypos,'+', label='ARMADA',color='red')
+    ax.plot(0,0,'*',color='g')
+    ax.plot(ra, dec, '--',color='g')
+
+    #plot lines from data to best fit orbit
+    i=0
+    while i<len(decpoints):
+        x=[xpos_all[i],rapoints[i]]
+        y=[ypos_all[i],decpoints[i]]
+        ax.plot(x,y,color="black")
+        i+=1
+
+    ax.set_xlabel('dRA (mas)')
+    ax.set_ylabel('dDEC (mas)')
+    ax.invert_xaxis()
+    ax.axis('equal')
+    ax.set_title('HD%s Outer Orbit'%target_hd)
+    ax.legend()
+    plt.savefig('%s/HD%s_%s_outer_mcmc.pdf'%(directory,target_hd,date))
+    plt.show()
+    plt.close()
+
+    ## Save txt file with best orbit
+    f = open("%s/%s_%s_orbit_mcmc.txt"%(directory,target_hd,date),"w+")
+    f.write("# P(d) a(mas) e i(deg) w(deg) W(deg) T(mjd) mean_resid(mu-as)\r\n")
+    f.write("# Perr(d) aerr(mas) eerr ierr(deg) werr(deg) Werr(deg) Terr(mjd)\r\n")
+    f.write("%s %s %s %s %s %s %s %s\r\n"%(P_start.value,a_start.value,e_start.value,
+                                       inc_start.value,w_start.value,
+                                       bigw_start.value,T_start.value,
+                                      resids_median))
+    try:
+        f.write("%s %s %s %s %s %s %s"%(P_mcmc,a_mcmc,e_mcmc,
+                                           inc_mcmc,w_mcmc,
+                                           bigw_mcmc,T_mcmc))
+    except:
+        f.write("Errors not estimated")
+    f.close()
+
+    ## Save txt file for paper
+    f = open("%s/%s_%s_orbit_paper.txt"%(directory,target_hd,date),"w+")
+    f.write("# P(d) T(mjd) e w(deg) W(deg) i(deg) a(mas) med_resid(mu-as)\r\n")
+    f.write("$%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s\pm%s$ & $%s$\r\n"%(P_start.value,
+                                    P_mcmc,T_start.value,T_mcmc,e_start.value,e_mcmc,w_start.value,
+                                    w_mcmc,bigw_start.value,bigw_mcmc,inc_start.value,inc_mcmc,
+                                    a_start.value,a_mcmc,resids_median))
+    f.close()
 
 ## Save txt file with best orbit
 f = open("%s/%s_%s_orbit_ls.txt"%(directory,target_hd,date),"w+")

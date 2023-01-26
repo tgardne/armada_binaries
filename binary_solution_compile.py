@@ -13,14 +13,14 @@ quad = input('quad? (y/n)')
 subtract = input('subtract err pa from 360deg? (y/[n])')
 
 if triple=='y':
-    f = open("/Users/tgardne/ARMADA_orbits/%s_triple.txt"%target_id,"w+")
+    f = open("/Users/tgardner/ARMADA_orbits/%s_triple.txt"%target_id,"w+")
     f.write("# date mjd sep12 pa12 err_maj12 err_min12 err_pa12 sep13 pa13 err_maj13 err_min13 err_pa13\r\n")
 else:
     if quad=='y':
-        f = open("/Users/tgardne/ARMADA_orbits/%s_quad.txt"%target_id,"w+")
+        f = open("/Users/tgardner/ARMADA_orbits/%s_quad.txt"%target_id,"w+")
         f.write("# date mjd sep12 pa12 err_maj12 err_min12 err_pa12 sep13 pa13 err_maj13 err_min13 err_pa13 sep14 pa14 err_maj14 err_min14 err_pa14\r\n")
     else:
-        f = open("/Users/tgardne/ARMADA_orbits/%s_chi2err.txt"%target_id,"w+")
+        f = open("/Users/tgardner/ARMADA_orbits/%s_chi2err.txt"%target_id,"w+")
         f.write("# date mjd sep pa err_maj err_min err_pa\r\n")
 
 for file in os.listdir(dir):
@@ -99,13 +99,13 @@ for file in os.listdir(dir):
                         err_pa12 = 360 - float(line.split()[6])
                     else:
                         err_pa12 = line.split()[6]
-                    f.write("%s %s %s %s %s %s %s\r\n"%(date,mjd,sep,pa,err_maj,err_min,err_pa))
+                    f.write("%s %s %s %s %s %s %s\r\n"%(date,mjd,sep,pa,err_maj,err_min,err_pa12))
 f.close()
 
 if triple == 'y' or quad == 'y':
     print('done......')
 else:
-    f = open("/Users/tgardne/ARMADA_orbits/%s_bootstrap.txt"%target_id,"w+")
+    f = open("/Users/tgardner/ARMADA_orbits/%s_bootstrap.txt"%target_id,"w+")
     f.write("# date mjd sep pa err_maj err_min err_pa\r\n")
 
     for file in os.listdir(dir):
