@@ -62,8 +62,10 @@ elif os.getcwd()[7:19] == 'adam.scovera':
 ###########################################
 target_hd = input('Target HD #: ')
 date = input('Date for savefile: ')
-distance = float(input('Distance (pc): '))
-mass_star = float(input('Mass Star (Msun): '))
+distance = 100
+mass_star = 2
+#distance = float(input('Distance (pc): '))
+#mass_star = float(input('Mass Star (Msun): '))
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
@@ -815,6 +817,7 @@ if mcmc_option == 'y':
         print(result.var_names)
         emcee_plot = corner.corner(chains)
         plt.savefig('%s/HD%s_%s_corner.pdf'%(directory,target_hd,date))
+    plt.close()
 
     w_chain = chains[:,0]
     bigw_chain = chains[:,1]
@@ -872,7 +875,6 @@ if mcmc_option == 'y':
     ax.set_title('HD%s Outer Orbit'%target_hd)
     ax.legend()
     plt.savefig('%s/HD%s_%s_outer_mcmc.pdf'%(directory,target_hd,date))
-    plt.show()
     plt.close()
 
     ## Save txt file with best orbit
