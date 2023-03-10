@@ -34,6 +34,23 @@ if dtype=='chara_old':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoord,vcoord,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
 print(t3phi.shape,u_coords.shape,ucoord.shape,eff_wave.shape,tels.shape,time_obs.shape)
 print(eff_wave.shape)
+
+if dtype=='vlti':
+    reduce_size = input("Reduce R of high resolution data (y/[n]): ")
+    if reduce_size == 'y':
+        t3phi = t3phi[:,::100]
+        t3phierr = t3phierr[:,::100]
+        vis2 = vis2[:,::100]
+        vis2err = vis2err[:,::100]
+        visphi = visphi[:,::100]
+        visphierr = visphierr[:,::100]
+        visamp = visamp[:,::100]
+        visamperr = visamperr[:,::100]
+        eff_wave = eff_wave[:,::100]
+
+        print(t3phi.shape,u_coords.shape,ucoord.shape,eff_wave.shape,tels.shape,time_obs.shape)
+        print(eff_wave.shape)
+
 unique_tels = np.unique(tels,axis=0)
 unique_vistels = np.unique(vistels,axis=0)
 ## plot t3phi data
