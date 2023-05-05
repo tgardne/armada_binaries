@@ -57,24 +57,6 @@ Target_List = ['6456']#'1976', '2772','5143', '6456','10453', '11031', '16753', 
 
 Target_List_Fail = []
 
-# For Combined 3x3 plots
-all_mass1_result = []
-all_chi2_grid = []
-all_mass2_result = []
-all_chi2_grid2 = []
-all_ages = []
-all_chi2_grid3 = []
-all_xwave = []
-all_TOTmag_model = []
-all_data_wave = []
-all_split_mag1 = []
-all_split_mag2 = []
-all_model1 = []
-all_model2 = []
-all_yplot = []
-all_yplot1 = []
-all_Dmag_model = []
-
 
 ## Fuction to fit a single star model
 def single_star_fit(params,split_mag_star,d_mod,Av):
@@ -221,6 +203,26 @@ for target_hd in Target_List:
     print('--' * 10)
     print('--' * 10)
     print("Doing Target HD %s" % target_hd)
+    # For Combined 3x3 plots
+    all_mass1_result = []
+    all_chi2_grid = []
+    all_mass2_result = []
+    all_chi2_grid2 = []
+    all_ages = []
+    all_chi2_grid3 = []
+    all_xwave = []
+    all_TOTmag_model = []
+    all_data_wave = []
+    all_split_mag1 = []
+    all_split_mag2 = []
+    all_model1 = []
+    all_model2 = []
+    all_yplot = []
+    all_yplot1 = []
+    all_Dmag_model = []
+    all_modelx_best = []
+    all_modely_best = []
+    all_age_best = []
 
     for feh in feh_set:
         #try:
@@ -411,7 +413,7 @@ for target_hd in Target_List:
                     # print("Fails at log age = %s"%aa)
                     pass
 
-            idx_mass2 = np.argmin(chi2_grid)
+            idx_mass2 = np.argmin(chi2_grid2)
             all_mass2_result.append(mass2_result)
             all_chi2_grid2.append(chi2_grid2)
             mass2_guess = mass2_result[idx_mass2]
@@ -434,7 +436,7 @@ for target_hd in Target_List:
             print('Grid Searching over AGE to find best fit')
             #pdb.set_trace()
             ## Explore a grid of chi2 over age -- this paramter does not fit properly in least squares
-            chi2_grid = []
+            chi2_grid3 = []
             ages = []
             age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
 
@@ -448,18 +450,21 @@ for target_hd in Target_List:
                     minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
                                     nan_policy='omit')
                     result = minner.minimize()
-                    chi2_grid.append(result.redchi)
+                    chi2_grid3.append(result.redchi)
                     ages.append(aa)
                 except:
                     # print("Fails at log age = %s"%aa)
                     pass
 
-            idx2 = np.argmin(chi2_grid)
+            idx2 = np.argmin(chi2_grid3)
+
+            all_chi2_grid3.append(chi2_grid3)
+            all_ages.append(ages)
             age_best = ages[idx2]
             age_max = ages[-1]
 
-            ax3.scatter(ages, chi2_grid, alpha=0.6, marker="+", color="blue")
-            ax3.plot(ages, chi2_grid, alpha=0.6, ls="--", color="black")
+            ax3.scatter(ages, chi2_grid3, alpha=0.6, marker="+", color="blue")
+            ax3.plot(ages, chi2_grid3, alpha=0.6, ls="--", color="black")
             ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
             ax3.legend()
             ax3.set_yscale("log")
@@ -585,6 +590,10 @@ for target_hd in Target_List:
             #fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
             #fig.tight_layout()
             yplot = TOT_Mag
+            all_yplot.append(yplot)
+            all_xwave.append(x_wave)
+            all_TOTmag_model.append(TOTmag_model)
+            #pdb.set_trace()
             ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
             ax4.errorbar(x_wave, unumpy.nominal_values(yplot), unumpy.std_devs(yplot), fmt='o', color='black')
             ax4.plot(x_wave, TOTmag_model, '--', color='red')
@@ -594,9 +603,14 @@ for target_hd in Target_List:
 
             # ax1.gca().invert_yaxis()
             # plt.savefig("%s/HD_%s_%s_TOTmag_fit.pdf"%(directory,target_hd,note))
-            yplot = DiffM
+
+            yplot1 = DiffM
+            all_data_wave.append(data_wave)
+            all_yplot1.append(yplot1)
+            all_Dmag_model.append(Dmag_model)
+
             ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
-            ax5.errorbar(data_wave, unumpy.nominal_values(yplot), unumpy.std_devs(yplot), fmt='o', color='black')
+            ax5.errorbar(data_wave, unumpy.nominal_values(yplot1), unumpy.std_devs(yplot1), fmt='o', color='black')
             ax5.plot(x_wave, Dmag_model, '--', color='red')
             # ax2.set_xlabel('Wavelength (nm)')
             ax5.invert_yaxis()
@@ -604,6 +618,12 @@ for target_hd in Target_List:
             # plt.gca().invert_yaxis()
             # plt.savefig("%s/HD_%s_%s_Dmag_fit.pdf"%(directory,target_hd,note))
             # plt.show()
+
+            all_split_mag1.append(split_mag1)
+            all_split_mag2.append(split_mag2)
+            all_model1.append(model1)
+            all_model2.append(model2)
+
             ax6.set_title("Split SED Model Fit, HD %s" % target_hd)
             ax6.errorbar(data_wave, unumpy.nominal_values(split_mag1), unumpy.std_devs(split_mag1), fmt='o', color='black')
             ax6.errorbar(data_wave, unumpy.nominal_values(split_mag2), unumpy.std_devs(split_mag2), fmt='o', color='black')
@@ -692,6 +712,10 @@ for target_hd in Target_List:
                 modely_best = V_best[ii][iso_start:iso_end]
                 ax1.plot(modelx_best, modely_best, label=f"Best log age = {np.around(age_best,2)} ", color = 'black')
 
+            all_modelx_best.append(modelx_best)
+            all_modely_best.append(modely_best)
+            all_age_best.append(age_best)
+
             ax1.set_xlabel(xlabel, fontsize=15)
             ax1.set_ylabel(ylabel, fontsize=15)
             ax1.invert_yaxis()
@@ -720,20 +744,73 @@ for target_hd in Target_List:
             df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=True)
 
             print('Going to New Target')
-    ax2.scatter(all_mass1_result, all_chi2_grid, alpha=0.6, marker="+", color="blue", label='Mass 1')
-    ax2.plot(all_mass1_result, all_chi2_grid, alpha=0.6, ls="--", color="black")
-    ax2.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
-    ax2.set_yscale("log")
-    ax2.set_xlabel('Mass (solar)', fontsize=15)
-    ax2.set_ylabel(r'$\chi^2$', fontsize=15)
-    ax2.scatter(all_mass2_result, all_chi2_grid2, alpha=0.6, marker="+", color="Red", label='Mass 2')
-    ax2.plot(all_mass2_result, all_chi2_grid2, alpha=0.6, ls="--", color="black")
-    # ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
-    ax2.legend()
-    ax2.set_yscale("log")
-    ax2.set_xlabel('Mass (solar)', fontsize=15)
-    ax2.set_ylabel(r'$\chi^2$', fontsize=15)
-    ax2.set_title('Mass 1 & 2 Guess')
+
+
+    for i in range(len(all_mass1_result)):
+        ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue", label='Mass 1')
+        ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="black")
+        ax2.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
+        ax2.set_yscale("log")
+        ax2.set_xlabel('Mass (solar)', fontsize=15)
+        ax2.set_ylabel(r'$\chi^2$', fontsize=15)
+        ax2.scatter(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, marker="+", color="Red", label='Mass 2')
+        ax2.plot(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, ls="--", color="black")
+        # ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
+        #ax2.legend()
+        ax2.set_yscale("log")
+        ax2.set_xlabel('Mass (solar)', fontsize=15)
+        ax2.set_ylabel(r'$\chi^2$', fontsize=15)
+        ax2.set_title('Mass 1 & 2 Guess')
+        #pdb.set_trace()
+
+    for i in range(len(all_ages)):
+        ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="blue")
+        ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="black")
+        ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
+        ax3.legend()
+        ax3.set_yscale("log")
+        ax3.set_xlabel('Age', fontsize=15)
+        ax3.set_ylabel(r'$\chi^2$', fontsize=15)
+    #pdb.set_trace()
+
+
+    for i in range(len(all_yplot)):
+        ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
+        #ax4.errorbar(all_xwave, unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black')
+        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='red')
+        # ax1.set_xlabel('Wavelength (nm)')
+        ax4.set_ylabel('Total Mag')
+        #ax4.invert_yaxis()
+
+    for i in range(len(all_data_wave)):
+        ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
+        ax5.errorbar(all_data_wave[i], unumpy.nominal_values(all_yplot1[i]), unumpy.std_devs(all_yplot1[i]), fmt='o', color='black')
+        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='red')
+        # ax2.set_xlabel('Wavelength (nm)')
+        #ax5.invert_yaxis()
+        ax5.set_ylabel('Diff Mag')
+
+    for i in range(len(all_data_wave)):
+        ax6.set_title("Split SED Model Fit, HD %s" % target_hd)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='black')
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='black')
+        ax6.plot(all_xwave[i], all_model1[i], '--', color='red')
+        ax6.plot(all_xwave[i], all_model2[i], '--', color='red')
+        #ax6.invert_yaxis()
+        ax6.set_xlabel('Wavelength (nm)')
+        ax6.set_ylabel('Apparent Mag')
+
+    for i in range(len(all_modelx_best)):
+            ax1.plot(all_modelx_best[i], all_modely_best[i], label=f"Best log age = {np.around(all_age_best[i], 2)} ", color='black')
+            #ax1.invert_yaxis()
+            ax1.set_title("HD %s" % target_hd, fontsize=15)
+            ax1.legend()
+
+
+
+
+
+
     fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory2, target_hd, note))
     #except:
             #Target_List_Fail.append(target_hd)
