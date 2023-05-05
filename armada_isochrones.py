@@ -21,17 +21,17 @@ Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
+#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
+#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
+#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
+#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
 
-#summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved files
-#save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-#armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
-#photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-#csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
+summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved files
+save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
+photometry_file = '/home/colton/armada_binaries/Photometry.csv'
+csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
 
 Header =["HD", "M_Dyn", "M_Dyn_err",
                         "M_Tot", "M_Tot_err", "M1",
@@ -56,6 +56,24 @@ Target_List = ['6456']#'1976', '2772','5143', '6456','10453', '11031', '16753', 
     #, '217676', '217782', '220278', '224512']
 
 Target_List_Fail = []
+
+# For Combined 3x3 plots
+all_mass1_result = []
+all_chi2_grid = []
+all_mass2_result = []
+all_chi2_grid2 = []
+all_ages = []
+all_chi2_grid3 = []
+all_xwave = []
+all_TOTmag_model = []
+all_data_wave = []
+all_split_mag1 = []
+all_split_mag2 = []
+all_model1 = []
+all_model2 = []
+all_yplot = []
+all_yplot1 = []
+all_Dmag_model = []
 
 
 ## Fuction to fit a single star model
@@ -199,19 +217,17 @@ def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
 
 feh_set = [-0.1,0,0.1]
 
-for feh in feh_set:
+for target_hd in Target_List:
+    print('--' * 10)
+    print('--' * 10)
+    print("Doing Target HD %s" % target_hd)
 
-    print('--'*10)
-    print('--'*10)
-    print("Doing Metallicity [Fe/H] = %s"%feh)
-
-    for target_hd in Target_List:
-
+    for feh in feh_set:
         #try:
+        print('--' * 10)
+        print('--' * 10)
+        print("Doing Metallicity [Fe/H] = %s" % feh)
 
-        print('--'*10)
-        print('--'*10)
-        print("Doing Target HD %s"%target_hd)
 
         ## Create directory for saved files, if it doesn't already exist
         directory = "%s/HD_%s/" % (save_directory, target_hd)
@@ -290,7 +306,9 @@ for feh in feh_set:
 
 
         distance_set =[distance_low,distance_best,distance_high]
-        distance_set = [distance_best]
+
+        ## We only want to use this one below if we only want to look at one best distance!
+        #distance_set = [distance_best]
         #distance_set = [distance_hip]
 
         #pdb.set_trace()
@@ -338,6 +356,7 @@ for feh in feh_set:
             mass1_grid = np.linspace(0.5,5,50)
             mass2_grid = np.linspace(0.5,5,50)
 
+
             ## Explore a grid of chi2 over M1 at fixed age
             chi2_grid = []
             mass1_result = []
@@ -358,6 +377,9 @@ for feh in feh_set:
 
             idx_mass1 = np.argmin(chi2_grid)
             mass1_guess = mass1_result[idx_mass1]
+            all_mass1_result.append(mass1_result)
+            all_chi2_grid.append(chi2_grid)
+
             print("Mass 1 Guess = %s" % mass1_guess)
 
             ax2.scatter(mass1_result, chi2_grid, alpha=0.6, marker="+", color="blue", label = 'Mass 1')
@@ -372,7 +394,7 @@ for feh in feh_set:
             #plt.close()
 
             ## Explore a grid of chi2 over M1 at fixed age
-            chi2_grid = []
+            chi2_grid2 = []
             mass2_result = []
             for mm in mass2_grid:
                 try:
@@ -383,13 +405,15 @@ for feh in feh_set:
                     minner = Minimizer(single_star_fit, params, fcn_args=(split_mag2, d_modulus.nominal_value, Av),
                                     nan_policy='omit')
                     result = minner.minimize()
-                    chi2_grid.append(result.redchi)
+                    chi2_grid2.append(result.redchi)
                     mass2_result.append(mm)
                 except:
                     # print("Fails at log age = %s"%aa)
                     pass
 
             idx_mass2 = np.argmin(chi2_grid)
+            all_mass2_result.append(mass2_result)
+            all_chi2_grid2.append(chi2_grid2)
             mass2_guess = mass2_result[idx_mass2]
             print("Mass 2 Guess = %s" % mass2_guess)
 
@@ -412,7 +436,7 @@ for feh in feh_set:
             ## Explore a grid of chi2 over age -- this paramter does not fit properly in least squares
             chi2_grid = []
             ages = []
-            age_grid = np.linspace(6, 10, 1000)  ## do fewer steps to go faster
+            age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
 
             for aa in tqdm(age_grid):
                 try:
@@ -474,8 +498,8 @@ for feh in feh_set:
             ## Setup MCMC fit
             emcee_params = result.params.copy()
             nwalkers = 2 * len(emcee_params)
-            steps = 3000
-            burn = 1000
+            steps = 300
+            burn = 100
             thin = 1
 
             print("Running MCMC chains: ")
@@ -676,7 +700,6 @@ for feh in feh_set:
 
 
             fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory, target_hd, note))
-            fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory2, target_hd, note))
 
 
             #Finding Dynamical Mass
@@ -697,8 +720,22 @@ for feh in feh_set:
             df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=True)
 
             print('Going to New Target')
-        
-        #except:
+    ax2.scatter(all_mass1_result, all_chi2_grid, alpha=0.6, marker="+", color="blue", label='Mass 1')
+    ax2.plot(all_mass1_result, all_chi2_grid, alpha=0.6, ls="--", color="black")
+    ax2.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
+    ax2.set_yscale("log")
+    ax2.set_xlabel('Mass (solar)', fontsize=15)
+    ax2.set_ylabel(r'$\chi^2$', fontsize=15)
+    ax2.scatter(all_mass2_result, all_chi2_grid2, alpha=0.6, marker="+", color="Red", label='Mass 2')
+    ax2.plot(all_mass2_result, all_chi2_grid2, alpha=0.6, ls="--", color="black")
+    # ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
+    ax2.legend()
+    ax2.set_yscale("log")
+    ax2.set_xlabel('Mass (solar)', fontsize=15)
+    ax2.set_ylabel(r'$\chi^2$', fontsize=15)
+    ax2.set_title('Mass 1 & 2 Guess')
+    fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory2, target_hd, note))
+    #except:
             #Target_List_Fail.append(target_hd)
             #print('--'*10)
             #print('--'*10)
@@ -707,5 +744,5 @@ for feh in feh_set:
 print("Failed Targets = ")
 print(Target_List_Fail)
 
-df = pd.read_csv(csv, header= None)
-df.to_csv('file.csv', header = Header)
+#df = pd.read_csv(csv, header= None)
+#df.to_csv('file.csv', header = Header)
