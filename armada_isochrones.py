@@ -52,14 +52,14 @@ df_photometry = pd.read_csv(photometry_file, dtype=object)
 note = input("Choose note for saved files in this run: ") 
 
 Target_List = ['6456','1976', '2772','5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
-
     , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
                '75974', '78316', '82446', '87652', '87822', '107259', '112846'
     , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
-               '145589', '148283', '153370', '154569', '156190', '158140'
+              '145589', '148283', '153370', '154569', '156190', '158140'
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
+
 
 Target_List_Fail = []
 
@@ -201,8 +201,6 @@ def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
     return np.concatenate([diff1, diff2])
 
 
-
-
 feh_set = [-0.1,0,0.1]
 
 for target_hd in Target_List:
@@ -229,6 +227,13 @@ for target_hd in Target_List:
     all_modelx_best = []
     all_modely_best = []
     all_age_best = []
+    all_m_dyn = []
+    all_m_phot = []
+    all_xval1 = []
+    all_xval2 = []
+    all_yval1 = []
+    all_yval2 = []
+
 
     for feh in feh_set:
         #try:
@@ -690,14 +695,52 @@ for target_hd in Target_List:
             for iso in isoList_best:
                 K_best.append(iso['K_mag'])
 
-            ## Choose x/y axis. For example, V-H vs V
-            xval1 = v1-h1 ## component 1
+                ## Choose x/y axis for isochrone plot. For example, V-H vs V. Tyler can you see why this isnt working
+            if h1.nominal_value == np.nan:
+                xval1 = v1 - k1  ## component 1
+                yval1 = v1 - d_modulus
+                xval2 = v2 - k2  ## component 2
+                yval2 = v2 - d_modulus
+
+                xlabel = "V - K"
+                ylabel = "V"
+            elif k1.nominal_value == np.nan:
+                xval1 = v1 - h1  ## component 1
+                yval1 = v1 - d_modulus
+                xval2 = v2 - h2  ## component 2
+                yval2 = v2 - d_modulus
+
+                xlabel = "V - H"
+                ylabel = "V"
+            elif k1.nominal_value != np.nan and h1.nominal_value != np.nan:
+                xval1_k = v1 - k1  ## component 1
+                yval1_k = v1 - d_modulus
+                xval2_k = v2 - k2  ## component 2
+                yval2_k = v2 - d_modulus
+
+                xlabel_k = "V - K"
+                ylabel_k = "V"
+
+                xval1_h = v1 - h1  ## component 1
+                yval1_h = v1 - d_modulus
+                xval2_h = v2 - h2  ## component 2
+                yval2_h = v2 - d_modulus
+
+                xlabel_h = "V - H"
+                ylabel_h = "V"
+
+            xval1 = v1 - h1  ## component 1
             yval1 = v1 - d_modulus
-            xval2 = v2-h2 ## component 2
+            xval2 = v2 - h2  ## component 2
             yval2 = v2 - d_modulus
 
             xlabel = "V - H"
             ylabel = "V"
+
+            all_xval1.append(xval1)
+            all_xval2.append(xval2)
+            all_yval1.append(yval1)
+            all_yval2.append(yval2)
 
             iso_start = 100
             iso_end = 500
@@ -742,28 +785,40 @@ for target_hd in Target_List:
 
             #Save all of the desired Data (M_phot, M_dyn, Age, Feh, Av)
             m_tot= mass1+mass2
+            all_m_phot.append(m_tot)
+            all_m_dyn.append(mdyn)
             df_new = pd.DataFrame(dict(HD=[target_hd], M_Dyn=[mdyn.nominal_value], M_Dyn_err=[mdyn.std_dev],
                                   M_Tot=[m_tot.nominal_value], M_Tot_err=[m_tot.std_dev],M1=[mass1.nominal_value],
                                  M1_err=[mass1.std_dev],M2=[mass2.nominal_value],M2_err=[mass2.std_dev],
                                 log_age=[age.nominal_value], log_age_err=[age.std_dev],FeH=[feh_best], Av=[Av],
                                Redchi2=[redchi2_best]))
-            file_name = f"{note}_{feh}_{distance.nominal_value}"
+            file_name = f"{note}"
             print(df_new)
-            df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=True)
+            df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=False)
 
             print('Going to New Target')
-    fig = plt.figure(figsize=(11.69,8.27))
-
-    gs = mpl.gridspec.GridSpec(6, 9, wspace=0.01, hspace=0.01)  # 2x2 grid
-    ax1 = fig.add_subplot(gs[0:2, 0:2])  # first row, second col
-    ax2 = fig.add_subplot(gs[0:2,3:5])  # full second row
-    ax3 = fig.add_subplot(gs[0:2, 6:8])  # full second row
-    ax4 = fig.add_subplot(gs[3, 0:2])  # first row, second col
-    ax5 = fig.add_subplot(gs[4,0:2])  # full second row
-    ax6 = fig.add_subplot(gs[5, 0:2])  # full second row
-    ax7 = fig.add_subplot(gs[3:5, 3:8])  # full second row
 
 
+    df = pd.read_csv(f'{save_directory}/HD_{target_hd}/target_info_{file_name}.csv', header=None, index_col= None)
+    df.to_csv(f'{save_directory}/HD_{target_hd}/target_info_{file_name}.csv', header = Header, index= False)
+    df2 = pd.read_csv(f"{save_directory}/HD_{target_hd}/target_info_{file_name}.csv")
+    print(df2)
+
+    fig = plt.figure(figsize=(11.0,8.5), layout= "compressed")
+    import matplotlib.gridspec
+    gs = mpl.gridspec.GridSpec(6, 9)  # 6x9 grid
+    gs.update(left=0.05,right=0.99,top=0.95,bottom=0.05,wspace=0.00001,hspace=0.00001)
+
+    ax1 = fig.add_subplot(gs[0:2, 0:2])  # first row, first col
+    ax2 = fig.add_subplot(gs[0:2,3:5])  # first row, sec col
+    ax3 = fig.add_subplot(gs[0:2, 6:8])  # first row, third col
+    ax4 = fig.add_subplot(gs[3, 0:2])  # sec.1 row, first col
+    ax5 = fig.add_subplot(gs[4,0:2])  # sec.2 row, first col
+    ax6 = fig.add_subplot(gs[5, 0:2])  # sec.3  row, first col
+    ax7 = fig.add_subplot(gs[3:5, 3:5])  # sec row, sec col
+    ax8 = fig.add_subplot(gs[3:5, 6:8])  # sec row. third col
+
+    #pdb.set_trace()
     for i in [1,7]:
         ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue", s=1)
         ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="blue", linewidth =1)
@@ -796,6 +851,7 @@ for target_hd in Target_List:
         ax2.set_xlabel('Mass (solar)', fontsize=5)
         ax2.set_ylabel(r'$\chi^2$', fontsize=5)
         ax2.set_title('Mass 1 & 2 Guess', fontsize=5)
+
         #pdb.set_trace()
 
 
@@ -815,6 +871,8 @@ for target_hd in Target_List:
         ax2.set_ylabel(r'$\chi^2$', fontsize=5)
         ax2.set_title('Mass 1 & 2 Guess', fontsize=5)
         ax2.tick_params(axis='both', labelsize=5)
+        ax2.set_aspect('auto')
+
         #pdb.set_trace()
 
     for i in [1,7]:
@@ -825,6 +883,8 @@ for target_hd in Target_List:
         ax3.set_yscale("log")
         ax3.set_xlabel('Age', fontsize=5)
         ax3.set_ylabel(r'$\chi^2$', fontsize=5)
+        ax3.set_aspect('equal')
+
     #pdb.set_trace()
 
     for i in [3,5]:
@@ -835,6 +895,8 @@ for target_hd in Target_List:
         ax3.set_yscale("log")
         ax3.set_xlabel('Age', fontsize=5)
         ax3.set_ylabel(r'$\chi^2$', fontsize=5)
+        ax3.set_aspect('equal')
+
     #pdb.set_trace()
 
     for i in [4]:
@@ -846,6 +908,11 @@ for target_hd in Target_List:
         ax3.set_xlabel('Age', fontsize=5)
         ax3.set_ylabel(r'$\chi^2$', fontsize=5)
         ax3.tick_params(axis='both', labelsize=5)
+        ax3.set_title("Chi2 vs Age, HD %s" % target_hd, fontsize=5)
+        ax3.set_aspect('auto')
+
+
+
     #pdb.set_trace()
     for i in [1,7]:
         #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
@@ -871,7 +938,9 @@ for target_hd in Target_List:
         # ax1.set_xlabel('Wavelength (nm)')
         ax4.set_ylabel('Total Mag', fontsize=5)
         ax4.tick_params(axis='both', labelsize=5)
+        ax4.set_aspect('auto')
         ax4.invert_yaxis()
+
 
 
     for i in [1,7]:
@@ -899,6 +968,8 @@ for target_hd in Target_List:
         ax5.invert_yaxis()
         ax5.set_ylabel('Diff Mag', fontsize=5)
         ax5.tick_params(axis='both', labelsize=5)
+        ax5.set_aspect('auto')
+
 
     for i in [1,7]:
         ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
@@ -934,6 +1005,8 @@ for target_hd in Target_List:
         ax6.set_xlabel('Wavelength (nm)', fontsize=5)
         ax6.set_ylabel('Apparent Mag', fontsize=5)
         ax6.tick_params(axis='both', labelsize=5)
+        ax6.set_aspect('auto')
+
 
 
     for i in [1,7]:
@@ -950,25 +1023,79 @@ for target_hd in Target_List:
             ax1.legend(fontsize=5)
     for i in [4]:
             ax1.plot(all_modelx_best[i], all_modely_best[i], label=f"Best log age = {np.around(all_age_best[i], 2)} ", color='black', linewidth=1)
+            ax1.errorbar(all_xval1[i].nominal_value, all_yval1[i].nominal_value,
+                         xerr=all_xval1[i].std_dev, yerr=all_yval1[i].std_dev,
+                         color="red")
+            ax1.errorbar(all_xval2[i].nominal_value, all_yval2[i].nominal_value,
+                         xerr=all_xval2[i].std_dev, yerr=all_yval2[i].std_dev,
+                         color="red")
             ax1.invert_yaxis()
             ax1.set_title("HD %s" % target_hd, fontsize=5)
+            ax1.set_xlabel(xlabel, fontsize=5)
+            ax1.set_ylabel(ylabel, fontsize=5)
             ax1.legend(fontsize=5)
+            ax1.set_xlim(np.min(all_modelx_best),np.max(all_modelx_best)-2)
             ax1.tick_params(axis='both', labelsize=5)
+            ax1.set_aspect('auto')
+
+    for i in range(len(all_m_dyn)):
+        ax8.scatter(all_m_dyn[i].nominal_value, all_m_phot[i].nominal_value, s=5, color ='black')
+        ax8.set_title('M_dyn vs M_phot', fontsize=5)
+        ax8.set_xlim(all_m_dyn[0].nominal_value - 0.15, all_m_dyn[8].nominal_value + 0.15)
+        ax8.set_ylim(all_m_phot[0].nominal_value - 0.5, all_m_phot[8].nominal_value + 0.5)
+        ax8.set_xlabel('M_dyn', fontsize=5)
+        ax8.set_ylabel('M_phot', fontsize=5)
+        ax8.axvline(x= all_m_dyn[i].nominal_value, color='grey')
+
+    all_m_phot_nom = []
+    all_m_dyn_nom =[]
+    for i in range(len(all_m_dyn)):
+        all_m_dyn_nom.append(all_m_dyn[i].nominal_value)
+        all_m_phot_nom.append(all_m_phot[i].nominal_value)
+    #pdb.set_trace()
+    ax8.plot(all_m_dyn_nom[0:2], all_m_phot_nom[0:2], color = 'red', linewidth =1)
+    ax8.plot(all_m_dyn_nom[3:5], all_m_phot_nom[3:5], color = 'blue', linewidth =1)
+    ax8.plot(all_m_dyn_nom[6:8], all_m_phot_nom[6:8], color = 'green',linewidth =1)
+
+    ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =1)
+    ax8.plot([all_m_dyn_nom[5],all_m_dyn_nom[4]], [all_m_phot_nom[5],all_m_phot_nom[4]], color = 'blue', linewidth =1)
+    ax8.plot([all_m_dyn_nom[8],all_m_dyn_nom[7]], [all_m_phot_nom[8],all_m_phot_nom[7]], color = 'green', linewidth =1)
+    ax8.annotate('Feh =-0.1', xy=(all_m_dyn_nom[2]+0.06, all_m_phot_nom[2]), xytext=(all_m_dyn_nom[2]+0.06, all_m_phot_nom[2]), color = 'red',size=5)
+    ax8.annotate('Feh =0.0', xy=(all_m_dyn_nom[5]+0.06, all_m_phot_nom[5]), xytext=(all_m_dyn_nom[5]+0.06, all_m_phot_nom[5]), color = 'blue',size=5)
+    ax8.annotate('Feh =0.1', xy=(all_m_dyn_nom[8]+0.06, all_m_phot_nom[8]), xytext=(all_m_dyn_nom[8]+0.06, all_m_phot_nom[8]), color = 'green',size=5)
+    ax8.annotate('Dist =-1*sigma', xy=(all_m_dyn_nom[1]+0.01, all_m_phot_nom[1]), xytext=(all_m_dyn_nom[1]+0.01, all_m_phot_nom[1]),xycoords=("data", "axes fraction"), color = 'red',size=5)
+    ax8.annotate('Dist =0.0*Sigma', xy=(all_m_dyn_nom[4]+0.01, all_m_phot_nom[4]), xytext=(all_m_dyn_nom[4]+0.01, all_m_phot_nom[4]), xycoords=("data", "axes fraction"),color = 'blue',size=5)
+    ax8.annotate('Feh =+1*Sigma', xy=(all_m_dyn_nom[7]+0.01, all_m_phot_nom[7]), xytext=(all_m_dyn_nom[7]+0.01, all_m_phot_nom[7]), xycoords=("data", "axes fraction"),color = 'green',size=5)
+    ax8.axline((0, 0), slope=1., color='yellow', label='M_dyn = M_phot')
+    ax8.axvline(x=all_m_dyn[1].nominal_value, color='salmon')
+    ax8.legend(fontsize=5)
+    ax8.set_aspect('auto')
 
     #pdb.set_trace()
-    file = f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf'
-    pdf_file = fitz.open(file)
-    for page in pdf_file:  # iterate through the pages
-        pix = page.get_pixmap()  # render page to an image
-        pix.save(f'{orbit_directory}HD{target_hd}.png')  # store image as a PNG
+    #file = f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf'
+    #pdf_file = fitz.open(file)
+    #for page in pdf_file:  # iterate through the pages
+        #pix = page.get_pixmap()  # render page to an image
+        #pix.save(f'{orbit_directory}HD{target_hd}.png')  # store image as a PNG
+
+    from pdf2image import convert_from_path, convert_from_bytes
+
+    # Store Pdf with convert_from_path function
+    images = convert_from_path(f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf',700)
+    for i in range(len(images)):
+        # Save pages as images in the pdf
+        images[i].save(f'{orbit_directory}HD{target_hd}.png', 'PNG')
+
+
 
     pic = f'{orbit_directory}HD{target_hd}.png'
 
     img = io.imread(pic)
     ax7.imshow(img)
-    ax7.tick_params(axis='both',top=False, bottom=False, left=False, right=False,
+    ax7.set_aspect('equal')
+    ax7.tick_params(top=False, bottom=False, left=False, right=False,
                 labelleft=False, labelbottom=False)
-    fig.tight_layout(pad=0.5)
+
 
 
 
