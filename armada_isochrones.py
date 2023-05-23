@@ -1,8 +1,14 @@
 import pdb
+import shutil
+from os.path import isfile, join
+from os import listdir
+import numpy
+import cv2
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 import matplotlib as mpl
+from matplotlib.gridspec import GridSpec
 import os
 import random
 from astroquery.simbad import Simbad
@@ -20,6 +26,7 @@ import fitz
 import matplotlib.image as mpimg
 from skimage import io
 from PIL import Image
+from pdf2image import convert_from_path, convert_from_bytes
 
 Mist_iso = MIST_Isochrone()
 Mist_evoTrack = MIST_EvolutionTrack()
@@ -32,12 +39,14 @@ matplotlib.rcParams['figure.figsize'] = (8, 5)
 #photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
 #csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
 
-summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved files
+summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
 save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
 armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
 photometry_file = '/home/colton/armada_binaries/Photometry.csv'
 csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
 orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
+corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
 
 Header =["HD", "M_Dyn", "M_Dyn_err",
                         "M_Tot", "M_Tot_err", "M1",
@@ -50,8 +59,8 @@ df_photometry = pd.read_csv(photometry_file, dtype=object)
 ## note for saved files (e.g. 'hip' for hipparcos distance, or 'gaia')
 
 note = input("Choose note for saved files in this run: ") 
-
-Target_List = ['6456','1976', '2772','5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
+# Problem target  '2772'
+Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
     , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
                '75974', '78316', '82446', '87652', '87822', '107259', '112846'
     , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
@@ -234,6 +243,16 @@ for target_hd in Target_List:
     all_yval1 = []
     all_yval2 = []
 
+    ## Create directory for saved files, if it doesn't already exist
+    directory_corner = "%s/HD_%s/" % (corner_directory, target_hd)
+    if os.path.exists(directory_corner):
+        shutil.rmtree(directory_corner)
+        print("removing directory")
+
+
+    if not os.path.exists(directory_corner):
+        print("Creating directory")
+        os.makedirs(directory_corner)
 
     for feh in feh_set:
         #try:
@@ -252,6 +271,10 @@ for target_hd in Target_List:
         if not os.path.exists(directory2):
             print("Creating directory")
             os.makedirs(directory2)
+
+        corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
+
+
 
         idx = np.where(df_armada['HD'] == target_hd)[0][0]
         Av = float(df_armada['Av'][idx])
@@ -537,7 +560,8 @@ for target_hd in Target_List:
             try:
                 emcee_plot = corner.corner(chains, labels=result.var_names)
                 plt.savefig('%s/HD_%s_%s_corner.pdf' % (directory, target_hd, name))
-                plt.savefig('%s/HD_%s_%s_corner.pdf' % (directory2, target_hd, name))
+                #plt.savefig('%s/HD_%s_%s_corner.pdf' % (directory2, target_hd, name))
+                plt.savefig('%s/HD_%s/_%s_corner.png' % (corner_directory, target_hd, name))
                 plt.close()
             except:
                 #print(result.var_names)
@@ -804,112 +828,122 @@ for target_hd in Target_List:
     df2 = pd.read_csv(f"{save_directory}/HD_{target_hd}/target_info_{file_name}.csv")
     print(df2)
 
-    fig = plt.figure(figsize=(11.0,8.5), layout= "compressed")
-    import matplotlib.gridspec
-    gs = mpl.gridspec.GridSpec(6, 9)  # 6x9 grid
-    gs.update(left=0.05,right=0.99,top=0.95,bottom=0.05,wspace=0.00001,hspace=0.00001)
+    fig = plt.figure(figsize=(55.0,42.5), constrained_layout=False)
 
-    ax1 = fig.add_subplot(gs[0:2, 0:2])  # first row, first col
-    ax2 = fig.add_subplot(gs[0:2,3:5])  # first row, sec col
-    ax3 = fig.add_subplot(gs[0:2, 6:8])  # first row, third col
-    ax4 = fig.add_subplot(gs[3, 0:2])  # sec.1 row, first col
-    ax5 = fig.add_subplot(gs[4,0:2])  # sec.2 row, first col
-    ax6 = fig.add_subplot(gs[5, 0:2])  # sec.3  row, first col
-    ax7 = fig.add_subplot(gs[3:5, 3:5])  # sec row, sec col
-    ax8 = fig.add_subplot(gs[3:5, 6:8])  # sec row. third col
+    gs1 = GridSpec(1, 1)
+    gs1.update(left=0.05, right=0.35, bottom=0.5,top=0.95, hspace=0)
+    ax1 = fig.add_subplot(gs1[0])  # first row, first col
+    gs2 = GridSpec(1, 2)
+    gs2.update(left=0.38, right=0.97, bottom=0.55, wspace=0,top=0.95, hspace=0)
+    ax2 = fig.add_subplot(gs2[0])  # first row, sec col
+    ax3 = fig.add_subplot(gs2[1], sharey = ax2)  # first row, third col
+    gs3 = GridSpec(3, 1)
+    gs3.update(bottom=0.05, left=0.05, right=0.35, top=0.45, wspace=0, hspace=0)
+    ax4 = fig.add_subplot(gs3[0], sharex = ax6)  # sec.1 row, first col
+    ax5 = fig.add_subplot(gs3[1], sharex = ax6)  # sec.2 row, first col
+    ax6 = fig.add_subplot(gs3[2])  # sec.3  row, first col
+    gs4 = GridSpec(1, 1)
+    gs4.update(left=0.38, right=0.66, bottom=0.075, top=0.45)  # 0.53 aligns with sides
+    ax7 = fig.add_subplot(gs4[0])  # sec row, sec col
+    gs5 = GridSpec(1, 1)
+    gs5.update(bottom=0.05, left=0.71, right=0.97, top=0.45, wspace=0, hspace=0)
+    ax8 = fig.add_subplot(gs5[0])  # sec row. third col
 
     #pdb.set_trace()
     for i in [1,7]:
-        ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue", s=1)
-        ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="blue", linewidth =1)
+        ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue", s=5)
+        ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="blue", linewidth =5)
         #ax2.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
         ax2.set_yscale("log")
-        ax2.set_xlabel('Mass (solar)', fontsize=5)
-        ax2.set_ylabel(r'$\chi^2$', fontsize=5)
-        ax2.scatter(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, marker="+", color="Red", s=1)
-        ax2.plot(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, ls="--", color="blue", linewidth =1)
+        ax2.scatter(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, marker="+", color="Red", s=5)
+        ax2.plot(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, ls="--", color="blue", linewidth =5)
         # ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
         #ax2.legend()
         ax2.set_yscale("log")
-        ax2.set_xlabel('Mass (solar)', fontsize=5)
-        ax2.set_ylabel(r'$\chi^2$', fontsize=5)
-        ax2.set_title('Mass 1 & 2 Guess', fontsize=5)
+        ax2.set_xlabel('Mass (solar)', fontsize=30)
+        ax2.set_ylabel(r'$\chi^2$', fontsize=30)
+        ax2.set_title('Mass 1 & 2 Guess', fontsize=35)
         #pdb.set_trace()
 
     for i in [3,5]:
-        ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue",s = 1)
-        ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="red", linewidth =1)
+        ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue",s = 5)
+        ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="red", linewidth =5)
         #ax2.axhline(y=1, color="red", alpha=0.6)
         ax2.set_yscale("log")
-        ax2.set_xlabel('Mass (solar)', fontsize=5)
-        ax2.set_ylabel(r'$\chi^2$', fontsize=5)
-        ax2.scatter(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, marker="+", color="Red",s = 1)
-        ax2.plot(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, ls="--", color="red", linewidth =1)
+        ax2.scatter(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, marker="+", color="Red",s = 5)
+        ax2.plot(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, ls="--", color="red", linewidth =5)
         # ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
         #ax2.legend()
         ax2.set_yscale("log")
-        ax2.set_xlabel('Mass (solar)', fontsize=5)
-        ax2.set_ylabel(r'$\chi^2$', fontsize=5)
-        ax2.set_title('Mass 1 & 2 Guess', fontsize=5)
+        ax2.set_xlabel('Mass (solar)', fontsize=30)
+        ax2.set_ylabel(r'$\chi^2$', fontsize=30)
+        ax2.set_title('Mass 1 & 2 Guess', fontsize=35)
 
         #pdb.set_trace()
 
-
     for i in [4]:
-        ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue", label='Mass 1', s = 1)
-        ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="black", linewidth=1)
+        idx_mass1 = np.array(all_chi2_grid[i]).argmin()
+        mass1_best = all_mass1_result[i][idx_mass1]
+        idx_mass2 = np.array(all_chi2_grid2[i]).argmin()
+        mass2_best = all_mass2_result[i][idx_mass2]
+        ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue", label=f'Mass 1 ={mass1_best:.2f}', s = 5)
+        ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="black", linewidth=5)
         ax2.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
         ax2.set_yscale("log")
-        ax2.set_xlabel('Mass (solar)', fontsize=5)
-        ax2.set_ylabel(r'$\chi^2$', fontsize=5)
-        ax2.scatter(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, marker="+", color="Red", label='Mass 2',  s = 1)
-        ax2.plot(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, ls="--", color="black", linewidth = 1)
+        ax2.scatter(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, marker="+", color="Red", label=f'Mass 2 ={mass2_best:.2f}',  s = 5)
+        ax2.plot(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, ls="--", color="black", linewidth = 5)
         # ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
-        ax2.legend(fontsize= 5)
+        ax2.legend(fontsize= 25)
         ax2.set_yscale("log")
-        ax2.set_xlabel('Mass (solar)', fontsize=5)
-        ax2.set_ylabel(r'$\chi^2$', fontsize=5)
-        ax2.set_title('Mass 1 & 2 Guess', fontsize=5)
-        ax2.tick_params(axis='both', labelsize=5)
+        ax2.set_xlabel('Mass (solar)', fontsize=35)
+        ax2.set_ylabel(r'$\chi^2$', fontsize=35)
+        ax2.set_title('Mass 1 & 2 Guess', fontsize=40)
+        ax2.tick_params(axis='both', labelsize=6)
         ax2.set_aspect('auto')
 
         #pdb.set_trace()
 
     for i in [1,7]:
-        ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="blue",  s = 1)
-        ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="blue", linewidth=1)
+        ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="blue",  s = 5)
+        ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="blue", linewidth=5)
         ax3.axhline(y=1, color="red", alpha=0.6)
         #ax3.legend()
         ax3.set_yscale("log")
-        ax3.set_xlabel('Age', fontsize=5)
-        ax3.set_ylabel(r'$\chi^2$', fontsize=5)
+        ax3.set_xlabel('Age', fontsize=30)
+        #ax3.set_ylabel(r'$\chi^2$', fontsize=6)
         ax3.set_aspect('equal')
 
     #pdb.set_trace()
 
     for i in [3,5]:
-        ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="red",  s = 1)
-        ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="red", linewidth=1)
+
+        ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="red",  s = 5)
+        ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="red", linewidth=5)
         ax3.axhline(y=1, color="red", alpha=0.6)
         #ax3.legend()
         ax3.set_yscale("log")
-        ax3.set_xlabel('Age', fontsize=5)
-        ax3.set_ylabel(r'$\chi^2$', fontsize=5)
+        ax3.set_xlabel('Age', fontsize=35)
+        #ax3.set_ylabel(r'$\chi^2$', fontsize=6)
         ax3.set_aspect('equal')
 
     #pdb.set_trace()
 
     for i in [4]:
-        ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="black",  s = 1)
-        ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="black", linewidth=1)
+        idx_age1 = np.array(all_chi2_grid3[i]).argmin()
+        age1_best = all_ages[i][idx_mass1]
+        ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="black", label=f'Best Age ={age1_best:.2f}' ,  s = 5)
+        ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="black", linewidth=5)
         ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
-        ax3.legend(fontsize=5)
+        ax3.legend(fontsize=35)
         ax3.set_yscale("log")
-        ax3.set_xlabel('Age', fontsize=5)
-        ax3.set_ylabel(r'$\chi^2$', fontsize=5)
-        ax3.tick_params(axis='both', labelsize=5)
-        ax3.set_title("Chi2 vs Age, HD %s" % target_hd, fontsize=5)
+        ax3.set_xlabel('Age', fontsize=35)
+       # ax3.set_ylabel(r'$\chi^2$', fontsize=7)
+        ax3.tick_params(axis='both', labelsize=30)
+        ax3.set_title("Chi2 vs Age, HD %s" % target_hd, fontsize=8)
         ax3.set_aspect('auto')
+        ax3.tick_params('y', labelleft=False)
+
+
 
 
 
@@ -925,27 +959,28 @@ for target_hd in Target_List:
     for i in [3,5]:
         #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
         #ax4.errorbar(all_xwave, unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black')
-        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='red', linewidth=1)
+        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='red', linewidth=5)
         # ax1.set_xlabel('Wavelength (nm)')
         #ax4.set_ylabel('Total Mag', fontsize=5)
         #ax4.invert_yaxis()
 
     for i in [4]:
-        ax4.set_title("Total Mag Model Fit, HD %s" % target_hd, fontsize=5)
-        ax4.errorbar(all_xwave[i], unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black', ms=1, elinewidth=1,
-             ecolor='black', capsize=1, capthick=1)
-        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='black', linewidth=1)
+        #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd, fontsize=8)
+        ax4.errorbar(all_xwave[i], unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black', ms=1, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
+        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='black', linewidth=5)
         # ax1.set_xlabel('Wavelength (nm)')
-        ax4.set_ylabel('Total Mag', fontsize=5)
-        ax4.tick_params(axis='both', labelsize=5)
+        ax4.set_ylabel('Total Mag', fontsize=35)
+        ax4.tick_params(axis='both', labelsize=30)
         ax4.set_aspect('auto')
         ax4.invert_yaxis()
+        ax4.tick_params('x', labelbottom=False)
 
 
 
     for i in [1,7]:
         #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
-        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='blue', linewidth=1)
+        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='blue', linewidth=5)
         # ax2.set_xlabel('Wavelength (nm)')
         #ax5.invert_yaxis()
         #ax5.set_ylabel('Diff Mag')
@@ -954,98 +989,114 @@ for target_hd in Target_List:
         #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
         #ax5.errorbar(all_data_wave[i], unumpy.nominal_values(all_yplot1[i]), unumpy.std_devs(all_yplot1[i]), fmt='o', color='blue', elinewidth=1,
              #ecolor='black', capsize=1, capthick=1)
-        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='red', linewidth=1)
+        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='red', linewidth=5)
         # ax2.set_xlabel('Wavelength (nm)')
         #ax5.invert_yaxis()
         #ax5.set_ylabel('Diff Mag')
 
     for i in [4]:
-        ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd, fontsize=5)
-        ax5.errorbar(all_data_wave[i], unumpy.nominal_values(all_yplot1[i]), unumpy.std_devs(all_yplot1[i]), fmt='o', color='black', ms=1, elinewidth=1,
-             ecolor='black', capsize=1, capthick=1)
-        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='black', linewidth=1)
-        ax5.set_xlabel('Wavelength (nm)', fontsize=5)
+        #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd, fontsize=8)
+        ax5.errorbar(all_data_wave[i], unumpy.nominal_values(all_yplot1[i]), unumpy.std_devs(all_yplot1[i]), fmt='o', color='black', ms=5, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
+        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='black', linewidth=5)
+        #ax5.set_xlabel('Wavelength (nm)', fontsize=6)
         ax5.invert_yaxis()
-        ax5.set_ylabel('Diff Mag', fontsize=5)
-        ax5.tick_params(axis='both', labelsize=5)
+        ax5.set_ylabel('Diff Mag', fontsize=35)
+        ax5.tick_params(axis='both', labelsize=30)
         ax5.set_aspect('auto')
+        ax5.tick_params('x', labelbottom=False)
 
 
     for i in [1,7]:
-        ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='blue', ms=1, elinewidth=1,
-             ecolor='black', capsize=1, capthick=1)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='blue', ms=1, elinewidth=1,
-             ecolor='black', capsize=1, capthick=1)
+        #ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
         ax6.plot(all_xwave[i], all_model1[i], '--', color='blue', linewidth=1)
         ax6.plot(all_xwave[i], all_model2[i], '--', color='blue', linewidth=1)
         #ax6.invert_yaxis()
-        ax6.set_xlabel('Wavelength (nm)', fontsize=5)
-        ax6.set_ylabel('Apparent Mag', fontsize=5)
+        ax6.set_xlabel('Wavelength (nm)', fontsize=25)
+        ax6.set_ylabel('Apparent Mag', fontsize=25)
     for i in [3,5]:
-        ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='red', ms=1, elinewidth=1,
-             ecolor='black', capsize=1, capthick=1)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='red', ms=1, elinewidth=1,
-             ecolor='black', capsize=1, capthick=1)
-        ax6.plot(all_xwave[i], all_model1[i], '--', color='red', linewidth=1)
-        ax6.plot(all_xwave[i], all_model2[i], '--', color='red', linewidth=1)
+        ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=8)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='red', ms=5, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='red', ms=5, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
+        ax6.plot(all_xwave[i], all_model1[i], '--', color='red', linewidth=5)
+        ax6.plot(all_xwave[i], all_model2[i], '--', color='red', linewidth=5)
         #ax6.invert_yaxis()
-        ax6.set_xlabel('Wavelength (nm)', fontsize=5)
-        ax6.set_ylabel('Apparent Mag', fontsize=5)
+        ax6.set_xlabel('Wavelength (nm)', fontsize=25)
+        ax6.set_ylabel('Apparent Mag', fontsize=25)
     for i in [4]:
-        ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='black', ms=1, elinewidth=1,
+        ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=8)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='black', ms=5, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='black', ms=5, elinewidth=5,
              ecolor='black', capsize=1, capthick=1)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='black', ms=1, elinewidth=1,
-             ecolor='black', capsize=1, capthick=1)
-        ax6.plot(all_xwave[i], all_model1[i], '--', color='black', linewidth=1)
-        ax6.plot(all_xwave[i], all_model2[i], '--', color='black', linewidth=1)
+        ax6.plot(all_xwave[i], all_model1[i], '--', color='black', linewidth=5)
+        ax6.plot(all_xwave[i], all_model2[i], '--', color='black', linewidth=5)
         ax6.invert_yaxis()
-        ax6.set_xlabel('Wavelength (nm)', fontsize=5)
-        ax6.set_ylabel('Apparent Mag', fontsize=5)
-        ax6.tick_params(axis='both', labelsize=5)
+        ax6.set_xlabel('Wavelength (nm)', fontsize=35)
+        ax6.set_ylabel('Apparent Mag', fontsize=35)
+        ax6.tick_params(axis='both', labelsize=30)
         ax6.set_aspect('auto')
 
 
 
-    for i in [1,7]:
-            ax1.plot(all_modelx_best[i], all_modely_best[i], label=f"Best log age = {np.around(all_age_best[i], 2)} ", color='blue', linewidth=1)
+    for i in [1]:
+            ax1.plot(all_modelx_best[i], all_modely_best[i], color='blue', linewidth=5)
             #ax1.invert_yaxis()
-            ax1.set_title("HD %s" % target_hd, fontsize=15)
+            label=f"Best log age_feh_-0.1 = {np.around(all_age_best[i], 2)} "
+            ax1.set_title("HD %s" % target_hd, fontsize=50)
+            ax1.legend(fontsize=5)
+
+    for i in [7]:
+            ax1.plot(all_modelx_best[i], all_modely_best[i], color='green', linewidth=5)
+            #ax1.invert_yaxis()
+            label=f"Best log age _feh_0.1= {np.around(all_age_best[i], 2)} "
+            ax1.set_title("HD %s" % target_hd, fontsize=50)
             ax1.legend(fontsize=5)
 
 
     for i in [3,5]:
-            ax1.plot(all_modelx_best[i], all_modely_best[i], label=f"Best log age = {np.around(all_age_best[i], 2)} ", color='red', linewidth=1)
+            ax1.plot(all_modelx_best[i], all_modely_best[i], label=f"Best log age = {np.around(all_age_best[i], 2)} ", color='red', linewidth=5)
             #ax1.invert_yaxis()
-            ax1.set_title("HD %s" % target_hd, fontsize=5)
+            ax1.set_title("HD %s" % target_hd, fontsize=35)
             ax1.legend(fontsize=5)
     for i in [4]:
-            ax1.plot(all_modelx_best[i], all_modely_best[i], label=f"Best log age = {np.around(all_age_best[i], 2)} ", color='black', linewidth=1)
+            ax1.plot(all_modelx_best[i], all_modely_best[i], label=f"Best log age = {np.around(all_age_best[i], 2)} ", color='black', linewidth=5)
             ax1.errorbar(all_xval1[i].nominal_value, all_yval1[i].nominal_value,
                          xerr=all_xval1[i].std_dev, yerr=all_yval1[i].std_dev,
                          color="red")
             ax1.errorbar(all_xval2[i].nominal_value, all_yval2[i].nominal_value,
                          xerr=all_xval2[i].std_dev, yerr=all_yval2[i].std_dev,
                          color="red")
+            ax1.annotate(f'Feh =-0.1: Age = {np.around(all_age_best[1], 2)}', xy=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value), xytext=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value+1.2), color = 'green',size=25)
+            ax1.annotate(f'Feh =+0.1: Age = {np.around(all_age_best[7], 2)}', xy=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value), xytext=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value-0.3), color = 'blue',size=25)
             ax1.invert_yaxis()
-            ax1.set_title("HD %s" % target_hd, fontsize=5)
-            ax1.set_xlabel(xlabel, fontsize=5)
-            ax1.set_ylabel(ylabel, fontsize=5)
-            ax1.legend(fontsize=5)
-            ax1.set_xlim(np.min(all_modelx_best),np.max(all_modelx_best)-2)
-            ax1.tick_params(axis='both', labelsize=5)
+            ax1.set_title("HD %s" % target_hd, fontsize=40)
+            ax1.set_xlabel(xlabel, fontsize=35)
+            ax1.set_ylabel(ylabel, fontsize=35)
+            ax1.legend(fontsize=30)
+            #pdb.set_trace()
+            x_axis_max = np.max(all_modelx_best[4])
+            x_axis_max = x_axis_max - 2
+            x_axis_min =np.min(all_modelx_best)
+            ax1.set_xlim(x_axis_min,x_axis_max)
+            ax1.tick_params(axis='both', labelsize=30)
             ax1.set_aspect('auto')
 
     for i in range(len(all_m_dyn)):
-        ax8.scatter(all_m_dyn[i].nominal_value, all_m_phot[i].nominal_value, s=5, color ='black')
-        ax8.set_title('M_dyn vs M_phot', fontsize=5)
-        ax8.set_xlim(all_m_dyn[0].nominal_value - 0.15, all_m_dyn[8].nominal_value + 0.15)
-        ax8.set_ylim(all_m_phot[0].nominal_value - 0.5, all_m_phot[8].nominal_value + 0.5)
-        ax8.set_xlabel('M_dyn', fontsize=5)
-        ax8.set_ylabel('M_phot', fontsize=5)
-        ax8.axvline(x= all_m_dyn[i].nominal_value, color='grey')
+        ax8.scatter(all_m_dyn[i].nominal_value, all_m_phot[i].nominal_value, s=25, color ='black')
+        ax8.set_title('M_dyn vs M_phot', fontsize=40)
+        ax8.set_xlim(all_m_dyn[0].nominal_value - 0.2, all_m_dyn[8].nominal_value + 0.2)
+        ax8.set_ylim(all_m_phot[0].nominal_value - 0.3, all_m_phot[8].nominal_value + 0.3)
+        #ax8.set_xlim(4.1,5.1)
+        #ax8.set_ylim(4.1,5.1)
+        #ax8.axvline(x= all_m_dyn[i].nominal_value, color='grey')
+        ax8.tick_params(axis='both', labelsize=30)
 
     all_m_phot_nom = []
     all_m_dyn_nom =[]
@@ -1053,23 +1104,28 @@ for target_hd in Target_List:
         all_m_dyn_nom.append(all_m_dyn[i].nominal_value)
         all_m_phot_nom.append(all_m_phot[i].nominal_value)
     #pdb.set_trace()
-    ax8.plot(all_m_dyn_nom[0:2], all_m_phot_nom[0:2], color = 'red', linewidth =1)
-    ax8.plot(all_m_dyn_nom[3:5], all_m_phot_nom[3:5], color = 'blue', linewidth =1)
-    ax8.plot(all_m_dyn_nom[6:8], all_m_phot_nom[6:8], color = 'green',linewidth =1)
+    ax8.plot(all_m_dyn_nom[0:2], all_m_phot_nom[0:2], color = 'red', linewidth =5)
+    ax8.plot(all_m_dyn_nom[3:5], all_m_phot_nom[3:5], color = 'blue', linewidth =5)
+    ax8.plot(all_m_dyn_nom[6:8], all_m_phot_nom[6:8], color = 'green',linewidth =5)
 
-    ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =1)
-    ax8.plot([all_m_dyn_nom[5],all_m_dyn_nom[4]], [all_m_phot_nom[5],all_m_phot_nom[4]], color = 'blue', linewidth =1)
-    ax8.plot([all_m_dyn_nom[8],all_m_dyn_nom[7]], [all_m_phot_nom[8],all_m_phot_nom[7]], color = 'green', linewidth =1)
-    ax8.annotate('Feh =-0.1', xy=(all_m_dyn_nom[2]+0.06, all_m_phot_nom[2]), xytext=(all_m_dyn_nom[2]+0.06, all_m_phot_nom[2]), color = 'red',size=5)
-    ax8.annotate('Feh =0.0', xy=(all_m_dyn_nom[5]+0.06, all_m_phot_nom[5]), xytext=(all_m_dyn_nom[5]+0.06, all_m_phot_nom[5]), color = 'blue',size=5)
-    ax8.annotate('Feh =0.1', xy=(all_m_dyn_nom[8]+0.06, all_m_phot_nom[8]), xytext=(all_m_dyn_nom[8]+0.06, all_m_phot_nom[8]), color = 'green',size=5)
-    ax8.annotate('Dist =-1*sigma', xy=(all_m_dyn_nom[1]+0.01, all_m_phot_nom[1]), xytext=(all_m_dyn_nom[1]+0.01, all_m_phot_nom[1]),xycoords=("data", "axes fraction"), color = 'red',size=5)
-    ax8.annotate('Dist =0.0*Sigma', xy=(all_m_dyn_nom[4]+0.01, all_m_phot_nom[4]), xytext=(all_m_dyn_nom[4]+0.01, all_m_phot_nom[4]), xycoords=("data", "axes fraction"),color = 'blue',size=5)
-    ax8.annotate('Feh =+1*Sigma', xy=(all_m_dyn_nom[7]+0.01, all_m_phot_nom[7]), xytext=(all_m_dyn_nom[7]+0.01, all_m_phot_nom[7]), xycoords=("data", "axes fraction"),color = 'green',size=5)
-    ax8.axline((0, 0), slope=1., color='yellow', label='M_dyn = M_phot')
-    ax8.axvline(x=all_m_dyn[1].nominal_value, color='salmon')
-    ax8.legend(fontsize=5)
-    ax8.set_aspect('auto')
+    ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =5)
+    ax8.plot([all_m_dyn_nom[5],all_m_dyn_nom[4]], [all_m_phot_nom[5],all_m_phot_nom[4]], color = 'blue', linewidth =5)
+    ax8.plot([all_m_dyn_nom[8],all_m_dyn_nom[7]], [all_m_phot_nom[8],all_m_phot_nom[7]], color = 'green', linewidth =5)
+    ax8.annotate('Feh =-0.1', xy=(all_m_dyn_nom[2]+0.03, all_m_phot_nom[5]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2]))), xytext=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2]))), color = 'red',size=25)
+    ax8.annotate('Feh =0.0', xy=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]), xytext=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]), color = 'blue',size=25)
+    ax8.annotate('Feh =0.1', xy=(all_m_dyn_nom[8]+0.03, all_m_phot_nom[5]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[8]))), xytext=(all_m_dyn_nom[8]+00.03, all_m_phot_nom[5]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[8]))), color = 'green',size=25)
+    ax8.annotate('d=-$\sigma$', xy=(all_m_dyn_nom[1]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2])), all_m_phot_nom[0]-0.03), xytext=(all_m_dyn_nom[0]-0.07, all_m_phot_nom[0]-0.03), color = 'red',size=25)
+    ax8.annotate('d=0$\sigma$', xy=(all_m_dyn_nom[1], all_m_phot_nom[1]-0.03), xytext=(all_m_dyn_nom[1]-0.01, all_m_phot_nom[1]-0.05),color = 'blue',size=25)
+    ax8.annotate('d=+$\sigma$', xy=(all_m_dyn_nom[1]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2])), all_m_phot_nom[2]-0.03), xytext=(all_m_dyn_nom[2]+0.03, all_m_phot_nom[2]-0.03),size=25, color ='green')
+    ax8.axline((0, 0), slope=1., color='green', label='M_dyn = M_phot')
+    #ax8.axvline(x=all_m_dyn[1].nominal_value, color='salmon')
+    ax8.legend(fontsize=35)
+    #ax8.set_aspect('equal')
+    ax8.set_xlabel('M_dyn', fontsize=35)
+    ax8.set_ylabel('M_phot', fontsize=35)
+    ax8.grid()
+
+
 
     #pdb.set_trace()
     #file = f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf'
@@ -1077,8 +1133,6 @@ for target_hd in Target_List:
     #for page in pdf_file:  # iterate through the pages
         #pix = page.get_pixmap()  # render page to an image
         #pix.save(f'{orbit_directory}HD{target_hd}.png')  # store image as a PNG
-
-    from pdf2image import convert_from_path, convert_from_bytes
 
     # Store Pdf with convert_from_path function
     images = convert_from_path(f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf',700)
@@ -1092,14 +1146,22 @@ for target_hd in Target_List:
 
     img = io.imread(pic)
     ax7.imshow(img)
+    box = ax7.get_position()
+    box.y0 = box.y0 - 4000
+    box.y1 = box.y1 + 4000
+    ax7.set_position(box)
+    e = np.round(float(df_armada['e'][idx]),2)
+    a = np.round(float(df_armada['a (mas)'][idx]),2)
+    p = np.round(float(df_armada['P (yr)'][idx]),2)
+    #pdb.set_trace()
     ax7.set_aspect('equal')
-    ax7.tick_params(top=False, bottom=False, left=False, right=False,
-                labelleft=False, labelbottom=False)
+    ax7.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
+    ax7.annotate(f"e={df_armada['e'][idx]}", xy=(0, 0), xytext=(0.0, 4300), color = 'black',size=35)
+    ax7.annotate(f"a(mas)={df_armada['a (mas)'][idx]}", xy=(0, 0), xytext=(2000, 4300), color = 'black',size=35)
+    ax7.annotate(f"P(Yr)={df_armada['P (yr)'][idx]}", xy=(0, 0), xytext=(0, 4100), color = 'black',size=35)
+    ax7.annotate(f"d(kpc)={distance_best:.2f}", xy=(0, 0), xytext=(2000, 4100), color = 'black',size=35)
 
-
-
-
-
+    #ax7.annotate(f"a={df_armada['plx (mas)'][idx]}", xy=(0.6, 0.01), xytext=(0.6, 0.01), color='black', size=5)
 
 
     fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory2, target_hd, note))
@@ -1108,6 +1170,8 @@ for target_hd in Target_List:
             #print('--'*10)
             #print('--'*10)
             #print("Target HD %s FAILED !!!!!!! Check this one. Continuing for now..."%target_hd)
+
+
 
 print("Failed Targets = ")
 print(Target_List_Fail)
