@@ -70,16 +70,10 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = [ '45542', '46273', '47105', '48581', '49643', '60107', '64235',
-               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
-    , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
-              '145589', '148283', '153370', '154569', '156190', '158140'
-    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
-               '196089', '196867', '198183', '199766', '201038', '206901'
-    , '217676', '217782', '220278', '224512']
+Target_List = [ '217782', '220278', '224512']
 
 
-Target_List_Fail = []
+Target_List_Fail = ['133955']
 
 
 ## Fuction to fit a single star model
@@ -303,9 +297,9 @@ for target_hd in Target_List:
         ## get total magnitudes and errors from photometry file
         idx1 = np.where(df_photometry['HD'] == target_hd)[0][0]
         utot = ufloat(np.nan, np.nan)
-        btot = ufloat(float(df_photometry['B_ I/259/tyc2'][idx1]), float(df_photometry['B_error_I/259/tyc2'][idx1]))
-        vtot = ufloat(float(df_photometry['V_ I/259/tyc2'][idx1]), float(df_photometry['V_error_I/259/tyc2'][idx1]))
-        rtot = ufloat(np.nan, np.nan)
+        btot = ufloat(float(df_photometry['B_complete'][idx1]), float(df_photometry['B_err_complete'][idx1]))
+        vtot = ufloat(float(df_photometry['V_complete'][idx1]), float(df_photometry['V_err_complete'][idx1]))
+        rtot = ufloat(float(df_photometry['R2_I/284'][idx1]), float(df_photometry['R2_I/284'][idx1]))
         gtot = ufloat(float(df_photometry['G _I/350/gaiaedr3'][idx1]), float(df_photometry['G_err'][idx1]))
         itot = ufloat(np.nan, np.nan)
         jtot = ufloat(float(df_photometry['J_ II/246/out'][idx1]), float(df_photometry['J_err'][idx1]))
@@ -1092,7 +1086,7 @@ for target_hd in Target_List:
             x_axis_max = np.max(all_modelx_best[4])
             x_axis_max = x_axis_max - 2
             x_axis_min =np.min(all_modelx_best[4])
-            ax1.set_xlim(x_axis_min,x_axis_min+1)
+            ax1.set_xlim(x_axis_min-0.2,x_axis_min+1)
             #ax1.set_xlim(0,1)
             ax1.tick_params(axis='both', labelsize=30)
             ax1.set_aspect('auto')
