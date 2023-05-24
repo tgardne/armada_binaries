@@ -1053,9 +1053,8 @@ for target_hd in Target_List:
             ax1.legend(fontsize=5)
 
     for i in [7]:
-            ax1.plot(all_modelx_best[i], all_modely_best[i], color='green', linewidth=5)
+            ax1.plot(all_modelx_best[i], all_modely_best[i], color='green', linewidth=5, label=f"Best log age _feh_0.1= {np.around(all_age_best[i], 2)} ")
             #ax1.invert_yaxis()
-            label=f"Best log age _feh_0.1= {np.around(all_age_best[i], 2)} "
             ax1.set_title("HD %s" % target_hd, fontsize=50)
             ax1.legend(fontsize=5)
 
@@ -1073,8 +1072,8 @@ for target_hd in Target_List:
             ax1.errorbar(all_xval2[i].nominal_value, all_yval2[i].nominal_value,
                          xerr=all_xval2[i].std_dev, yerr=all_yval2[i].std_dev,
                          color="red")
-            ax1.annotate(f'Feh =-0.1: Age = {np.around(all_age_best[1], 2)}', xy=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value), xytext=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value+1.2), color = 'green',size=25)
-            ax1.annotate(f'Feh =+0.1: Age = {np.around(all_age_best[7], 2)}', xy=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value), xytext=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value-0.3), color = 'blue',size=25)
+            ax1.annotate(f'Feh =-0.1: Age = {np.around(all_age_best[1], 2)}', xy=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value), xytext=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value+1.2), color = 'blue',size=25)
+            ax1.annotate(f'Feh =+0.1: Age = {np.around(all_age_best[7], 2)}', xy=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value), xytext=(all_xval2[i].nominal_value+0.3, all_yval2[i].nominal_value-0.3), color = 'green',size=25)
             ax1.invert_yaxis()
             ax1.set_title("HD %s" % target_hd, fontsize=40)
             ax1.set_xlabel(xlabel, fontsize=35)
@@ -1170,6 +1169,35 @@ for target_hd in Target_List:
             #print('--'*10)
             #print('--'*10)
             #print("Target HD %s FAILED !!!!!!! Check this one. Continuing for now..."%target_hd)
+
+    import matplotlib.pyplot as plt
+    from pathlib import Path
+
+    # create a list of directories
+    dirs = [f'{corner_directory}HD_{target_hd}/']
+
+    # extract the image paths into a list
+    files = [f for dir_ in dirs for f in list(Path(dir_).glob('*.png'))]
+
+    # create the figure
+    fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(55, 44.2))
+    fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, hspace=0.0, wspace=0.0)
+
+    # flatten the axis into a 1-d array to make it easier to access each axes
+    axs = axs.flatten()
+
+    # iterate through and enumerate the files, use i to index the axes
+    for i, file in enumerate(files):
+        # read the image in
+        pic = plt.imread(file)
+
+        # add the image to the axes
+        axs[i].imshow(pic)
+        axs[i].axis('off')
+
+        # add an axes title; .stem is a pathlib method to get the filename
+        axs[i].set(title=file.stem)
+    fig.savefig(f'{corner_directory}_{target_hd}', dpi=fig.dpi)
 
 
 
