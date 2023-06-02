@@ -27,6 +27,8 @@ import matplotlib.image as mpimg
 from skimage import io
 from PIL import Image
 from pdf2image import convert_from_path, convert_from_bytes
+import matplotlib
+matplotlib.use('Agg')
 
 Mist_iso = MIST_Isochrone()
 Mist_evoTrack = MIST_EvolutionTrack()
@@ -70,7 +72,14 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = [ '217782', '220278', '224512']
+Target_List = ['31297', '34319', '36058',  '37711', '38545'
+    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
+               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
+    , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
+              '145589', '148283', '153370', '154569', '156190', '158140'
+    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
+               '196089', '196867', '198183', '199766', '201038', '206901'
+    , '217676', '217782', '220278', '224512']
 
 
 Target_List_Fail = ['133955']
@@ -299,7 +308,7 @@ for target_hd in Target_List:
         utot = ufloat(np.nan, np.nan)
         btot = ufloat(float(df_photometry['B_complete'][idx1]), float(df_photometry['B_err_complete'][idx1]))
         vtot = ufloat(float(df_photometry['V_complete'][idx1]), float(df_photometry['V_err_complete'][idx1]))
-        rtot = ufloat(float(df_photometry['R2_I/284'][idx1]), float(df_photometry['R2_I/284'][idx1]))
+        rtot = ufloat(float(df_photometry['R2_I/284'][idx1]), 0)
         gtot = ufloat(float(df_photometry['G _I/350/gaiaedr3'][idx1]), float(df_photometry['G_err'][idx1]))
         itot = ufloat(np.nan, np.nan)
         jtot = ufloat(float(df_photometry['J_ II/246/out'][idx1]), float(df_photometry['J_err'][idx1]))
@@ -723,7 +732,8 @@ for target_hd in Target_List:
                 K_best.append(iso['K_mag'])
 
                 ## Choose x/y axis for isochrone plot. For example, V-H vs V. Tyler can you see why this isnt working
-            if h1.nominal_value == np.nan:
+            #pdb.set_trace()
+            if np.isnan(h1.nominal_value) == True:
                 xval1 = v1 - k1  ## component 1
                 yval1 = v1 - d_modulus
                 xval2 = v2 - k2  ## component 2
@@ -731,7 +741,8 @@ for target_hd in Target_List:
 
                 xlabel = "V - K"
                 ylabel = "V"
-            elif k1.nominal_value == np.nan:
+
+            elif np.isnan(h1.nominal_value) == False:
                 xval1 = v1 - h1  ## component 1
                 yval1 = v1 - d_modulus
                 xval2 = v2 - h2  ## component 2
@@ -739,7 +750,9 @@ for target_hd in Target_List:
 
                 xlabel = "V - H"
                 ylabel = "V"
-            elif k1.nominal_value != np.nan and h1.nominal_value != np.nan:
+
+            #pdb.set_trace()
+            """elif k1.nominal_value != np.nan and h1.nominal_value != np.nan:
                 xval1_k = v1 - k1  ## component 1
                 yval1_k = v1 - d_modulus
                 xval2_k = v2 - k2  ## component 2
@@ -754,15 +767,15 @@ for target_hd in Target_List:
                 yval2_h = v2 - d_modulus
 
                 xlabel_h = "V - H"
-                ylabel_h = "V"
+                ylabel_h = "V"""
 
-            xval1 = v1 - h1  ## component 1
+            """xval1 = v1 - h1  ## component 1
             yval1 = v1 - d_modulus
             xval2 = v2 - h2  ## component 2
             yval2 = v2 - d_modulus
 
             xlabel = "V - H"
-            ylabel = "V"
+            ylabel = "V"""
 
             all_xval1.append(xval1)
             all_xval2.append(xval2)
@@ -875,13 +888,12 @@ for target_hd in Target_List:
         ax2.set_yscale("log")
         ax2.scatter(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, marker="+", color="Red",s = 5)
         ax2.plot(all_mass2_result[i], all_chi2_grid2[i], alpha=0.6, ls="--", color="red", linewidth =5)
-        # ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
+        #ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
         #ax2.legend()
         ax2.set_yscale("log")
         ax2.set_xlabel('Mass (solar)', fontsize=30)
         ax2.set_ylabel(r'$\chi^2$', fontsize=30)
         ax2.set_title('Mass 1 & 2 Guess', fontsize=35)
-
         #pdb.set_trace()
 
     for i in [4]:
@@ -942,7 +954,7 @@ for target_hd in Target_List:
         ax3.set_xlabel('Age', fontsize=35)
        # ax3.set_ylabel(r'$\chi^2$', fontsize=7)
         ax3.tick_params(axis='both', labelsize=30)
-        ax3.set_title("Chi2 vs Age, HD %s" % target_hd, fontsize=8)
+        ax3.set_title("Chi2 vs Age, HD %s" % target_hd, fontsize=40)
         ax3.set_aspect('auto')
         ax3.tick_params('y', labelleft=False)
 
@@ -1046,8 +1058,6 @@ for target_hd in Target_List:
         ax6.tick_params(axis='both', labelsize=30)
         ax6.set_aspect('auto')
 
-
-
     for i in [1]:
             ax1.plot(all_modelx_best[i], all_modely_best[i], color='blue', linewidth=5,label=f"Best log age_feh_-0.1 = {np.around(all_age_best[i], 2)} ")
             #ax1.invert_yaxis()
@@ -1067,6 +1077,7 @@ for target_hd in Target_List:
             #ax1.invert_yaxis()
             ax1.set_title("HD %s" % target_hd, fontsize=35)
             ax1.legend(fontsize=5)
+
     for i in [4]:
             ax1.plot(all_modelx_best[i], all_modely_best[i], label=f"Best log age = {np.around(all_age_best[i], 2)} ", color='black', linewidth=5)
             ax1.errorbar(all_xval1[i].nominal_value, all_yval1[i].nominal_value,
@@ -1075,23 +1086,43 @@ for target_hd in Target_List:
             ax1.errorbar(all_xval2[i].nominal_value, all_yval2[i].nominal_value,
                          xerr=all_xval2[i].std_dev, yerr=all_yval2[i].std_dev,
                          color="red")
-            ax1.annotate(f'Feh =-0.1: Age = {np.around(all_age_best[1], 2)}', xy=(all_xval1[i].nominal_value+0.3, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.3, all_yval1[i].nominal_value+1.2), color = 'blue',size=25)
-            ax1.annotate(f'Feh =+0.1: Age = {np.around(all_age_best[7], 2)}', xy=(all_xval1[i].nominal_value+0.3, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.3, all_yval1[i].nominal_value-0.3), color = 'green',size=25)
-            ax1.invert_yaxis()
+            #pdb.set_trace()
+            ax1.annotate(f'Feh =-0.1: Age = {np.around(all_age_best[1], 2)}', xy=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value+1.2), color = 'blue',size=25)
+            ax1.annotate(f'Feh =+0.1: Age = {np.around(all_age_best[7], 2)}', xy=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value-0.3), color = 'green',size=25)
             ax1.set_title("HD %s" % target_hd, fontsize=40)
             ax1.set_xlabel(xlabel, fontsize=35)
             ax1.set_ylabel(ylabel, fontsize=35)
             ax1.legend(fontsize=30)
+            comb_xvals = [all_xval2[i].nominal_value, all_xval1[i].nominal_value]
+            comb_err_xvals = [all_xval2[i].std_dev, all_xval1[i].std_dev]
+            idx_xmin = comb_xvals.index(np.min(comb_xvals))
+            idx_xmax = comb_xvals.index(np.max(comb_xvals))
             #pdb.set_trace()
-            x_axis_max = np.max(all_modelx_best[4])
-            x_axis_max = x_axis_max - 2
-            x_axis_min =np.min(all_modelx_best[4])
-            ax1.set_xlim(x_axis_min-0.2,x_axis_min+1)
-            #ax1.set_xlim(0,1)
+            if (np.min(comb_xvals) < np.median(all_modelx_best[i])) == True:
+                x_axis_max = np.median(all_modelx_best[i]) + 0.15
+                x_axis_min =np.min(comb_xvals) - comb_err_xvals[idx_xmin] - 0.1- comb_err_xvals[idx_xmin] - 0.1
+            elif (np.min(comb_xvals) < np.median(all_modelx_best[i])) == False:
+                x_axis_max = np.max(comb_xvals) + comb_err_xvals[idx_xmax] + 0.1
+                x_axis_min = np.median(all_modelx_best[i]) - 0.15
+            ax1.set_xlim(x_axis_min,x_axis_max)
+
+            comb_yvals = [all_yval2[i].nominal_value, all_yval1[i].nominal_value]
+            comb_err_yvals = [all_yval2[i].std_dev, all_yval1[i].std_dev]
+            idx_ymin = comb_yvals.index(np.min(comb_yvals))
+            idx_ymax = comb_yvals.index(np.max(comb_yvals))
+            if (np.min(comb_xvals) < np.median(all_modely_best[i])) == True:
+                y_axis_max = np.median(all_modely_best[i]) + 0.15
+                y_axis_min = np.min(comb_yvals) - comb_err_yvals[idx_ymin] - 0.1
+            elif (np.min(comb_yvals) < np.median(all_modely_best[i])) == False:
+                y_axis_max = np.max(comb_yvals) + comb_err_yvals[idx_ymax] + 0.1
+                y_axis_min = np.median(all_modely_best[i]) - 0.15
+            ax1.set_ylim(y_axis_min,y_axis_max)
+            ax1.invert_yaxis()
             ax1.tick_params(axis='both', labelsize=30)
             ax1.set_aspect('auto')
-
+    #pdb.set_trace()
     for i in range(len(all_m_dyn)):
+
         ax8.scatter(all_m_dyn[i].nominal_value, all_m_phot[i].nominal_value, s=25, color ='black')
         ax8.set_title('M_dyn vs M_phot', fontsize=40)
         ax8.set_xlim(all_m_dyn[0].nominal_value - 0.2, all_m_dyn[8].nominal_value + 0.2)
@@ -1166,10 +1197,14 @@ for target_hd in Target_List:
     #pdb.set_trace()
     ax7.set_aspect('equal')
     ax7.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
+    ax7.annotate(f"PA(deg)= {df_armada['PA(deg)_tycoDouble'][idx]}", xy=(0, 0), xytext=(2000, -300), color = 'black',size=35)
+    ax7.annotate(f"Sep(arcsec) ={df_armada['Sep(arcsec)'][idx]}", xy=(0, 0), xytext=(0.0, -100), color = 'black',size=35)
+    ax7.annotate(f"Triple = {df_armada['triple'][idx]}", xy=(0, 0), xytext=(0.0, -300), color = 'black',size=35)
+    ax7.annotate(f"Residual ={df_armada['residual (micro-as)'][idx]}", xy=(0, 0), xytext=(0.0, -100), color = 'black',size=35)
     ax7.annotate(f"e={df_armada['e'][idx]}", xy=(0, 0), xytext=(0.0, 4300), color = 'black',size=35)
     ax7.annotate(f"a(mas)={df_armada['a (mas)'][idx]}", xy=(0, 0), xytext=(2000, 4300), color = 'black',size=35)
     ax7.annotate(f"P(Yr)={df_armada['P (yr)'][idx]}", xy=(0, 0), xytext=(0, 4100), color = 'black',size=35)
-    ax7.annotate(f"d(kpc)={distance_best:.2f}", xy=(0, 0), xytext=(2000, 4100), color = 'black',size=35)
+    ax7.annotate(f"d(pc)={distance_best:.2f}", xy=(0, 0), xytext=(2000, 4100), color = 'black',size=35)
 
     #ax7.annotate(f"a={df_armada['plx (mas)'][idx]}", xy=(0.6, 0.01), xytext=(0.6, 0.01), color='black', size=5)
 
