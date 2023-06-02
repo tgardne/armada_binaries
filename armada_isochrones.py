@@ -72,17 +72,14 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = ['31297', '34319', '36058',  '37711', '38545'
-    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
-               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
-    , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
+Target_List = ['133955', '137798', '140159', '140436', '144892',
               '145589', '148283', '153370', '154569', '156190', '158140'
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
 
 
-Target_List_Fail = ['133955']
+Target_List_Fail = ['133955','112846','133484']
 
 
 ## Fuction to fit a single star model
@@ -945,7 +942,7 @@ for target_hd in Target_List:
 
     for i in [4]:
         idx_age1 = np.array(all_chi2_grid3[i]).argmin()
-        age1_best = all_ages[i][idx_mass1]
+        age1_best = all_ages[i][idx_age1]
         ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="black", label=f'Best Age ={age1_best:.2f}' ,  s = 5)
         ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="black", linewidth=5)
         ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
@@ -1087,8 +1084,8 @@ for target_hd in Target_List:
                          xerr=all_xval2[i].std_dev, yerr=all_yval2[i].std_dev,
                          color="red")
             #pdb.set_trace()
-            ax1.annotate(f'Feh =-0.1: Age = {np.around(all_age_best[1], 2)}', xy=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value+1.2), color = 'blue',size=25)
-            ax1.annotate(f'Feh =+0.1: Age = {np.around(all_age_best[7], 2)}', xy=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value-0.3), color = 'green',size=25)
+            ax1.annotate(f'Feh =-0.1: Age = {np.around(all_age_best[1], 2)}', xy=(all_xval1[i].nominal_value+0.05, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value+0.5), color = 'blue',size=25)
+            ax1.annotate(f'Feh =+0.1: Age = {np.around(all_age_best[7], 2)}', xy=(all_xval1[i].nominal_value+0.05, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value-0.1), color = 'green',size=25)
             ax1.set_title("HD %s" % target_hd, fontsize=40)
             ax1.set_xlabel(xlabel, fontsize=35)
             ax1.set_ylabel(ylabel, fontsize=35)
@@ -1197,8 +1194,8 @@ for target_hd in Target_List:
     #pdb.set_trace()
     ax7.set_aspect('equal')
     ax7.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
-    ax7.annotate(f"PA(deg)= {df_armada['PA(deg)_tycoDouble'][idx]}", xy=(0, 0), xytext=(2000, -300), color = 'black',size=35)
-    ax7.annotate(f"Sep(arcsec) ={df_armada['Sep(arcsec)'][idx]}", xy=(0, 0), xytext=(0.0, -100), color = 'black',size=35)
+    ax7.annotate(f"PA(deg)= {df_photometry['PA(deg)_tycoDouble'][idx]}", xy=(0, 0), xytext=(2000, -300), color = 'black',size=35)
+    ax7.annotate(f"Sep(arcsec) ={df_photometry['Sep(arcsec)'][idx]}", xy=(0, 0), xytext=(2000, -100), color = 'black',size=35)
     ax7.annotate(f"Triple = {df_armada['triple'][idx]}", xy=(0, 0), xytext=(0.0, -300), color = 'black',size=35)
     ax7.annotate(f"Residual ={df_armada['residual (micro-as)'][idx]}", xy=(0, 0), xytext=(0.0, -100), color = 'black',size=35)
     ax7.annotate(f"e={df_armada['e'][idx]}", xy=(0, 0), xytext=(0.0, 4300), color = 'black',size=35)
