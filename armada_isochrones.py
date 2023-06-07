@@ -72,7 +72,14 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = [ '27176']
+Target_List = ['27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
+    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
+               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
+    , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
+              '145589', '148283', '153370', '154569', '156190', '158140'
+    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
+               '196089', '196867', '198183', '199766', '201038', '206901'
+    , '217676', '217782', '220278', '224512']
 
 
 Target_List_Fail = ['133955','112846','133484']
@@ -311,7 +318,7 @@ for target_hd in Target_List:
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), 0.02)
         else:
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
-        pdb.set_trace()
+        #pdb.set_trace()
 
         fratio_h = 10 ** (cdiff_h / 2.5)
         fratio_k = 10 ** (cdiff_k / 2.5)
@@ -1146,7 +1153,7 @@ for target_hd in Target_List:
             comb_err_yvals = [all_yval2[i].std_dev, all_yval1[i].std_dev]
             idx_ymin = comb_yvals.index(np.min(comb_yvals))
             idx_ymax = comb_yvals.index(np.max(comb_yvals))
-            if (np.min(comb_xvals) < np.median(all_modely_best[i])) == True:
+            if (np.min(comb_yvals) < np.median(all_modely_best[i])) == True:
                 y_axis_max = np.median(all_modely_best[i]) + 0.15
                 y_axis_min = np.min(comb_yvals) - comb_err_yvals[idx_ymin] - 0.1
             elif (np.min(comb_yvals) < np.median(all_modely_best[i])) == False:
@@ -1241,6 +1248,8 @@ for target_hd in Target_List:
     ax7.annotate(f"a(mas)={df_armada['a (mas)'][idx]}", xy=(0, 0), xytext=(2000, 4300), color = 'black',size=35)
     ax7.annotate(f"P(Yr)={df_armada['P (yr)'][idx]}", xy=(0, 0), xytext=(0, 4100), color = 'black',size=35)
     ax7.annotate(f"d(pc)={distance_best:.2f}", xy=(0, 0), xytext=(2000, 4100), color = 'black',size=35)
+    ax7.annotate(f"Spectral Type={df_armada['SpType (primary?)'][idx]}", xy=(0, 0), xytext=(0, 3900), color = 'black',size=35)
+
 
     #ax7.annotate(f"a={df_armada['plx (mas)'][idx]}", xy=(0.6, 0.01), xytext=(0.6, 0.01), color='black', size=5)
 
