@@ -72,14 +72,13 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = ['27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
-    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
-               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
-    , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
-              '145589', '148283', '153370', '154569', '156190', '158140'
-    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
-               '196089', '196867', '198183', '199766', '201038', '206901'
-    , '217676', '217782', '220278', '224512']
+Target_List = [ '11031']# '60107', '64235',
+               #'75974', '78316', '82446', '87652', '87822', '107259', '112846'
+    #, '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
+    #         '145589', '148283', '153370', '154569', '156190', '158140'
+    #, '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
+    #          '196089', '196867', '198183', '199766', '201038', '206901'
+    #, '217676', '217782', '220278', '224512']
 
 
 Target_List_Fail = ['133955','112846','133484']
@@ -318,7 +317,7 @@ for target_hd in Target_List:
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), 0.02)
         else:
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
-        #pdb.set_trace()
+        pdb.set_trace()
 
         fratio_h = 10 ** (cdiff_h / 2.5)
         fratio_k = 10 ** (cdiff_k / 2.5)
@@ -339,7 +338,7 @@ for target_hd in Target_List:
         else:
             vtot = ufloat(float(df_photometry['V_complete'][idx1]), float(df_photometry['V_err_complete'][idx1]))
 
-        rtot = ufloat(float(df_photometry['R2_I/284'][idx1]), 0)
+        rtot = ufloat(float(df_photometry['R2_I/284'][idx1]), 0.15)
         gtot = ufloat(np.nan, np.nan)
         itot = ufloat(np.nan, np.nan)
 
@@ -529,7 +528,7 @@ for target_hd in Target_List:
             ## Explore a grid of chi2 over age -- this paramter does not fit properly in least squares
             chi2_grid3 = []
             ages = []
-            age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
+            age_grid = np.linspace(6, 13, 1000)  ## do fewer steps to go faster
 
             for aa in tqdm(age_grid):
                 try:
@@ -595,7 +594,7 @@ for target_hd in Target_List:
             emcee_params = result.params.copy()
             nwalkers = 2 * len(emcee_params)
             steps = 300
-            burn = 100
+            burn = 10
             thin = 1
 
             print("Running MCMC chains: ")
