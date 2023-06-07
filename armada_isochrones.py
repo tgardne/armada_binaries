@@ -72,7 +72,7 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = [ '133955','112846']
+Target_List = [ '27176']
 
 
 Target_List_Fail = ['133955','112846','133484']
@@ -284,11 +284,34 @@ for target_hd in Target_List:
         idx = np.where(df_armada['HD'] == target_hd)[0][0]
         Av = float(df_armada['Av'][idx])
 
-        cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]))
-        cdiff_k = ufloat(float(df_armada['dmag_k'][idx]), float(df_armada['dmag_k_err'][idx]))
-        cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
-        cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]), float(df_armada['dmag_speckle_b_err'][idx]))
-        cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
+        if np.isnan(float(df_armada['dmag_h_err'][idx])) == True or (float(df_armada['dmag_h_err'][idx])<0.02)==True:
+            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), 0.02)
+        else:
+            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
+
+        if np.isnan(float(df_armada['dmag_k_err'][idx])) == True or (float(df_armada['dmag_k_err'][idx])<0.02)==True:
+            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]), 0.02)
+        else:
+            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
+
+
+        if np.isnan(float(df_armada['dmag_speckle_i_err'][idx])) == True or (float(df_armada['dmag_speckle_i_err'][idx])<0.02)==True:
+            cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), 0.02)
+        else:
+            cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
+
+
+        if np.isnan(float(df_armada['dmag_speckle_b_err'][idx])) == True or (float(df_armada['dmag_speckle_b_err'][idx])<0.02)==True:
+            cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]), 0.02)
+        else:
+            cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]),float(df_armada['dmag_speckle_b_err'][idx]))
+
+
+        if np.isnan(float(df_armada['dmag_wds_v_err'][idx])) == True or (float(df_armada['dmag_wds_v_err'][idx])<0.2)==True:
+            cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), 0.02)
+        else:
+            cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
+        pdb.set_trace()
 
         fratio_h = 10 ** (cdiff_h / 2.5)
         fratio_k = 10 ** (cdiff_k / 2.5)
@@ -299,14 +322,34 @@ for target_hd in Target_List:
         ## get total magnitudes and errors from photometry file
         idx1 = np.where(df_photometry['HD'] == target_hd)[0][0]
         utot = ufloat(np.nan, np.nan)
-        btot = ufloat(float(df_photometry['B_complete'][idx1]), float(df_photometry['B_err_complete'][idx1]))
-        vtot = ufloat(float(df_photometry['V_complete'][idx1]), float(df_photometry['V_err_complete'][idx1]))
+        if np.isnan(float(df_photometry['B_err_complete'][idx1])) or float(df_photometry['B_err_complete'][idx1]) < 0.02:
+            btot = ufloat(float(df_photometry['B_complete'][idx1]), 0.02)
+        else:
+            btot = ufloat(float(df_photometry['B_complete'][idx1]), float(df_photometry['B_err_complete'][idx1]))
+
+        if np.isnan(float(df_photometry['V_err_complete'][idx1])) or float(df_photometry['V_err_complete'][idx1]) < 0.02:
+            vtot = ufloat(float(df_photometry['V_complete'][idx1]), 0.02)
+        else:
+            vtot = ufloat(float(df_photometry['V_complete'][idx1]), float(df_photometry['V_err_complete'][idx1]))
+
         rtot = ufloat(float(df_photometry['R2_I/284'][idx1]), 0)
-        gtot = ufloat(float(df_photometry['G _I/350/gaiaedr3'][idx1]), float(df_photometry['G_err'][idx1]))
+        gtot = ufloat(np.nan, np.nan)
         itot = ufloat(np.nan, np.nan)
-        jtot = ufloat(float(df_photometry['J_ II/246/out'][idx1]), float(df_photometry['J_err'][idx1]))
-        htot = ufloat(float(df_photometry['H_ II/246/out'][idx1]), float(df_photometry['H_err'][idx1]))
-        ktot = ufloat(float(df_photometry['K_ II/246/out'][idx1]), float(df_photometry['K_err'][idx1]))
+
+        if np.isnan(float(df_photometry['J_err'][idx1])) or float(df_photometry['J_err'][idx1]) < 0.02:
+            jtot = ufloat(float(df_photometry['J_ II/246/out'][idx1]), 0.02)
+        else:
+            jtot = ufloat(float(df_photometry['J_ II/246/out'][idx1]), float(df_photometry['J_err'][idx1]))
+
+        if np.isnan(float(df_photometry['H_err'][idx1])) or float(df_photometry['H_err'][idx1]) < 0.02:
+            htot = ufloat(float(df_photometry['H_ II/246/out'][idx1]), 0.02)
+        else:
+            htot = ufloat(float(df_photometry['H_ II/246/out'][idx1]), float(df_photometry['H_err'][idx1]))
+
+        if np.isnan(float(df_photometry['K_err'][idx1])) or float(df_photometry['K_err'][idx1]) < 0.02:
+            ktot = ufloat(float(df_photometry['K_ II/246/out'][idx1]), 0.02)
+        else:
+            ktot = ufloat(float(df_photometry['K_ II/246/out'][idx1]), float(df_photometry['K_err'][idx1]))
 
         ## Compute individual magnitudes from flux ratios and total magnitudes
         ## Mostly for plotting. Though we will use these to estimate M1 and M2 roughly
