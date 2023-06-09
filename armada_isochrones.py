@@ -72,13 +72,14 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = [ '11031']# '60107', '64235',
-               #'75974', '78316', '82446', '87652', '87822', '107259', '112846'
-    #, '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
-    #         '145589', '148283', '153370', '154569', '156190', '158140'
-    #, '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
-    #          '196089', '196867', '198183', '199766', '201038', '206901'
-    #, '217676', '217782', '220278', '224512']
+Target_List = [ '2772', '11031', '31297','37711', '38545'
+    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
+               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
+    , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
+              '145589', '148283', '153370', '154569', '156190', '158140'
+    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
+               '196089', '196867', '198183', '199766', '201038', '206901'
+    , '217676', '217782', '220278', '224512']
 
 
 Target_List_Fail = ['133955','112846','133484']
@@ -317,7 +318,7 @@ for target_hd in Target_List:
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), 0.02)
         else:
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
-        pdb.set_trace()
+        #pdb.set_trace()
 
         fratio_h = 10 ** (cdiff_h / 2.5)
         fratio_k = 10 ** (cdiff_k / 2.5)
@@ -340,6 +341,7 @@ for target_hd in Target_List:
 
         rtot = ufloat(float(df_photometry['R2_I/284'][idx1]), 0.15)
         gtot = ufloat(np.nan, np.nan)
+
         itot = ufloat(np.nan, np.nan)
 
         if np.isnan(float(df_photometry['J_err'][idx1])) or float(df_photometry['J_err'][idx1]) < 0.02:
@@ -528,12 +530,12 @@ for target_hd in Target_List:
             ## Explore a grid of chi2 over age -- this paramter does not fit properly in least squares
             chi2_grid3 = []
             ages = []
-            age_grid = np.linspace(6, 13, 1000)  ## do fewer steps to go faster
+            age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
 
             for aa in tqdm(age_grid):
                 try:
                     params = Parameters()
-                    params.add('age', value=aa, vary=False)
+                    params.add('age', value=aa, vary=True)
                     params.add('mass1', value=mass1_guess, min=0)
                     params.add('mass2', value=mass2_guess, min=0)
                     params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
@@ -677,7 +679,7 @@ for target_hd in Target_List:
             TOTmag_model = -2.5 * np.log10(10 ** (-0.4 * model1) + 10 ** (-0.4 * model2))
 
             ## central wavelengths of Simbad magnitudes chosen above (UBVRIJHK)
-            x_wave = np.array([365.6, 435.3, 547.7, 658, 832, 1220, 1630, 2190])
+            x_wave = np.array([365.6, 435.3, 547.7, 675, 832, 1220, 1630, 2190])
             #fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
             #fig.tight_layout()
             yplot = TOT_Mag
@@ -1128,7 +1130,6 @@ for target_hd in Target_List:
             ax1.errorbar(all_xval2[i].nominal_value, all_yval2[i].nominal_value,
                          xerr=all_xval2[i].std_dev, yerr=all_yval2[i].std_dev,
                          color="red")
-            #pdb.set_trace()
             ax1.annotate(f'Feh =-0.1: Age = {np.around(all_age_best[1], 2)}', xy=(all_xval1[i].nominal_value+0.05, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value+0.5), color = 'blue',size=25)
             ax1.annotate(f'Feh =+0.1: Age = {np.around(all_age_best[7], 2)}', xy=(all_xval1[i].nominal_value+0.05, all_yval1[i].nominal_value), xytext=(all_xval1[i].nominal_value+0.2, all_yval1[i].nominal_value-0.1), color = 'green',size=25)
             ax1.set_title("HD %s" % target_hd, fontsize=40)
@@ -1137,27 +1138,40 @@ for target_hd in Target_List:
             ax1.legend(fontsize=30)
             comb_xvals = [all_xval2[i].nominal_value, all_xval1[i].nominal_value]
             comb_err_xvals = [all_xval2[i].std_dev, all_xval1[i].std_dev]
-            idx_xmin = comb_xvals.index(np.min(comb_xvals))
-            idx_xmax = comb_xvals.index(np.max(comb_xvals))
             #pdb.set_trace()
+            main_xvals = [all_modely_best[i]]
+            #pdb.set_trace()
+
+
             if (np.min(comb_xvals) < np.median(all_modelx_best[i])) == True:
                 x_axis_max = np.median(all_modelx_best[i]) + 0.15
+                idx_xmax = comb_xvals.index(np.max(comb_xvals))
+                idx_xmin = comb_xvals.index(np.min(comb_xvals))
                 x_axis_min =np.min(comb_xvals) - comb_err_xvals[idx_xmin] - 0.1- comb_err_xvals[idx_xmin] - 0.1
-            elif (np.min(comb_xvals) < np.median(all_modelx_best[i])) == False:
+            elif (np.min(comb_xvals) < np.median(all_modelx_best[i])) and np.isnan(comb_xvals[1]) == False:
+                idx_xmax = comb_xvals.index(np.max(comb_xvals))
                 x_axis_max = np.max(comb_xvals) + comb_err_xvals[idx_xmax] + 0.1
                 x_axis_min = np.median(all_modelx_best[i]) - 0.15
+            elif np.isnan(comb_xvals[1]) == True:
+                x_axis_min = np.min(all_modelx_best[i])-0.15
+                x_axis_max = np.max(all_modelx_best[i]) - 0.15
             ax1.set_xlim(x_axis_min,x_axis_max)
 
             comb_yvals = [all_yval2[i].nominal_value, all_yval1[i].nominal_value]
             comb_err_yvals = [all_yval2[i].std_dev, all_yval1[i].std_dev]
-            idx_ymin = comb_yvals.index(np.min(comb_yvals))
-            idx_ymax = comb_yvals.index(np.max(comb_yvals))
             if (np.min(comb_yvals) < np.median(all_modely_best[i])) == True:
+                idx_ymin = comb_yvals.index(np.min(comb_yvals))
+                idx_ymax = comb_yvals.index(np.max(comb_yvals))
                 y_axis_max = np.median(all_modely_best[i]) + 0.15
                 y_axis_min = np.min(comb_yvals) - comb_err_yvals[idx_ymin] - 0.1
-            elif (np.min(comb_yvals) < np.median(all_modely_best[i])) == False:
+            elif (np.min(comb_yvals) < np.median(all_modely_best[i])) and np.isnan(comb_yvals[1]) == False:
+                idx_ymin = comb_yvals.index(np.min(comb_yvals))
+                idx_ymax = comb_yvals.index(np.max(comb_yvals))
                 y_axis_max = np.max(comb_yvals) + comb_err_yvals[idx_ymax] + 0.1
                 y_axis_min = np.median(all_modely_best[i]) - 0.15
+            elif np.isnan(comb_yvals[1]) == True:
+                y_axis_min = np.min(all_modely_best[i])-0.15
+                y_axis_max = np.max(all_modely_best[i]) - 0.15
             ax1.set_ylim(y_axis_min,y_axis_max)
             ax1.invert_yaxis()
             ax1.tick_params(axis='both', labelsize=30)
