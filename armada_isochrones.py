@@ -72,7 +72,7 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = [ '2772', '11031', '31297','37711', '38545'
+Target_List = [ '1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
     , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
                '75974', '78316', '82446', '87652', '87822', '107259', '112846'
     , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
@@ -415,7 +415,7 @@ for target_hd in Target_List:
 
             ## central wavelengths of magnitudes chosen above, smallest to largest - ubvrgjhk
             ## Bessel_U, Bessel_B, Bessel_V, Bessel_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
-            x = np.array([365, 445, 551, 658, 673, 806, 1250, 1650, 2150])
+            x = np.array([365, 445, 551, 675, 673, 806, 1250, 1650, 2150])
             y = np.array([utot.nominal_value, btot.nominal_value, vtot.nominal_value,
                           rtot.nominal_value, gtot.nominal_value, itot.nominal_value, jtot.nominal_value,
                           htot.nominal_value, ktot.nominal_value])
