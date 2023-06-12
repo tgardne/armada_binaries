@@ -193,8 +193,8 @@ def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
 
     diff1 = (D_mag_val - D_mag_model) / D_mag_err
 
-    ## Bessel_U, Bessel_B, Bessel_V, Bessel_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
-    # Wavelengths = np.array([365, 445, 551, 658, 673, 806, 905, 1250, 1650, 2150])
+    ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
+    # Wavelengths = np.array([365, 445, 551, 675, 673, 806, 905, 1250, 1650, 2150])
 
     mag1_model = np.array([(a1['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
@@ -414,7 +414,7 @@ for target_hd in Target_List:
             name = f"{note}_{feh}_{distance.nominal_value}"
 
             ## central wavelengths of magnitudes chosen above, smallest to largest - ubvrgjhk
-            ## Bessel_U, Bessel_B, Bessel_V, Bessel_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
+            ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
             x = np.array([365, 445, 551, 675, 673, 806, 1250, 1650, 2150])
             y = np.array([utot.nominal_value, btot.nominal_value, vtot.nominal_value,
                           rtot.nominal_value, gtot.nominal_value, itot.nominal_value, jtot.nominal_value,
