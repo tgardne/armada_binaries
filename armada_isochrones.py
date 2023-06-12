@@ -530,12 +530,12 @@ for target_hd in Target_List:
             ## Explore a grid of chi2 over age -- this paramter does not fit properly in least squares
             chi2_grid3 = []
             ages = []
-            age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
+            age_grid = np.linspace(6, 10, 250)  ## do fewer steps to go faster
 
             for aa in tqdm(age_grid):
                 try:
                     params = Parameters()
-                    params.add('age', value=aa, vary=True)
+                    params.add('age', value=aa, vary=False)
                     params.add('mass1', value=mass1_guess, min=0)
                     params.add('mass2', value=mass2_guess, min=0)
                     params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
@@ -972,6 +972,16 @@ for target_hd in Target_List:
         #ax3.set_ylabel(r'$\chi^2$', fontsize=6)
         ax3.set_aspect('equal')
 
+    for i in [7]:
+        ax3.scatter(all_ages[i], all_chi2_grid3[i], alpha=0.6, marker="+", color="green",  s = 5)
+        ax3.plot(all_ages[i], all_chi2_grid3[i], alpha=0.6, ls="--", color="green", linewidth=5)
+        ax3.axhline(y=1, color="red", alpha=0.6)
+        #ax3.legend()
+        ax3.set_yscale("log")
+        ax3.set_xlabel('Age', fontsize=30)
+        #ax3.set_ylabel(r'$\chi^2$', fontsize=6)
+        ax3.set_aspect('equal')
+
     #pdb.set_trace()
 
     for i in [3,5]:
@@ -1007,10 +1017,18 @@ for target_hd in Target_List:
 
 
     #pdb.set_trace()
-    for i in [1,7]:
+    for i in [1]:
         #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
         #ax4.errorbar(all_xwave, unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black')
         ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='blue', linewidth=5)
+        # ax1.set_xlabel('Wavelength (nm)')
+        #ax4.set_ylabel('Total Mag', fontsize=5)
+        #ax4.invert_yaxis()
+
+    for i in [7]:
+        #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
+        #ax4.errorbar(all_xwave, unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black')
+        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='green', linewidth=5)
         # ax1.set_xlabel('Wavelength (nm)')
         #ax4.set_ylabel('Total Mag', fontsize=5)
         #ax4.invert_yaxis()
@@ -1037,9 +1055,16 @@ for target_hd in Target_List:
 
 
 
-    for i in [1,7]:
+    for i in [1]:
         #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
         ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='blue', linewidth=5)
+        # ax2.set_xlabel('Wavelength (nm)')
+        #ax5.invert_yaxis()
+        #ax5.set_ylabel('Diff Mag')
+
+    for i in [7]:
+        #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
+        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='green', linewidth=5)
         # ax2.set_xlabel('Wavelength (nm)')
         #ax5.invert_yaxis()
         #ax5.set_ylabel('Diff Mag')
@@ -1066,7 +1091,7 @@ for target_hd in Target_List:
         ax5.tick_params('x', labelbottom=False)
 
 
-    for i in [1,7]:
+    for i in [1]:
         #ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
         ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='blue', ms=5, elinewidth=5,
              ecolor='black', capsize=5, capthick=5)
@@ -1077,6 +1102,19 @@ for target_hd in Target_List:
         #ax6.invert_yaxis()
         ax6.set_xlabel('Wavelength (nm)', fontsize=25)
         ax6.set_ylabel('Apparent Mag', fontsize=25)
+
+    for i in [7]:
+        #ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='green', ms=5, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
+        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='green', ms=5, elinewidth=5,
+             ecolor='black', capsize=5, capthick=5)
+        ax6.plot(all_xwave[i], all_model1[i], '--', color='green', linewidth=5)
+        ax6.plot(all_xwave[i], all_model2[i], '--', color='green', linewidth=5)
+        #ax6.invert_yaxis()
+        ax6.set_xlabel('Wavelength (nm)', fontsize=25)
+        ax6.set_ylabel('Apparent Mag', fontsize=25)
+
     for i in [3,5]:
         ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=8)
         ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='red', ms=5, elinewidth=5,
@@ -1164,7 +1202,7 @@ for target_hd in Target_List:
                 idx_ymax = comb_yvals.index(np.max(comb_yvals))
                 y_axis_max = np.median(all_modely_best[i]) + 0.15
                 y_axis_min = np.min(comb_yvals) - comb_err_yvals[idx_ymin] - 0.1
-            elif (np.min(comb_yvals) < np.median(all_modely_best[i])) and np.isnan(comb_yvals[1]) == False:
+            elif (np.min(comb_yvals) > np.median(all_modely_best[i])) == True  and np.isnan(comb_yvals[1]) == False:
                 idx_ymin = comb_yvals.index(np.min(comb_yvals))
                 idx_ymax = comb_yvals.index(np.max(comb_yvals))
                 y_axis_max = np.max(comb_yvals) + comb_err_yvals[idx_ymax] + 0.1
