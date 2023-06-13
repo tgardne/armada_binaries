@@ -479,8 +479,8 @@ for target_hd in Target_List:
             ##################
             ## Now let's find best masses and age
             ##################
-            mass1_grid = np.linspace(0.5,5,100)
-            mass2_grid = np.linspace(0.5,5,100)
+            mass1_grid = np.linspace(0.5,5,50)
+            mass2_grid = np.linspace(0.5,5,50)
             age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
 
             print('Grid Searching over AGE to find best fit')
@@ -496,10 +496,13 @@ for target_hd in Target_List:
                     idx_mass2 = np.argmin(chi2_grid2)
                     mass2_guess = mass2_result[idx_mass2]
 
+                    mass1_max = np.nanmax(mass1_result)
+                    mass2_max = np.nanmax(mass2_result)
+
                     params = Parameters()
                     params.add('age', value=aa, vary=False)
-                    params.add('mass1', value=mass1_guess, vary=False)#min=0)
-                    params.add('mass2', value=mass2_guess, vary=False)#min=0)
+                    params.add('mass1', value=mass1_guess, min=0, max=mass1_max)
+                    params.add('mass2', value=mass2_guess, min=0, max=mass2_max)
                     params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
                     minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
                                     nan_policy='omit')
