@@ -72,8 +72,7 @@ Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']"""
 
-Target_List = [ '1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
-    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
+Target_List = ['47105', '48581', '49643', '60107', '64235',
                '75974', '78316', '82446', '87652', '87822', '107259', '112846'
     , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
               '145589', '148283', '153370', '154569', '156190', '158140'
@@ -1186,7 +1185,7 @@ for target_hd in Target_List:
                 idx_xmax = comb_xvals.index(np.max(comb_xvals))
                 idx_xmin = comb_xvals.index(np.min(comb_xvals))
                 x_axis_min =np.min(comb_xvals) - comb_err_xvals[idx_xmin] - 0.1- comb_err_xvals[idx_xmin] - 0.1
-            elif (np.min(comb_xvals) < np.median(all_modelx_best[i])) and np.isnan(comb_xvals[1]) == False:
+            elif (np.min(comb_xvals) < np.median(all_modelx_best[i])) == False and np.isnan(comb_xvals[1]) == False:
                 idx_xmax = comb_xvals.index(np.max(comb_xvals))
                 x_axis_max = np.max(comb_xvals) + comb_err_xvals[idx_xmax] + 0.1
                 x_axis_min = np.median(all_modelx_best[i]) - 0.15
