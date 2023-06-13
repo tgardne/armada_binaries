@@ -1,54 +1,45 @@
-import pdb
 import shutil
-from os.path import isfile, join
-from os import listdir
-import numpy
-import cv2
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
-import matplotlib as mpl
 from matplotlib.gridspec import GridSpec
 import os
-import random
-from astroquery.simbad import Simbad
 from uncertainties import ufloat, unumpy
 from uncertainties.umath import *
 import pandas as pd
 from tqdm import tqdm
-import time
 from isochrones.mist import MIST_EvolutionTrack, MIST_Isochrone
 from isochrones import get_ichrone
 from lmfit import minimize, Minimizer, Parameters, Parameter, report_fit
 import corner
 from isochrones.mist.bc import MISTBolometricCorrectionGrid
-import fitz
-import matplotlib.image as mpimg
 from skimage import io
-from PIL import Image
 from pdf2image import convert_from_path, convert_from_bytes
 import matplotlib
-matplotlib.use('Agg')
+from pathlib import Path
+#matplotlib.use('Agg')
 
 Mist_iso = MIST_Isochrone()
 Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
+summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
+armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
+photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
+csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
+corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
 
-summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
-save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
-photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
-orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
-corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
+#summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
+#save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
+#armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
+#photometry_file = '/home/colton/armada_binaries/Photometry.csv'
+#orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
+##csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
+#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
 
 Header =["HD", "M_Dyn", "M_Dyn_err",
                         "M_Tot", "M_Tot_err", "M1",
@@ -79,6 +70,7 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
+Target_List = ['38769']
 
 
 Target_List_Fail = ['133955','112846','133484']
@@ -102,6 +94,10 @@ def single_star_fit(params,split_mag_star,d_mod,Av):
                            a1["H_mag"],
                            a1["K_mag"]])
     diff = (split_mag_val - split_mag_model) / split_mag_err
+
+    if np.isnan(a1['Mbol']):
+        diff[:] = FAIL ## can do this more elegantly. This will just kill the minimization :)
+
     return(diff)
 
 ## Objective function for binaries to be minimized for lmfit
@@ -144,8 +140,9 @@ def isochrone_model(params, TOT_mag_star, D_mag_star, d_mod, Av):
 
     # print(age.value, m1.value, m2.value,diff1,diff2)
     if np.isnan(a1['Mbol']) or np.isnan(a2['Mbol']):
-        diff1[:] = np.inf
-        diff2[:] = np.inf
+        print('ALL NAN ENCOUNTERED. NEED TO FIX!!')
+        diff1[:] = FAIL
+        diff2[:] = FAIL ## kill the minimization in these cases. Need to fix
 
     return np.concatenate([diff1, diff2])
 
@@ -173,8 +170,9 @@ def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
     a1 = tracks.generate(m1, age, feh, return_dict=True)
     a2 = tracks.generate(m2, age, feh, return_dict=True)
 
-    # if np.isnan(a1['Mbol']) or np.isnan(a2['Mbol']):
-    #    return np.inf
+    if np.isnan(a1['Mbol']) or np.isnan(a2['Mbol']):
+       print('ALL NAN ENCOUNTERED. NEED TO FIX!!')
+       FAIL ## kill the program
 
     mag1_model = np.array([(a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
@@ -219,6 +217,46 @@ def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
     # print(np.concatenate([diff1,diff2]).size)
 
     return np.concatenate([diff1, diff2])
+
+def mass_search(mass1_grid,mass2_grid,log_age_guess,split_mag1,split_mag2,d_modulus,Av,feh):
+        
+    ## search for mass 1
+    chi2_grid1 = []
+    mass1_result = []
+    for mm in mass1_grid:
+        try:
+            params = Parameters()
+            params.add('age', value=log_age_guess, vary=False) ## NOTE: I could vary this!
+            params.add('mass', value=mm, vary=False)
+            params.add('feh', value=feh, vary=False)
+            minner = Minimizer(single_star_fit, params, fcn_args=(split_mag1, d_modulus.nominal_value, Av),
+                            nan_policy='omit')
+            result = minner.minimize()
+            chi2_grid1.append(result.redchi)
+            mass1_result.append(mm)
+        except:
+            # print("Fails at log age = %s"%aa)
+            pass
+
+    ## search for mass 2
+    chi2_grid2 = []
+    mass2_result = []
+    for mm in mass2_grid:
+        try:
+            params = Parameters()
+            params.add('age', value=log_age_guess, vary=False) ## NOTE: I could vary this!
+            params.add('mass', value=mm, vary=False)
+            params.add('feh', value=feh, vary=False)
+            minner = Minimizer(single_star_fit, params, fcn_args=(split_mag2, d_modulus.nominal_value, Av),
+                            nan_policy='omit')
+            result = minner.minimize()
+            chi2_grid2.append(result.redchi)
+            mass2_result.append(mm)
+        except:
+            # print("Fails at log age = %s"%aa)
+            pass
+
+    return chi2_grid1,mass1_result,chi2_grid2,mass2_result
 
 
 feh_set = [-0.1,0,0.1]
@@ -282,9 +320,6 @@ for target_hd in Target_List:
         if not os.path.exists(directory2):
             print("Creating directory")
             os.makedirs(directory2)
-
-        corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
-
 
 
         idx = np.where(df_armada['HD'] == target_hd)[0][0]
@@ -442,140 +477,85 @@ for target_hd in Target_List:
             DiffM = np.array([cdiff_wds, cdiff_b, cdiff_i, cdiff_h, cdiff_k])
 
             ##################
-            ## Now let's do a rough estimation of M1 and M2 for age grid
+            ## Now let's find best masses and age
             ##################
-            print("Estimating M1 and M2 for age grid")
-            log_age_guess = 8 ## rough age of main sequence Astar... might want to check
-            mass1_grid = np.linspace(0.5,5,50)
-            mass2_grid = np.linspace(0.5,5,50)
+            mass1_grid = np.linspace(0.5,5,100)
+            mass2_grid = np.linspace(0.5,5,100)
+            age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
 
-
-            ## Explore a grid of chi2 over M1 at fixed age
-            chi2_grid = []
-            mass1_result = []
-            for mm in mass1_grid:
-                try:
-                    params = Parameters()
-                    params.add('age', value=log_age_guess, vary=False) ## NOTE: I could vary this!
-                    params.add('mass', value=mm, vary=False)
-                    params.add('feh', value=feh, vary=False)
-                    minner = Minimizer(single_star_fit, params, fcn_args=(split_mag1, d_modulus.nominal_value, Av),
-                                    nan_policy='omit')
-                    result = minner.minimize()
-                    chi2_grid.append(result.redchi)
-                    mass1_result.append(mm)
-                except:
-                    # print("Fails at log age = %s"%aa)
-                    pass
-
-            idx_mass1 = np.argmin(chi2_grid)
-            mass1_guess = mass1_result[idx_mass1]
-            all_mass1_result.append(mass1_result)
-            all_chi2_grid.append(chi2_grid)
-
-            print("Mass 1 Guess = %s" % mass1_guess)
-
-            ax2.scatter(mass1_result, chi2_grid, alpha=0.6, marker="+", color="blue", label = 'Mass 1')
-            ax2.plot(mass1_result, chi2_grid, alpha=0.6, ls="--", color="black")
-            ax2.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
-            #ax3.legend()
-            ax2.set_yscale("log")
-            ax2.set_xlabel('Mass (solar)', fontsize=15)
-            ax2.set_ylabel(r'$\chi^2$', fontsize=15)
-            #ax3.set_title('Mass 1 Guess = %s Msun'%np.around(mass1_guess,2))
-            #plt.savefig("%s/HD_%s_%s_chi2_mass1.pdf" % (directory, target_hd, name))
-            #plt.close()
-
-            ## Explore a grid of chi2 over M1 at fixed age
-            chi2_grid2 = []
-            mass2_result = []
-            for mm in mass2_grid:
-                try:
-                    params = Parameters()
-                    params.add('age', value=log_age_guess, vary=False) ## NOTE: I could vary this!
-                    params.add('mass', value=mm, vary=False)
-                    params.add('feh', value=feh, vary=False)
-                    minner = Minimizer(single_star_fit, params, fcn_args=(split_mag2, d_modulus.nominal_value, Av),
-                                    nan_policy='omit')
-                    result = minner.minimize()
-                    chi2_grid2.append(result.redchi)
-                    mass2_result.append(mm)
-                except:
-                    # print("Fails at log age = %s"%aa)
-                    pass
-
-            idx_mass2 = np.argmin(chi2_grid2)
-            all_mass2_result.append(mass2_result)
-            all_chi2_grid2.append(chi2_grid2)
-            mass2_guess = mass2_result[idx_mass2]
-            print("Mass 2 Guess = %s" % mass2_guess)
-
-            ax2.scatter(mass2_result, chi2_grid, alpha=0.6, marker="+", color="Red", label ='Mass 2')
-            ax2.plot(mass2_result, chi2_grid, alpha=0.6, ls="--", color="black")
-            #ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
-            ax2.legend()
-            ax2.set_yscale("log")
-            ax2.set_xlabel('Mass 2 (solar)', fontsize=15)
-            ax2.set_ylabel(r'$\chi^2$', fontsize=15)
-            ax2.set_title('Mass 1 & 2 Guess = %s Msun'%np.around(mass2_guess,2))
-            #plt.savefig("%s/HD_%s_%s_chi2_mass2.pdf" % (directory, target_hd, name))
-            #plt.close()
-
-            ##################
-            ## Now let's find the best age with our M1 and M2 starting points
-            ##################
             print('Grid Searching over AGE to find best fit')
             #pdb.set_trace()
             ## Explore a grid of chi2 over age -- this paramter does not fit properly in least squares
-            chi2_grid3 = []
+            chi2_grid = []
             ages = []
-            age_grid = np.linspace(6, 10, 250)  ## do fewer steps to go faster
-
             for aa in tqdm(age_grid):
                 try:
+                    chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,aa,split_mag1,split_mag2,d_modulus,Av,feh)
+                    idx_mass1 = np.argmin(chi2_grid1)
+                    mass1_guess = mass1_result[idx_mass1]
+                    idx_mass2 = np.argmin(chi2_grid2)
+                    mass2_guess = mass2_result[idx_mass2]
+
                     params = Parameters()
                     params.add('age', value=aa, vary=False)
-                    params.add('mass1', value=mass1_guess, min=0)
-                    params.add('mass2', value=mass2_guess, min=0)
+                    params.add('mass1', value=mass1_guess, vary=False)#min=0)
+                    params.add('mass2', value=mass2_guess, vary=False)#min=0)
                     params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
                     minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
                                     nan_policy='omit')
                     result = minner.minimize()
-                    chi2_grid3.append(result.redchi)
-                    ages.append(aa)
+                    chi2_grid.append(result.redchi)
+                    ages.append(result.params['age'].value)
                 except:
                     # print("Fails at log age = %s"%aa)
                     pass
 
-            idx2 = np.argmin(chi2_grid3)
-
-            all_chi2_grid3.append(chi2_grid3)
+            ## Get best age
+            idx_age = np.argmin(chi2_grid)
+            all_chi2_grid3.append(chi2_grid)
             all_ages.append(ages)
-            age_best = ages[idx2]
+            age_best = ages[idx_age]
             age_max = ages[-1]
+            #print('Fit fails at log Age = %s' % age_max)
 
-            ax3.scatter(ages, chi2_grid3, alpha=0.6, marker="+", color="blue")
-            ax3.plot(ages, chi2_grid3, alpha=0.6, ls="--", color="black")
+            ## Make chi2 plot of masses at best age
+            chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,age_best,split_mag1,split_mag2,d_modulus,Av,feh)
+
+            idx_mass1 = np.argmin(chi2_grid1)
+            mass1_best = mass1_result[idx_mass1]
+            all_mass1_result.append(mass1_result)
+            all_chi2_grid.append(chi2_grid1)
+
+            idx_mass2 = np.argmin(chi2_grid2)
+            all_mass2_result.append(mass2_result)
+            all_chi2_grid2.append(chi2_grid2)
+            mass2_best = mass2_result[idx_mass2]
+
+            ## Plot Mass 1 and Mass 2 chi2 grids
+            ax2.scatter(mass1_result, chi2_grid1, alpha=0.6, marker=".", color="Blue", label ='Mass 1')
+            ax2.scatter(mass2_result, chi2_grid2, alpha=0.6, marker="+", color="Red", label ='Mass 2')
+            ax2.plot(mass1_result, chi2_grid1, alpha=0.6, ls="--", color="black")
+            ax2.plot(mass2_result, chi2_grid2, alpha=0.6, ls="--", color="black")
+            ax2.legend()
+            ax2.set_yscale("log")
+            ax2.set_xlabel('Mass (solar)', fontsize=15)
+            ax2.set_ylabel(r'$\chi^2$', fontsize=15)
+            ax2.set_title('M1 = %s, M2 = %s'%(np.around(mass1_best,2),np.around(mass2_best,2)))
+
+            ## Plot age chi2 grid
+            ax3.scatter(ages, chi2_grid, alpha=0.6, marker="+", color="blue")
+            ax3.plot(ages, chi2_grid, alpha=0.6, ls="--", color="black")
             ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
             ax3.legend()
             ax3.set_yscale("log")
             ax3.set_xlabel('Age', fontsize=15)
             ax3.set_ylabel(r'$\chi^2$', fontsize=15)
-            #fig.show()
-            #fig.savefig("%s/HD_%s_%s_original_SEDs_hr_chi2_age_mass.pdf" % (directory, target_hd, note))
-            #fig.savefig("%s/HD_%s_%s_original_SEDs_hr_chi2_age_mass.pdf" % (directory2, target_hd, note))
 
-
-
-            print("Best log Age = %s" % age_best)
-            print('Fit fails at log Age = %s' % age_max)
-            ## start with a chi2 fit (this does not always work)
-            ## NOTE --> Since isochrones has a fixed age grid, the fitting currently fails to optimize this parameter
-            ## We can search age on a grid, or change the default step size for the parameter
+            ## Do one more least squares fit to minimize all parameters
             params = Parameters()
             params.add('age', value=age_best, min=6, max=age_max)
-            params.add('mass1', value=mass1_guess, min=0)  # , max=max_mass)
-            params.add('mass2', value=mass2_guess, min=0)  # , max=max_mass)
+            params.add('mass1', value=mass1_best, min=0)  # , max=max_mass)
+            params.add('mass2', value=mass2_best, min=0)  # , max=max_mass)
             params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
             minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
                                nan_policy='omit')
@@ -588,6 +568,10 @@ for target_hd in Target_List:
             mass2_best = result.params['mass2'].value
             feh_best = result.params['feh'].value
             redchi2_best = result.redchi
+
+            print("Best log Age = %s" % age_best)
+            print("Best M1 = %s" % mass1_best)
+            print("Best M2 = %s" % mass2_best)
 
             ########################
             ########################
@@ -825,7 +809,7 @@ for target_hd in Target_List:
             all_yval1.append(yval1)
             all_yval2.append(yval2)
 
-            iso_start = 100
+            iso_start = 50
             iso_end = 500
             for i, iso in enumerate(isoList):
                 ## make sure model matches data magnitudes
@@ -876,7 +860,7 @@ for target_hd in Target_List:
                                 log_age=[age.nominal_value], log_age_err=[age.std_dev],FeH=[feh_best], Av=[Av],
                                Redchi2=[redchi2_best]))
             file_name = f"{note}"
-            print(df_new)
+            #print(df_new)
             df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=False)
 
             print('Going to New Target')
@@ -885,7 +869,7 @@ for target_hd in Target_List:
     df = pd.read_csv(f'{save_directory}/HD_{target_hd}/target_info_{file_name}.csv', header=None, index_col= None)
     df.to_csv(f'{save_directory}/HD_{target_hd}/target_info_{file_name}.csv', header = Header, index= False)
     df2 = pd.read_csv(f"{save_directory}/HD_{target_hd}/target_info_{file_name}.csv")
-    print(df2)
+    #print(df2)
 
     fig = plt.figure(figsize=(55.0,42.5), constrained_layout=False)
 
@@ -1310,9 +1294,6 @@ for target_hd in Target_List:
             #print('--'*10)
             #print('--'*10)
             #print("Target HD %s FAILED !!!!!!! Check this one. Continuing for now..."%target_hd)
-
-    import matplotlib.pyplot as plt
-    from pathlib import Path
 
     # create a list of directories
     dirs = [f'{corner_directory}HD_{target_hd}/']
