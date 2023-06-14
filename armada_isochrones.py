@@ -71,7 +71,7 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
-Target_List = ['38769']
+Target_List = ['40932']
 
 
 Target_List_Fail = ['133955','112846','133484']
@@ -326,33 +326,12 @@ for target_hd in Target_List:
         idx = np.where(df_armada['HD'] == target_hd)[0][0]
         Av = float(df_armada['Av'][idx])
 
-        if np.isnan(float(df_armada['dmag_h_err'][idx])) == True or (float(df_armada['dmag_h_err'][idx])<0.02)==True:
-            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), 0.02)
-        else:
-            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
+        cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]))
+        cdiff_k = ufloat(float(df_armada['dmag_k'][idx]), float(df_armada['dmag_k_err'][idx]))
+        cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
+        cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]), float(df_armada['dmag_speckle_b_err'][idx]))
+        cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
 
-        if np.isnan(float(df_armada['dmag_k_err'][idx])) == True or (float(df_armada['dmag_k_err'][idx])<0.02)==True:
-            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]), 0.02)
-        else:
-            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
-
-
-        if np.isnan(float(df_armada['dmag_speckle_i_err'][idx])) == True or (float(df_armada['dmag_speckle_i_err'][idx])<0.02)==True:
-            cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), 0.02)
-        else:
-            cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
-
-
-        if np.isnan(float(df_armada['dmag_speckle_b_err'][idx])) == True or (float(df_armada['dmag_speckle_b_err'][idx])<0.02)==True:
-            cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]), 0.02)
-        else:
-            cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]),float(df_armada['dmag_speckle_b_err'][idx]))
-
-
-        if np.isnan(float(df_armada['dmag_wds_v_err'][idx])) == True or (float(df_armada['dmag_wds_v_err'][idx])<0.2)==True:
-            cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), 0.02)
-        else:
-            cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
         #pdb.set_trace()
 
         fratio_h = 10 ** (cdiff_h / 2.5)
