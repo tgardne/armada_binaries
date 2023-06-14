@@ -1,4 +1,3 @@
-import shutil
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
@@ -70,10 +69,9 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
-Target_List = ['38769']
+Target_List = ['6456']
 
-
-Target_List_Fail = ['133955','112846','133484']
+Target_List_Fail = []
 
 
 ## Fuction to fit a single star model
@@ -294,11 +292,6 @@ for target_hd in Target_List:
 
     ## Create directory for saved files, if it doesn't already exist
     directory_corner = "%s/HD_%s/" % (corner_directory, target_hd)
-    if os.path.exists(directory_corner):
-        shutil.rmtree(directory_corner)
-        print("removing directory")
-
-
     if not os.path.exists(directory_corner):
         print("Creating directory")
         os.makedirs(directory_corner)
@@ -322,36 +315,16 @@ for target_hd in Target_List:
             os.makedirs(directory2)
 
 
+        ## Get target from spreadsheet
         idx = np.where(df_armada['HD'] == target_hd)[0][0]
         Av = float(df_armada['Av'][idx])
-
-        if np.isnan(float(df_armada['dmag_h_err'][idx])) == True or (float(df_armada['dmag_h_err'][idx])<0.02)==True:
-            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), 0.02)
-        else:
-            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
-
-        if np.isnan(float(df_armada['dmag_k_err'][idx])) == True or (float(df_armada['dmag_k_err'][idx])<0.02)==True:
-            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]), 0.02)
-        else:
-            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
-
-
-        if np.isnan(float(df_armada['dmag_speckle_i_err'][idx])) == True or (float(df_armada['dmag_speckle_i_err'][idx])<0.02)==True:
-            cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), 0.02)
-        else:
-            cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
-
-
-        if np.isnan(float(df_armada['dmag_speckle_b_err'][idx])) == True or (float(df_armada['dmag_speckle_b_err'][idx])<0.02)==True:
-            cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]), 0.02)
-        else:
-            cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]),float(df_armada['dmag_speckle_b_err'][idx]))
-
-
-        if np.isnan(float(df_armada['dmag_wds_v_err'][idx])) == True or (float(df_armada['dmag_wds_v_err'][idx])<0.2)==True:
-            cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), 0.02)
-        else:
-            cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
+        
+        ## Get magnitude differences for target
+        cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
+        cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
+        cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
+        cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]),float(df_armada['dmag_speckle_b_err'][idx]))
+        cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
         #pdb.set_trace()
 
         fratio_h = 10 ** (cdiff_h / 2.5)
@@ -360,38 +333,32 @@ for target_hd in Target_List:
         fratio_b = 10 ** (cdiff_b / 2.5)
         fratio_wds = 10 ** (cdiff_wds / 2.5)
 
-        ## get total magnitudes and errors from photometry file
-        idx1 = np.where(df_photometry['HD'] == target_hd)[0][0]
+        ## get total magnitudes and errors from photometry file. Set minimum error 
+        err_min = 0.02        
         utot = ufloat(np.nan, np.nan)
-        if np.isnan(float(df_photometry['B_err_complete'][idx1])) or float(df_photometry['B_err_complete'][idx1]) < 0.02:
-            btot = ufloat(float(df_photometry['B_complete'][idx1]), 0.02)
+        if np.isnan(float(df_photometry['B_err_complete'][idx])) or float(df_photometry['B_err_complete'][idx]) < err_min:
+            btot = ufloat(float(df_photometry['B_complete'][idx]), err_min)
         else:
-            btot = ufloat(float(df_photometry['B_complete'][idx1]), float(df_photometry['B_err_complete'][idx1]))
-
-        if np.isnan(float(df_photometry['V_err_complete'][idx1])) or float(df_photometry['V_err_complete'][idx1]) < 0.02:
-            vtot = ufloat(float(df_photometry['V_complete'][idx1]), 0.02)
+            btot = ufloat(float(df_photometry['B_complete'][idx]), float(df_photometry['B_err_complete'][idx]))
+        if np.isnan(float(df_photometry['V_err_complete'][idx])) or float(df_photometry['V_err_complete'][idx]) < err_min:
+            vtot = ufloat(float(df_photometry['V_complete'][idx]), err_min)
         else:
-            vtot = ufloat(float(df_photometry['V_complete'][idx1]), float(df_photometry['V_err_complete'][idx1]))
-
-        rtot = ufloat(float(df_photometry['R2_I/284'][idx1]), 0.15)
+            vtot = ufloat(float(df_photometry['V_complete'][idx]), float(df_photometry['V_err_complete'][idx]))
+        rtot = ufloat(float(df_photometry['R2_I/284'][idx]), 0.15)
         gtot = ufloat(np.nan, np.nan)
-
         itot = ufloat(np.nan, np.nan)
-
-        if np.isnan(float(df_photometry['J_err'][idx1])) or float(df_photometry['J_err'][idx1]) < 0.02:
-            jtot = ufloat(float(df_photometry['J_ II/246/out'][idx1]), 0.02)
+        if np.isnan(float(df_photometry['J_err'][idx])) or float(df_photometry['J_err'][idx]) < err_min:
+            jtot = ufloat(float(df_photometry['J_ II/246/out'][idx]), err_min)
         else:
-            jtot = ufloat(float(df_photometry['J_ II/246/out'][idx1]), float(df_photometry['J_err'][idx1]))
-
-        if np.isnan(float(df_photometry['H_err'][idx1])) or float(df_photometry['H_err'][idx1]) < 0.02:
-            htot = ufloat(float(df_photometry['H_ II/246/out'][idx1]), 0.02)
+            jtot = ufloat(float(df_photometry['J_ II/246/out'][idx]), float(df_photometry['J_err'][idx]))
+        if np.isnan(float(df_photometry['H_err'][idx])) or float(df_photometry['H_err'][idx]) < err_min:
+            htot = ufloat(float(df_photometry['H_ II/246/out'][idx]), err_min)
         else:
-            htot = ufloat(float(df_photometry['H_ II/246/out'][idx1]), float(df_photometry['H_err'][idx1]))
-
-        if np.isnan(float(df_photometry['K_err'][idx1])) or float(df_photometry['K_err'][idx1]) < 0.02:
-            ktot = ufloat(float(df_photometry['K_ II/246/out'][idx1]), 0.02)
+            htot = ufloat(float(df_photometry['H_ II/246/out'][idx]), float(df_photometry['H_err'][idx]))
+        if np.isnan(float(df_photometry['K_err'][idx])) or float(df_photometry['K_err'][idx]) < err_min:
+            ktot = ufloat(float(df_photometry['K_ II/246/out'][idx]), err_min)
         else:
-            ktot = ufloat(float(df_photometry['K_ II/246/out'][idx1]), float(df_photometry['K_err'][idx1]))
+            ktot = ufloat(float(df_photometry['K_ II/246/out'][idx]), float(df_photometry['K_err'][idx]))
 
         ## Compute individual magnitudes from flux ratios and total magnitudes
         ## Mostly for plotting. Though we will use these to estimate M1 and M2 roughly
@@ -400,7 +367,7 @@ for target_hd in Target_List:
         k2 = cdiff_k + k1
         h1 = -2.5 * log10(10 ** (-htot / 2.5) / (1 + 10 ** (-cdiff_h / 2.5)))
         h2 = cdiff_h + h1
-        i1 = -2.5 * log10(10 ** (-gtot / 2.5) / (1 + 10 ** (-cdiff_i / 2.5)))  ## NOTE: G is not the best here probably
+        i1 = -2.5 * log10(10 ** (-rtot / 2.5) / (1 + 10 ** (-cdiff_i / 2.5)))  ## NOTE: R is not the best here probably
         i2 = cdiff_i + i1
         v1 = -2.5 * log10(10 ** (-vtot / 2.5) / (1 + 10 ** (-cdiff_wds / 2.5)))
         v2 = cdiff_wds + v1
@@ -424,12 +391,9 @@ for target_hd in Target_List:
         distance_gaia = ufloat(float(df_armada['Gaia_distance (pc)'][idx]), float(df_armada['Gaia_distance_err (pc)'][idx]))
         distance_hip = ufloat(float(df_armada['HIP_distance (pc)'][idx]), float(df_armada['HIP_distance_err (pc)'][idx]))
         distance_kervella = ufloat(float(df_armada['kerv_dist'][idx]), float(df_armada['e_kerv'][idx]))
-
         distance_best = best_distance(distance_gaia, distance_hip, distance_kervella)
-        #pdb.set_trace()
         distance_low = distance_best - distance_best.std_dev
         distance_high = distance_best + distance_best.std_dev
-
 
         distance_set =[distance_low,distance_best,distance_high]
 
@@ -437,40 +401,14 @@ for target_hd in Target_List:
         #distance_set = [distance_best]
         #distance_set = [distance_hip]
 
-        #pdb.set_trace()
         for distance in distance_set:
-
-            print("Distance = ", distance, 'pc')
-
-            d_modulus = 5 * log10(distance) - 5
-
-
-            name = f"{note}_{feh}_{distance.nominal_value}"
-
-            ## central wavelengths of magnitudes chosen above, smallest to largest - ubvrgjhk
-            ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
-            x = np.array([365, 445, 551, 675, 673, 806, 1250, 1650, 2150])
-            y = np.array([utot.nominal_value, btot.nominal_value, vtot.nominal_value,
-                          rtot.nominal_value, gtot.nominal_value, itot.nominal_value, jtot.nominal_value,
-                          htot.nominal_value, ktot.nominal_value])
-            yerr = np.array([utot.std_dev, btot.std_dev, vtot.std_dev,
-                             rtot.std_dev, gtot.std_dev, itot.std_dev, jtot.std_dev,
-                             htot.std_dev, ktot.std_dev])
 
             fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(nrows=2, ncols=3, figsize=(25, 10))
             fig.tight_layout(pad=5)
 
-            #ax1.set_title("Total Apparent Magnitudes, HD %s" % target_hd)
-            #ax1.set_xlabel("Wavelength (nm)")
-            #ax1.set_ylabel("Apparent Mag")
-            #ax1.errorbar(x, y, yerr, fmt='o--')
-
-            #ax2.set_title("SED from Speckle and Interferometry, HD %s" % target_hd)
-            #ax2.errorbar(data_wave, unumpy.nominal_values(split_mag1), unumpy.std_devs(split_mag1), fmt='o--')
-            #ax2.errorbar(data_wave, unumpy.nominal_values(split_mag2), unumpy.std_devs(split_mag2), fmt='o--')
-            #ax2.set_xlabel('Wavelength (nm)')
-            #ax2.set_ylabel('Apparent Mag')
-            #ax2.invert_yaxis()
+            print("Distance = ", distance, 'pc')
+            d_modulus = 5 * log10(distance) - 5
+            name = f"{note}_{feh}_{distance.nominal_value}"
 
             ## Choose observables for fitting
             TOT_Mag = np.array([utot, btot, vtot, rtot, itot, jtot, htot, ktot])
@@ -543,7 +481,7 @@ for target_hd in Target_List:
             ax2.set_yscale("log")
             ax2.set_xlabel('Mass (solar)', fontsize=15)
             ax2.set_ylabel(r'$\chi^2$', fontsize=15)
-            ax2.set_title('M1 = %s, M2 = %s'%(np.around(mass1_best,2),np.around(mass2_best,2)))
+            ax2.set_title('M1 = %s, M2 = %s, log age = %s'%(np.around(mass1_best,2),np.around(mass2_best,2),np.around(age_best,2)))
 
             ## Plot age chi2 grid
             ax3.scatter(ages, chi2_grid, alpha=0.6, marker="+", color="blue")
@@ -664,8 +602,10 @@ for target_hd in Target_List:
             Dmag_model = model2 - model1
             TOTmag_model = -2.5 * np.log10(10 ** (-0.4 * model1) + 10 ** (-0.4 * model2))
 
-            ## central wavelengths of Simbad magnitudes chosen above (UBVRIJHK)
-            x_wave = np.array([365.6, 435.3, 547.7, 675, 832, 1220, 1630, 2190])
+            ## central wavelengths of magnitudes chosen above, smallest to largest - ubvrgjhk
+            ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Bessel_I, 2MASS_J, 2MASS_H, 2MASS_K
+            x_wave = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
+
             #fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
             #fig.tight_layout()
             yplot = TOT_Mag
@@ -721,15 +661,19 @@ for target_hd in Target_List:
             log_age_size = 0.5  ## step size
             log_age_steps = 5  ## number of steps
 
+            mass_start = mass2_best - 0.5
+            mass_size = 0.5  ## step size
+            mass_steps = 5  ## number of steps
+
             paramList = [np.array([log_age_start, feh]) + np.array([log_age_size, 0]) * i for i in
                          range(0, log_age_steps)]
             isoList = [Mist_iso.isochrone(param[0], param[1]) for param in paramList]
-            isoList_best = [Mist_iso.isochrone(age_best, feh)]
+            isoList_best = [Mist_iso.isochrone(age_best, feh_best)]
 
-            #pdb.set_trace()
-            bc_grid_B = MISTBolometricCorrectionGrid(['B'])
-            bc_grid_V = MISTBolometricCorrectionGrid(['V'])
-            bc_grid_I = MISTBolometricCorrectionGrid(['I'])
+            print(isoList)
+            stop
+            paramList_mass = [np.array([mass_start, feh]) + np.array([mass_size, 0]) * i for i in
+                         range(0, mass_steps)]
 
             Mbol_V = []
             for i, iso in enumerate(isoList):
@@ -737,11 +681,9 @@ for target_hd in Target_List:
             V = []
             for i, iso in enumerate(isoList):
                 V.append(iso['Mbol'] - Mbol_V[i])
-
             H = []
             for iso in isoList:
                 H.append(iso['H_mag'])
-
             K = []
             for iso in isoList:
                 K.append(iso['K_mag'])
@@ -752,60 +694,28 @@ for target_hd in Target_List:
             V_best = []
             for i, iso in enumerate(isoList_best):
                 V_best.append(iso['Mbol'] - Mbol_V_best[i])
-
             H_best = []
             for iso in isoList_best:
                 H_best.append(iso['H_mag'])
-
             K_best = []
             for iso in isoList_best:
                 K_best.append(iso['K_mag'])
 
-                ## Choose x/y axis for isochrone plot. For example, V-H vs V. Tyler can you see why this isnt working
-            #pdb.set_trace()
+            ## Choose x/y axis for isochrone plot. For example, V-H vs V-K
             if np.isnan(h1.nominal_value) == True:
                 xval1 = v1 - k1  ## component 1
                 yval1 = v1 - d_modulus
                 xval2 = v2 - k2  ## component 2
                 yval2 = v2 - d_modulus
-
                 xlabel = "V - K"
                 ylabel = "V"
-
             elif np.isnan(h1.nominal_value) == False:
                 xval1 = v1 - h1  ## component 1
                 yval1 = v1 - d_modulus
                 xval2 = v2 - h2  ## component 2
                 yval2 = v2 - d_modulus
-
                 xlabel = "V - H"
                 ylabel = "V"
-
-            #pdb.set_trace()
-            """elif k1.nominal_value != np.nan and h1.nominal_value != np.nan:
-                xval1_k = v1 - k1  ## component 1
-                yval1_k = v1 - d_modulus
-                xval2_k = v2 - k2  ## component 2
-                yval2_k = v2 - d_modulus
-
-                xlabel_k = "V - K"
-                ylabel_k = "V"
-
-                xval1_h = v1 - h1  ## component 1
-                yval1_h = v1 - d_modulus
-                xval2_h = v2 - h2  ## component 2
-                yval2_h = v2 - d_modulus
-
-                xlabel_h = "V - H"
-                ylabel_h = "V"""
-
-            """xval1 = v1 - h1  ## component 1
-            yval1 = v1 - d_modulus
-            xval2 = v2 - h2  ## component 2
-            yval2 = v2 - d_modulus
-
-            xlabel = "V - H"
-            ylabel = "V"""
 
             all_xval1.append(xval1)
             all_xval2.append(xval2)
@@ -843,9 +753,7 @@ for target_hd in Target_List:
             ax1.set_title("HD %s" % target_hd, fontsize=15)
             ax1.legend()
 
-
-            fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory, target_hd, note))
-
+            fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory, target_hd, name))
 
             #Finding Dynamical Mass
             Mdyn_over_d3 = float(df_armada['Mdyn_over_d3 (x10e-6)'][idx])
@@ -931,6 +839,9 @@ for target_hd in Target_List:
         mass1_best = all_mass1_result[i][idx_mass1]
         idx_mass2 = np.array(all_chi2_grid2[i]).argmin()
         mass2_best = all_mass2_result[i][idx_mass2]
+        idx_age1 = np.array(all_chi2_grid3[i]).argmin()
+        age1_best = all_ages[i][idx_age1]
+
         ax2.scatter(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, marker="+", color="blue", label=f'Mass 1 ={mass1_best:.2f}', s = 5)
         ax2.plot(all_mass1_result[i], all_chi2_grid[i], alpha=0.6, ls="--", color="black", linewidth=5)
         ax2.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
@@ -942,7 +853,7 @@ for target_hd in Target_List:
         ax2.set_yscale("log")
         ax2.set_xlabel('Mass (solar)', fontsize=35)
         ax2.set_ylabel(r'$\chi^2$', fontsize=35)
-        ax2.set_title('Mass 1 & 2 Guess', fontsize=40)
+        ax2.set_title('Mass 1 & 2 Guess, log age = %s'%np.around(age1_best,2), fontsize=40)
         ax2.tick_params(axis='both', labelsize=30)
         ax2.set_aspect('auto')
 
@@ -997,10 +908,6 @@ for target_hd in Target_List:
         ax3.set_title("Chi2 vs Age, HD %s" % target_hd, fontsize=40)
         ax3.set_aspect('auto')
         ax3.tick_params('y', labelleft=False)
-
-
-
-
 
     #pdb.set_trace()
     for i in [1]:
@@ -1292,11 +1199,6 @@ for target_hd in Target_List:
 
 
     fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory2, target_hd, note))
-    #except:
-            #Target_List_Fail.append(target_hd)
-            #print('--'*10)
-            #print('--'*10)
-            #print("Target HD %s FAILED !!!!!!! Check this one. Continuing for now..."%target_hd)
 
     # create a list of directories
     dirs = [f'{corner_directory}HD_{target_hd}/']
@@ -1327,8 +1229,8 @@ for target_hd in Target_List:
 
 
 print("Failed Targets = ")
+print("NOTE THIS IS NOT WORKING CURRENTLY")
 print(Target_List_Fail)
 
 #df = pd.read_csv(csv, header= None)
 #df.to_csv('file.csv', header = Header)
-
