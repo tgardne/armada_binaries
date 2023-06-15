@@ -24,22 +24,22 @@ Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
-orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
-corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
+#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
+#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
+#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
+#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
+#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+#orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
+#corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
 
-#summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
-#save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-#photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-#armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
-#orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
-#csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
-#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
+summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
+save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
+photometry_file = '/home/colton/armada_binaries/Photometry.csv'
+armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
+orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
+csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
+corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
 
 Header =["HD", "M_Dyn", "M_Dyn_err",
                         "M_Tot", "M_Tot_err", "M1",
