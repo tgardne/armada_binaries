@@ -23,22 +23,22 @@ Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
-orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
-corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
+#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
+#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
+#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
+#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
+#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+#orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
+#corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
 
-#summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
-#save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-#armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
-#photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-#orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
-##csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
-#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
+summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
+save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
+armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
+photometry_file = '/home/colton/armada_binaries/Photometry.csv'
+orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
+csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
+corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
 
 Header =["HD", "M_Dyn", "M_Dyn_err",
                         "M_Tot", "M_Tot_err", "M1",
@@ -69,7 +69,7 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
-Target_List = ['6456']
+Target_List = ['40932']
 
 Target_List_Fail = []
 
@@ -452,15 +452,23 @@ for target_hd in Target_List:
                     pass
 
             ## Get best age
+            ## Note: We only want to fit for the Main Sequence (Ages larger than 10 mill years or log 8)
+            ages_array = np.array(ages)
+            chi2_grid_array = np.array(chi2_grid)
+            ages_10mil = ages_array[ ages_array > 8]
+            idx_age_10mil = np.argmin(chi2_grid_array[ages_array > 8])
+            best_age_ms = ages_10mil[idx_age_10mil]
+            #pdb.set_trace()
+            ##This is for minimum for entire age grid (Not being used in the fitting or plots)
             idx_age = np.argmin(chi2_grid)
             all_chi2_grid3.append(chi2_grid)
             all_ages.append(ages)
-            age_best = ages[idx_age]
+            #age_best = ages[idx_age]
             age_max = ages[-1]
             #print('Fit fails at log Age = %s' % age_max)
 
             ## Make chi2 plot of masses at best age
-            chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,age_best,split_mag1,split_mag2,d_modulus,Av,feh)
+            chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,best_age_ms,split_mag1,split_mag2,d_modulus,Av,feh)
 
             idx_mass1 = np.argmin(chi2_grid1)
             mass1_best = mass1_result[idx_mass1]
@@ -494,7 +502,7 @@ for target_hd in Target_List:
 
             ## Do one more least squares fit to minimize all parameters
             params = Parameters()
-            params.add('age', value=age_best, min=6, max=age_max)
+            params.add('age', value=best_age_ms, min=6, max=age_max)
             params.add('mass1', value=mass1_best, min=0)  # , max=max_mass)
             params.add('mass2', value=mass2_best, min=0)  # , max=max_mass)
             params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
@@ -504,13 +512,13 @@ for target_hd in Target_List:
             #report_fit(result)
 
             ## We probably want least squares result as "best" parameters. TBD
-            age_best = result.params['age'].value
+            best_age_ms = result.params['age'].value
             mass1_best = result.params['mass1'].value
             mass2_best = result.params['mass2'].value
             feh_best = result.params['feh'].value
             redchi2_best = result.redchi
 
-            print("Best log Age = %s" % age_best)
+            print("Best log Age = %s" % best_age_ms)
             print("Best M1 = %s" % mass1_best)
             print("Best M2 = %s" % mass2_best)
 
@@ -563,7 +571,7 @@ for target_hd in Target_List:
             mass1_err = np.std(mass1_chain)
             mass2_err = np.std(mass2_chain)
 
-            age = ufloat(age_best, age_err)
+            age = ufloat(best_age_ms, age_err)
             mass1 = ufloat(mass1_best, mass1_err)
             mass2 = ufloat(mass2_best, mass2_err)
 
@@ -574,8 +582,8 @@ for target_hd in Target_List:
             print('Msum (solar) = ', mass1 + mass2)
 
             ## Now make plots from best fit results
-            a1_best = tracks.generate(mass1_best, age_best, feh, return_dict=True)
-            a2_best = tracks.generate(mass2_best, age_best, feh, return_dict=True)
+            a1_best = tracks.generate(mass1_best, best_age_ms, feh, return_dict=True)
+            a2_best = tracks.generate(mass2_best, best_age_ms, feh, return_dict=True)
             # if np.isnan(a1['Mbol']) or np.isnan(a2['Mbol']):
             #    return np.inf
 
@@ -657,7 +665,7 @@ for target_hd in Target_List:
             ###############
             ## Make an HR diagram plot
             ###############
-            log_age_start = age_best - 1.0  ## starting age
+            log_age_start = best_age_ms - 1.0  ## starting age
             log_age_size = 0.5  ## step size
             log_age_steps = 5  ## number of steps
 
@@ -668,10 +676,8 @@ for target_hd in Target_List:
             paramList = [np.array([log_age_start, feh]) + np.array([log_age_size, 0]) * i for i in
                          range(0, log_age_steps)]
             isoList = [Mist_iso.isochrone(param[0], param[1]) for param in paramList]
-            isoList_best = [Mist_iso.isochrone(age_best, feh_best)]
+            isoList_best = [Mist_iso.isochrone(best_age_ms, feh)]
 
-            print(isoList)
-            stop
             paramList_mass = [np.array([mass_start, feh]) + np.array([mass_size, 0]) * i for i in
                          range(0, mass_steps)]
 
@@ -741,11 +747,11 @@ for target_hd in Target_List:
                 ## make sure model matches data magnitudes
                 modelx_best = V_best[ii][iso_start:iso_end] - H_best[ii][iso_start:iso_end]
                 modely_best = V_best[ii][iso_start:iso_end]
-                ax1.plot(modelx_best, modely_best, label=f"Best log age = {np.around(age_best,2)} ", color = 'black')
+                ax1.plot(modelx_best, modely_best, label=f"Best log age = {np.around(best_age_ms,2)} ", color = 'black')
 
             all_modelx_best.append(modelx_best)
             all_modely_best.append(modely_best)
-            all_age_best.append(age_best)
+            all_age_best.append(best_age_ms)
 
             ax1.set_xlabel(xlabel, fontsize=15)
             ax1.set_ylabel(ylabel, fontsize=15)
