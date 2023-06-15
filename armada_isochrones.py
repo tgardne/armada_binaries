@@ -46,7 +46,7 @@ Header =["HD", "M_Dyn", "M_Dyn_err",
                         "M_Tot", "M_Tot_err", "M1",
                         "M1_err", "M2", "M2_err",
                         "log_age", "log_age_err", "FeH", "Av",
-                        "Redchi2"]
+                        "Redchi2", "Main Seq Only"]
 
 df_armada = pd.read_csv(armada_file, dtype=object)
 df_photometry = pd.read_csv(photometry_file, dtype=object)
@@ -813,7 +813,7 @@ for target_hd in Target_List:
                                   M_Tot=[m_tot.nominal_value], M_Tot_err=[m_tot.std_dev],M1=[mass1.nominal_value],
                                  M1_err=[mass1.std_dev],M2=[mass2.nominal_value],M2_err=[mass2.std_dev],
                                 log_age=[age.nominal_value], log_age_err=[age.std_dev],FeH=[feh_best], Av=[Av],
-                               Redchi2=[redchi2_best]))
+                               Redchi2=[redchi2_best], main_seq_only = [switch]))
             file_name = f"{note}"
             #print(df_new)
             df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=False)
