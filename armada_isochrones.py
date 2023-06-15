@@ -1,3 +1,4 @@
+import pdb
 import shutil
 import numpy as np
 import matplotlib
@@ -51,7 +52,13 @@ df_armada = pd.read_csv(armada_file, dtype=object)
 df_photometry = pd.read_csv(photometry_file, dtype=object)
 ## note for saved files (e.g. 'hip' for hipparcos distance, or 'gaia')
 
-note = input("Choose note for saved files in this run: ") 
+switch = input("Would you like to only use the main sequence ages?: ")
+note_first = input("Choose note for saved files in this run: ")
+if (switch == 'no') == True or (switch == 'No')== True:
+    note = note_first+'_full_seq'
+if (switch == 'yes') == True or (switch == 'Yes')== True:
+    note = note_first+'_main_seq'
+pdb.set_trace()
 # Problem target  '2772'
 """
 Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
@@ -490,8 +497,13 @@ for target_hd in Target_List:
             #print('Fit fails at log Age = %s' % age_max)
 
             ## choose which age to use as best
-            age_best = best_age_ms
+            #age_best = best_age_ms
             #age_best = best_age_total
+            #pdb.set_trace()
+            if (switch == 'yes') == True or switch == 'Yes' == True:
+                age_best = best_age_ms
+            elif (switch == 'no') == True or (switch == 'No') == True:
+                age_best = best_age_total
 
             ## Make chi2 plot of masses at best age
             chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,age_best,split_mag1,split_mag2,d_modulus,Av,feh)
