@@ -70,7 +70,7 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
-Target_List = ['40932']
+Target_List = ['16753']
 
 Target_List_Fail = []
 
@@ -257,6 +257,24 @@ def mass_search(mass1_grid,mass2_grid,log_age_guess,split_mag1,split_mag2,d_modu
 
     return chi2_grid1,mass1_result,chi2_grid2,mass2_result
 
+def find_max_mass(age,m1_grid,feh,TOT_Mag,DiffM,d_modulus,Av):
+    m1_max = np.nanmax(m1_grid)
+    for m1 in m1_grid:
+        try:
+            params = Parameters()
+            params.add('age', value=age, vary=False)
+            params.add('mass1', value=m1, vary=False)
+            params.add('mass2', value=0.5, vary=False)
+            params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
+            minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
+                            nan_policy='omit')
+            result = minner.minimize()
+        except:
+            m1_max = m1
+            break
+    return (m1_max)
+    
+
 
 feh_set = [-0.1,0,0.1]
 
@@ -438,17 +456,17 @@ for target_hd in Target_List:
                     idx_mass2 = np.argmin(chi2_grid2)
                     mass2_guess = mass2_result[idx_mass2]
 
-                    mass1_max = np.nanmax(mass1_result)
-                    mass2_max = np.nanmax(mass2_result)
+                    max_mass = find_max_mass(aa,mass1_grid,feh,TOT_Mag,DiffM,d_modulus,Av)
 
                     params = Parameters()
                     params.add('age', value=aa, vary=False)
-                    params.add('mass1', value=mass1_guess, min=0, max=mass1_max)
-                    params.add('mass2', value=mass2_guess, min=0, max=mass2_max)
+                    params.add('mass1', value=mass1_guess, min=0, max=max_mass)
+                    params.add('mass2', value=mass2_guess, min=0, max=max_mass)
                     params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
                     minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
                                     nan_policy='omit')
                     result = minner.minimize()
+
                     chi2_grid.append(result.redchi)
                     ages.append(result.params['age'].value)
                 except:
