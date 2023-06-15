@@ -333,7 +333,7 @@ for target_hd in Target_List:
 
 
         ## Create directory for saved files, if it doesn't already exist
-        directory = "%s/HD_%s/" % (save_directory, target_hd)
+        directory = "%s/HD_%s" % (save_directory, target_hd)
         if not os.path.exists(directory):
             print("Creating directory")
             os.makedirs(directory)
@@ -796,7 +796,7 @@ for target_hd in Target_List:
             ax1.invert_yaxis()
             ax1.set_title("HD %s" % target_hd, fontsize=15)
             ax1.legend()
-
+            pdb.set_trace()
             fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory, target_hd, name))
 
             #Finding Dynamical Mass
