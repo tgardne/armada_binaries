@@ -25,22 +25,21 @@ Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
-#orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
-#corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
+save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
+summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
+armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
+photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
+csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
+corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
 
-summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
-save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
-orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
-csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
-corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/'  ## path for saved files
+#summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
+#save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
+#photometry_file = '/home/colton/armada_binaries/Photometry.csv'
+#armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
+#orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
+#csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
 
 Header =["HD", "M_Dyn", "M_Dyn_err",
                         "M_Tot", "M_Tot_err", "M1",
@@ -58,7 +57,7 @@ if (switch == 'no') == True or (switch == 'No')== True:
     note = note_first+'_full_seq'
 if (switch == 'yes') == True or (switch == 'Yes')== True:
     note = note_first+'_main_seq'
-pdb.set_trace()
+#pdb.set_trace()
 # Problem target  '2772'
 """
 Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
@@ -77,9 +76,9 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
-Target_List = ['17094','34319','43525','47105', '49643','75974','82446','87652',
-               '107259', '114993', '129246', '133955', '140436','144892','156190',
-               '178475','179950']
+
+Target_List = ['10453']
+#pdb.set_trace()
 
 Target_List_Fail = []
 
@@ -288,51 +287,54 @@ def find_max_mass(age,m1_grid,feh,TOT_Mag,DiffM,d_modulus,Av):
 feh_set = [-0.1,0,0.1]
 
 for target_hd in Target_List:
-    try:
-        print('--' * 10)
-        print('--' * 10)
-        print("Doing Target HD %s" % target_hd)
-        # For Combined 3x3 plots
-        all_mass1_result = []
-        all_chi2_grid = []
-        all_mass2_result = []
-        all_chi2_grid2 = []
-        all_ages = []
-        all_chi2_grid3 = []
-        all_xwave = []
-        all_TOTmag_model = []
-        all_data_wave = []
-        all_split_mag1 = []
-        all_split_mag2 = []
-        all_model1 = []
-        all_model2 = []
-        all_yplot = []
-        all_yplot1 = []
-        all_Dmag_model = []
-        all_modelx_best = []
-        all_modely_best = []
-        all_age_best = []
-        all_m_dyn = []
-        all_m_phot = []
-        all_xval1 = []
-        all_xval2 = []
-        all_yval1 = []
-        all_yval2 = []
+    print('--' * 10)
+    print('--' * 10)
+    print("Doing Target HD %s" % target_hd)
+    # For Combined 3x3 plots
+    all_mass1_result = []
+    all_chi2_grid = []
+    all_mass2_result = []
+    all_chi2_grid2 = []
+    all_ages = []
+    all_chi2_grid3 = []
+    all_xwave = []
+    all_TOTmag_model = []
+    all_data_wave = []
+    all_split_mag1 = []
+    all_split_mag2 = []
+    all_model1 = []
+    all_model2 = []
+    all_yplot = []
+    all_yplot1 = []
+    all_Dmag_model = []
+    all_modelx_best = []
+    all_modely_best = []
+    all_age_best = []
+    all_m_dyn = []
+    all_m_phot = []
+    all_xval1 = []
+    all_xval2 = []
+    all_yval1 = []
+    all_yval2 = []
 
-        ## Create directory for saved files, if it doesn't already exist
-        directory = "%s/HD_%s" % (save_directory, target_hd)
-        if not os.path.exists(directory):
-            print("Creating directory")
-            os.makedirs(directory)
-        ## Create directory for saved files, if it doesn't already exist
-        directory2 = summary_directory
-        if not os.path.exists(directory2):
-            print("Creating directory")
-            os.makedirs(directory2)
+    ## Create directory for saved files, if it doesn't already exist
+    directory_corner = "%s/HD_%s/" % (corner_directory, target_hd)
+    if os.path.exists(directory_corner):
+         shutil.rmtree(directory_corner)
+         print("Removing corner directory")
+    if not os.path.exists(directory_corner):
+        print("Creating corner directory")
+        os.makedirs(directory_corner)
+
+    for feh in feh_set:
+        try:
+            print('--' * 10)
+            print('--' * 10)
+            print("Doing Metallicity [Fe/H] = %s" % feh)
 
 
             ## Create directory for saved files, if it doesn't already exist
-            directory = "%s/HD_%s/" % (save_directory, target_hd)
+            directory = "%s/HD_%s" % (save_directory, target_hd)
             if not os.path.exists(directory):
                 print("Creating directory")
                 os.makedirs(directory)
@@ -496,8 +498,13 @@ for target_hd in Target_List:
                 #print('Fit fails at log Age = %s' % age_max)
 
                 ## choose which age to use as best
-                age_best = best_age_ms
+                #age_best = best_age_ms
                 #age_best = best_age_total
+                #pdb.set_trace()
+                if (switch == 'yes') == True or switch == 'Yes' == True:
+                    age_best = best_age_ms
+                elif (switch == 'no') == True or (switch == 'No') == True:
+                    age_best = best_age_total
 
                 ## Make chi2 plot of masses at best age
                 chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,age_best,split_mag1,split_mag2,d_modulus,Av,feh)
@@ -534,6 +541,7 @@ for target_hd in Target_List:
 
                 ## Do one more least squares fit to minimize all parameters
                 max_mass = find_max_mass(age_best,mass1_grid,feh,TOT_Mag,DiffM,d_modulus,Av)
+
                 params = Parameters()
                 params.add('age', value=age_best, min=6, max=age_max)
                 params.add('mass1', value=mass1_best, min=0, max=max_mass)
@@ -595,14 +603,14 @@ for target_hd in Target_List:
                 mass1_chain = chains[:, 1]
                 mass2_chain = chains[:, 2]
 
-            ## choose which age to use as best
-            #age_best = best_age_ms
-            #age_best = best_age_total
-            #pdb.set_trace()
-            if (switch == 'yes') == True or switch == 'Yes' == True:
-                age_best = best_age_ms
-            elif (switch == 'no') == True or (switch == 'No') == True:
-                age_best = best_age_total
+                ## I am using least-sqaures fit for best values, though we could also get some from chains:
+                ## Using errors from chains
+                # age_best = np.median(age_chain)
+                # mass1_best = np.median(mass1_chain)
+                # mass2_best = np.median(mass2_chain)
+                age_err = np.std(age_chain)
+                mass1_err = np.std(mass1_chain)
+                mass2_err = np.std(mass2_chain)
 
                 age = ufloat(age_best, age_err)
                 mass1 = ufloat(mass1_best, mass1_err)
@@ -791,7 +799,7 @@ for target_hd in Target_List:
                 ax1.invert_yaxis()
                 ax1.set_title("HD %s" % target_hd, fontsize=15)
                 ax1.legend()
-
+                #pdb.set_trace()
                 fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory, target_hd, name))
 
                 #Finding Dynamical Mass
@@ -808,123 +816,15 @@ for target_hd in Target_List:
                                       M_Tot=[m_tot.nominal_value], M_Tot_err=[m_tot.std_dev],M1=[mass1.nominal_value],
                                      M1_err=[mass1.std_dev],M2=[mass2.nominal_value],M2_err=[mass2.std_dev],
                                     log_age=[age.nominal_value], log_age_err=[age.std_dev],FeH=[feh_best], Av=[Av],
-                                   Redchi2=[redchi2_best]))
+                                   Redchi2=[redchi2_best], main_seq_only = [switch]))
                 file_name = f"{note}"
                 #print(df_new)
                 df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=False)
 
-            mass_start = mass2_best - 0.5
-            mass_size = 0.5  ## step size
-            mass_steps = 5  ## number of steps
-
-            paramList = [np.array([log_age_start, feh]) + np.array([log_age_size, 0]) * i for i in
-                         range(0, log_age_steps)]
-            isoList = [Mist_iso.isochrone(param[0], param[1]) for param in paramList]
-            isoList_best = [Mist_iso.isochrone(age_best, feh)]
-
-            paramList_mass = [np.array([mass_start, feh]) + np.array([mass_size, 0]) * i for i in
-                         range(0, mass_steps)]
-
-            Mbol_V = []
-            for i, iso in enumerate(isoList):
-                Mbol_V.append(bc_grid_V.interp([iso['Teff'], iso['logg'], feh, Av]).ravel())
-            V = []
-            for i, iso in enumerate(isoList):
-                V.append(iso['Mbol'] - Mbol_V[i])
-            H = []
-            for iso in isoList:
-                H.append(iso['H_mag'])
-            K = []
-            for iso in isoList:
-                K.append(iso['K_mag'])
-
-            Mbol_V_best = []
-            for i, iso in enumerate(isoList_best):
-                Mbol_V_best.append(bc_grid_V.interp([iso['Teff'], iso['logg'], feh, Av]).ravel())
-            V_best = []
-            for i, iso in enumerate(isoList_best):
-                V_best.append(iso['Mbol'] - Mbol_V_best[i])
-            H_best = []
-            for iso in isoList_best:
-                H_best.append(iso['H_mag'])
-            K_best = []
-            for iso in isoList_best:
-                K_best.append(iso['K_mag'])
-
-            ## Choose x/y axis for isochrone plot. For example, V-H vs V-K
-            if np.isnan(h1.nominal_value) == True:
-                xval1 = v1 - k1  ## component 1
-                yval1 = v1 - d_modulus
-                xval2 = v2 - k2  ## component 2
-                yval2 = v2 - d_modulus
-                xlabel = "V - K"
-                ylabel = "V"
-            elif np.isnan(h1.nominal_value) == False:
-                xval1 = v1 - h1  ## component 1
-                yval1 = v1 - d_modulus
-                xval2 = v2 - h2  ## component 2
-                yval2 = v2 - d_modulus
-                xlabel = "V - H"
-                ylabel = "V"
-
-            all_xval1.append(xval1)
-            all_xval2.append(xval2)
-            all_yval1.append(yval1)
-            all_yval2.append(yval2)
-
-            iso_start = 50
-            iso_end = 500
-            for i, iso in enumerate(isoList):
-                ## make sure model matches data magnitudes
-                modelx = V[i][iso_start:iso_end] - H[i][iso_start:iso_end]
-                modely = V[i][iso_start:iso_end]
-                ax1.plot(modelx, modely, color='lightgrey')#,label=f"log age = {log_age_start + log_age_size * i} ")
-
-            ## make plot
-            ax1.errorbar(xval1.nominal_value, yval1.nominal_value,
-                         xerr=xval1.std_dev, yerr=yval1.std_dev,
-                         color="red")
-            ax1.errorbar(xval2.nominal_value, yval2.nominal_value,
-                         xerr=xval2.std_dev, yerr=yval2.std_dev,
-                         color="red")
-            for ii, iso in enumerate(isoList_best):
-                ## make sure model matches data magnitudes
-                modelx_best = V_best[ii][iso_start:iso_end] - H_best[ii][iso_start:iso_end]
-                modely_best = V_best[ii][iso_start:iso_end]
-                ax1.plot(modelx_best, modely_best, label=f"Best log age = {np.around(age_best,2)} ", color = 'black')
-
-            all_modelx_best.append(modelx_best)
-            all_modely_best.append(modely_best)
-            all_age_best.append(age_best)
-
-            ax1.set_xlabel(xlabel, fontsize=15)
-            ax1.set_ylabel(ylabel, fontsize=15)
-            ax1.invert_yaxis()
-            ax1.set_title("HD %s" % target_hd, fontsize=15)
-            ax1.legend()
-            pdb.set_trace()
-            fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory, target_hd, name))
-
-            #Finding Dynamical Mass
-            Mdyn_over_d3 = float(df_armada['Mdyn_over_d3 (x10e-6)'][idx])
-            Mdyn_over_d3_err = float(df_armada['Mdyn_over_d3_err (x10e-6)'][idx])
-            mdyn_over_d3_float = ufloat(Mdyn_over_d3, Mdyn_over_d3_err) * 10 ** (-6)
-            mdyn = mdyn_over_d3_float * (distance.nominal_value ** 3)
-
-            #Save all of the desired Data (M_phot, M_dyn, Age, Feh, Av)
-            m_tot= mass1+mass2
-            all_m_phot.append(m_tot)
-            all_m_dyn.append(mdyn)
-            df_new = pd.DataFrame(dict(HD=[target_hd], M_Dyn=[mdyn.nominal_value], M_Dyn_err=[mdyn.std_dev],
-                                  M_Tot=[m_tot.nominal_value], M_Tot_err=[m_tot.std_dev],M1=[mass1.nominal_value],
-                                 M1_err=[mass1.std_dev],M2=[mass2.nominal_value],M2_err=[mass2.std_dev],
-                                log_age=[age.nominal_value], log_age_err=[age.std_dev],FeH=[feh_best], Av=[Av],
-                               Redchi2=[redchi2_best], main_seq_only = [switch]))
-            file_name = f"{note}"
-            #print(df_new)
-            df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=False)
-
             print('Going to New Target')
+        except:
+            print('Target HD%s Failed'%target_hd)
+            Target_List_Fail.append(target_hd)
 
 
     df = pd.read_csv(f'{save_directory}/HD_{target_hd}/target_info_{file_name}.csv', header=None, index_col= None)
