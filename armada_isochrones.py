@@ -350,8 +350,11 @@ for target_hd in Target_List:
             Av = float(df_armada['Av'][idx])
 
             ## Get magnitude differences for target
-            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
-            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
+            #cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
+            #cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
+            cdiff_h = ufloat(float(np.nan), float(np.nan))
+            # cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
+            cdiff_k = ufloat(float(np.nan), float(np.nan))
             cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
             cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]),float(df_armada['dmag_speckle_b_err'][idx]))
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
