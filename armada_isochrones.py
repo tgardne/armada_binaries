@@ -77,7 +77,7 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
 
-Target_List = ['10453']
+Target_List = ['17094']
 #pdb.set_trace()
 
 Target_List_Fail = []
@@ -225,6 +225,70 @@ def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
 
     return np.concatenate([diff1, diff2])
 
+## Objective function for binaries to be minimized for lmfit
+def isochrone_model_mcmc(params, TOT_mag_star, D_mag_star, d_mod, Av):
+    TOT_mag_absolute = TOT_mag_star - d_mod
+    TOT_mag_val = unumpy.nominal_values(TOT_mag_absolute)
+    TOT_mag_err = unumpy.std_devs(TOT_mag_absolute)
+
+    D_mag_val = unumpy.nominal_values(D_mag_star)
+    D_mag_err = unumpy.std_devs(D_mag_star)
+
+    age = params['age']
+    m1 = params['mass1']
+    m2 = params['mass2']
+    feh = params['feh']
+
+    a1 = tracks.generate(m1, age, feh, return_dict=True)
+    a2 = tracks.generate(m2, age, feh, return_dict=True)
+
+    mag1_model = np.array([(a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           a1["H_mag"],
+                           a1["K_mag"]])
+
+    mag2_model = np.array([(a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_I.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           a2["H_mag"],
+                           a2["K_mag"]])
+
+    D_mag_model = mag2_model - mag1_model
+
+    diff1 = (D_mag_val - D_mag_model) / D_mag_err
+
+    ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
+    # Wavelengths = np.array([365, 445, 551, 675, 673, 806, 905, 1250, 1650, 2150])
+
+    mag1_model = np.array([(a1['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_R.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_J.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           a1["H_mag"],
+                           a1["K_mag"]])
+
+    mag2_model = np.array([(a2['Mbol'] - bc_grid_U.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_B.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_R.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_I.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_J.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
+                           a2["H_mag"],
+                           a2["K_mag"]])
+
+    TOT_mag_model = -2.5 * np.log10(10 ** (-0.4 * mag1_model) + 10 ** (-0.4 * mag2_model))
+
+    diff2 = (TOT_mag_val - TOT_mag_model) / TOT_mag_err
+    # print(np.concatenate([diff1,diff2]).size)
+
+    if np.isnan(a1['Mbol']) or np.isnan(a2['Mbol']):
+       return np.inf
+    else:
+        return np.concatenate([diff1, diff2])
+
 def mass_search(mass1_grid,mass2_grid,log_age_guess,split_mag1,split_mag2,d_modulus,Av,feh):
         
     ## search for mass 1
@@ -350,11 +414,10 @@ for target_hd in Target_List:
             Av = float(df_armada['Av'][idx])
 
             ## Get magnitude differences for target
-            #cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
-            #cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
-            cdiff_h = ufloat(float(np.nan), float(np.nan))
-            # cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
-            cdiff_k = ufloat(float(np.nan), float(np.nan))
+            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
+            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
+            #cdiff_h = ufloat(float(np.nan), float(np.nan))
+            #cdiff_k = ufloat(float(np.nan), float(np.nan))
             cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
             cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]),float(df_armada['dmag_speckle_b_err'][idx]))
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
@@ -445,7 +508,7 @@ for target_hd in Target_List:
 
                 ## Choose observables for fitting
                 TOT_Mag = np.array([utot, btot, vtot, rtot, itot, jtot, htot, ktot])
-                DiffM = np.array([cdiff_wds, cdiff_b, cdiff_i, cdiff_h, cdiff_k])
+                DiffM = np.array([cdiff_wds, cdiff_b, cdiff_i, np.nan, np.nan]) ## TG NOTE --> do NOT fit to H/K ratios
 
                 ##################
                 ## Now let's find best masses and age
@@ -577,7 +640,7 @@ for target_hd in Target_List:
 
                 print("Running MCMC chains: ")
                 ## Do MCMC fit (this cell could take some time, depending on steps)
-                minner = Minimizer(isochrone_model_v2, emcee_params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
+                minner = Minimizer(isochrone_model_mcmc, emcee_params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
                                    nan_policy='omit')
                 result = minner.minimize(method='emcee', steps=steps, burn=burn, thin=thin, nwalkers=nwalkers)
                 #print(report_fit(result))
