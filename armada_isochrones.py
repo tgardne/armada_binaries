@@ -25,23 +25,31 @@ Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
-orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
-corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
+#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
+#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
+#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
+#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
+#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+#orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
+#corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
 
-#summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
-#save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-#photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-#armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
-#orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
-#csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
+summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
+save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
+photometry_file = '/home/colton/armada_binaries/Photometry.csv'
+armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
+orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
+csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
 
-Header =["HD", "M_Dyn", "M_Dyn_err",
+#summary_directory = '/users/coltonmp/ARMADA_binaries/summary/' ## path for saved file
+#save_directory = '/users/coltonmp/ARMADA_binaries/' ## path for saved files
+#corner_directory = '/husers/coltonmp/ARMADA_binaries/summary/corner_plots/' ## path for saved files
+#photometry_file = '/users/coltonmp/armada_binaries/Photometry.csv'
+#armada_file = '/users/coltonmp/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
+#orbit_directory = '/husers/coltonmp/ARMADA_binaries/ARMADA_orbits/'
+#csv = '/husers/coltonmp/target_info_all_sigma.csv'
+
+Header =["HD", "M_Dyn_mcmc", "M_Dyn_mcmc_err", "M_Dyn_orbital", "M_Dyn_orbital_err",
                         "M_Tot", "M_Tot_err", "M1",
                         "M1_err", "M2", "M2_err",
                         "log_age", "log_age_err", "FeH", "Av",
@@ -77,7 +85,14 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
 
-Target_List = ['17094']
+Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
+    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
+               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
+    , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
+              '145589', '148283', '153370', '154569', '156190', '158140'
+    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
+               '196089', '196867', '198183', '199766', '201038', '206901'
+    , '217676', '217782', '220278', '224512']
 #pdb.set_trace()
 
 Target_List_Fail = []
@@ -361,6 +376,7 @@ for target_hd in Target_List:
     all_chi2_grid2 = []
     all_ages = []
     all_chi2_grid3 = []
+    all_mass = []
     all_xwave = []
     all_TOTmag_model = []
     all_data_wave = []
@@ -380,6 +396,16 @@ for target_hd in Target_List:
     all_xval2 = []
     all_yval1 = []
     all_yval2 = []
+    all_m_dyn_orbit_nom =[]
+    all_m_dyn_orbit_err =[]
+    all_m_phot_err = []
+    all_m_phot_nom = []
+    all_m_dyn_mcmc_nom =[]
+    all_m_dyn_mcmc_err =[]
+    all_m_dyn_mcmc = []
+    all_m_dyn_orbit = []
+
+
 
     ## Create directory for saved files, if it doesn't already exist
     directory_corner = "%s/HD_%s/" % (corner_directory, target_hd)
@@ -391,7 +417,7 @@ for target_hd in Target_List:
         os.makedirs(directory_corner)
 
     for feh in feh_set:
-        try:
+        #try:
             print('--' * 10)
             print('--' * 10)
             print("Doing Metallicity [Fe/H] = %s" % feh)
@@ -872,13 +898,23 @@ for target_hd in Target_List:
                 Mdyn_over_d3 = float(df_armada['Mdyn_over_d3 (x10e-6)'][idx])
                 Mdyn_over_d3_err = float(df_armada['Mdyn_over_d3_err (x10e-6)'][idx])
                 mdyn_over_d3_float = ufloat(Mdyn_over_d3, Mdyn_over_d3_err) * 10 ** (-6)
-                mdyn = mdyn_over_d3_float * (distance.nominal_value ** 3)
+                mdyn_mcmc = mdyn_over_d3_float * (distance.nominal_value ** 3)
+
+                #pdb.set_trace()
+                a_mas = ufloat(float(df_armada['a (mas)'][idx]),float(df_armada['a_err (mas)'][idx]))
+                a_mas = float(df_armada['a (mas)'][idx])
+                a_au = (a_mas/1000)*distance.nominal_value
+                p_yr = ufloat(float(df_armada['P (yr)'][idx]),float(df_armada['P_err (yr)'][idx]))
+                mdyn_orbit = a_au**3/p_yr**2
+
+                #pdb.set_trace()
 
                 #Save all of the desired Data (M_phot, M_dyn, Age, Feh, Av)
                 m_tot= mass1+mass2
                 all_m_phot.append(m_tot)
-                all_m_dyn.append(mdyn)
-                df_new = pd.DataFrame(dict(HD=[target_hd], M_Dyn=[mdyn.nominal_value], M_Dyn_err=[mdyn.std_dev],
+                all_m_dyn_mcmc.append(mdyn_mcmc)
+                all_m_dyn_orbit.append(mdyn_orbit)
+                df_new = pd.DataFrame(dict(HD=[target_hd], M_Dyn_mcmc=[mdyn_mcmc.nominal_value], M_Dyn_mcmc_err=[mdyn_mcmc.std_dev], M_Dyn_orbital=[mdyn_orbit.nominal_value], M_Dyn_orbital_err=[mdyn_orbit.std_dev],
                                       M_Tot=[m_tot.nominal_value], M_Tot_err=[m_tot.std_dev],M1=[mass1.nominal_value],
                                      M1_err=[mass1.std_dev],M2=[mass2.nominal_value],M2_err=[mass2.std_dev],
                                     log_age=[age.nominal_value], log_age_err=[age.std_dev],FeH=[feh_best], Av=[Av],
@@ -888,9 +924,9 @@ for target_hd in Target_List:
                 df_new.to_csv('%s/HD_%s/target_info_%s.csv' % (save_directory, target_hd,file_name), mode='a', index=False, header=False)
 
             print('Going to New Target')
-        except:
-            print('Target HD%s Failed'%target_hd)
-            Target_List_Fail.append(target_hd)
+        #except:
+            #print('Target HD%s Failed'%target_hd)
+            #Target_List_Fail.append(target_hd)
 
 
     df = pd.read_csv(f'{save_directory}/HD_{target_hd}/target_info_{file_name}.csv', header=None, index_col= None)
@@ -1224,43 +1260,79 @@ for target_hd in Target_List:
             ax1.tick_params(axis='both', labelsize=30)
             ax1.set_aspect('auto')
     #pdb.set_trace()
-    for i in range(len(all_m_dyn)):
+    for i in range(len(all_m_dyn_mcmc)):
 
-        ax8.scatter(all_m_dyn[i].nominal_value, all_m_phot[i].nominal_value, s=25, color ='black')
+        ax8.scatter(all_m_dyn_orbit[i].nominal_value, all_m_phot[i].nominal_value, s=25, color ='black')
         ax8.set_title('M_dyn vs M_phot', fontsize=40)
-        ax8.set_xlim(all_m_dyn[0].nominal_value - 0.2, all_m_dyn[8].nominal_value + 0.2)
+        ax8.set_xlim(all_m_dyn_orbit[0].nominal_value - 0.2, all_m_dyn_orbit[8].nominal_value + 0.2)
         ax8.set_ylim(all_m_phot[0].nominal_value - 0.3, all_m_phot[8].nominal_value + 0.3)
         #ax8.set_xlim(3.3,7.8)
         #ax8.set_ylim(3.3,7.8)
         #ax8.axvline(x= all_m_dyn[i].nominal_value, color='grey')
         ax8.tick_params(axis='both', labelsize=30)
 
-    all_m_phot_nom = []
-    all_m_dyn_nom =[]
-    for i in range(len(all_m_dyn)):
-        all_m_dyn_nom.append(all_m_dyn[i].nominal_value)
-        all_m_phot_nom.append(all_m_phot[i].nominal_value)
+    #pdb.set_trace()
+    for i in range(len(all_m_dyn_mcmc)):
+        all_m_dyn_mcmc_nom.append(all_m_dyn_mcmc[i].nominal_value)
+        all_m_dyn_mcmc_err.append(all_m_dyn_mcmc[i].std_dev)
 
-    all_mass =[]
-    all_mass = np.append(all_mass, all_m_dyn_nom)
+
+
+
+    for i in range(len(all_m_dyn_orbit)):
+        all_m_dyn_orbit_nom.append(all_m_dyn_orbit[i].nominal_value)
+        all_m_dyn_orbit_err.append(all_m_dyn_orbit[i].std_dev)
+        all_m_phot_nom.append(all_m_phot[i].nominal_value)
+        all_m_phot_err.append(all_m_phot[i].std_dev)
+
+
+    all_mass = np.append(all_mass, all_m_dyn_mcmc_nom)
     all_mass = np.append(all_mass, all_m_phot_nom)
+    all_mass = np.append(all_mass, all_m_dyn_orbit_nom)
+    for i in range(len(all_m_phot)):
+        plus_sig_phot =  all_m_phot_nom[i]+all_m_phot_err[i]
+        minus_sig_phot =  all_m_phot_nom[i]-all_m_phot_err[i]
+        plus_sig_mcmc =  all_m_dyn_mcmc_nom[i]+all_m_dyn_mcmc_err[i]
+        minus_sig_mcmc =  all_m_dyn_mcmc_nom[i]-all_m_dyn_mcmc_err[i]
+        plus_sig_orbit =  all_m_dyn_orbit_nom[i]+all_m_dyn_orbit_err[i]
+        minus_sig_orbit =  all_m_dyn_orbit_nom[i]-all_m_dyn_orbit_err[i]
+
+        all_mass= np.append(all_mass, plus_sig_phot)
+        all_mass= np.append(all_mass, minus_sig_phot)
+        all_mass= np.append(all_mass, plus_sig_mcmc)
+        all_mass= np.append(all_mass, minus_sig_orbit)
+
+
+
+
+    all_mass = np.append(all_mass, all_m_dyn_mcmc_nom)
+    all_mass = np.append(all_mass, all_m_dyn_orbit_nom)
     max = np.max(all_mass)+0.1
     min = np.min(all_mass)-0.1
     #pdb.set_trace()
-    ax8.plot(all_m_dyn_nom[0:2], all_m_phot_nom[0:2], color = 'red', linewidth =5)
-    ax8.plot(all_m_dyn_nom[3:5], all_m_phot_nom[3:5], color = 'blue', linewidth =5)
-    ax8.plot(all_m_dyn_nom[6:8], all_m_phot_nom[6:8], color = 'green',linewidth =5)
+    ax8.plot(all_m_dyn_mcmc_nom[0:3], all_m_phot_nom[0:3], color = 'darkred', linewidth =5)
+    ax8.plot(all_m_dyn_mcmc_nom[3:6], all_m_phot_nom[3:6], color = 'navy', linewidth =5)
+    ax8.plot(all_m_dyn_mcmc_nom[6:9], all_m_phot_nom[6:9], color = 'darkgreen',linewidth =5)
+    ax8.plot(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], color = 'red', linewidth =5)
+    ax8.plot(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], color = 'blue', linewidth =5)
+    ax8.plot(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], color = 'green',linewidth =5)
+    ax8.errorbar(all_m_dyn_mcmc_nom[0:3], all_m_phot_nom[0:3], all_m_dyn_mcmc_err[0:3], all_m_phot_err[0:3],  color = 'darkred', linewidth =5)
+    ax8.errorbar(all_m_dyn_mcmc_nom[3:6], all_m_phot_nom[3:6], all_m_dyn_mcmc_err[3:6], all_m_phot_err[3:6], color = 'navy', linewidth =5)
+    ax8.errorbar(all_m_dyn_mcmc_nom[6:9], all_m_phot_nom[6:9], all_m_dyn_mcmc_err[6:9], all_m_phot_err[6:9], color = 'darkgreen',linewidth =5)
+    ax8.errorbar(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], all_m_dyn_orbit_err[0:3], all_m_phot_err[0:3],color = 'red', linewidth =5)
+    ax8.errorbar(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], all_m_dyn_orbit_err[3:6], all_m_phot_err[3:6], color = 'blue', linewidth =5)
+    ax8.errorbar(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], all_m_dyn_orbit_err[6:9], all_m_phot_err[6:9], color = 'green',linewidth =5)
     ax8.set_xlim(min,max)
     ax8.set_ylim(min,max)
-    ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =5)
-    ax8.plot([all_m_dyn_nom[5],all_m_dyn_nom[4]], [all_m_phot_nom[5],all_m_phot_nom[4]], color = 'blue', linewidth =5)
-    ax8.plot([all_m_dyn_nom[8],all_m_dyn_nom[7]], [all_m_phot_nom[8],all_m_phot_nom[7]], color = 'green', linewidth =5)
-    ax8.annotate('Feh =-0.1', xy=(all_m_dyn_nom[2]+0.03, all_m_phot_nom[5]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2]))), xytext=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2]))), color = 'red',size=25)
-    ax8.annotate('Feh =0.0', xy=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]), xytext=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]), color = 'blue',size=25)
-    ax8.annotate('Feh =0.1', xy=(all_m_dyn_nom[8]+0.03, all_m_phot_nom[5]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[8]))), xytext=(all_m_dyn_nom[8]+00.03, all_m_phot_nom[5]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[8]))), color = 'green',size=25)
-    ax8.annotate('d=-$\sigma$', xy=(all_m_dyn_nom[1]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2])), all_m_phot_nom[0]-0.03), xytext=(all_m_dyn_nom[0]-0.07, all_m_phot_nom[0]-0.03), color = 'red',size=25)
-    ax8.annotate('d=0$\sigma$', xy=(all_m_dyn_nom[1], all_m_phot_nom[1]-0.03), xytext=(all_m_dyn_nom[1]-0.01, all_m_phot_nom[1]-0.05),color = 'blue',size=25)
-    ax8.annotate('d=+$\sigma$', xy=(all_m_dyn_nom[1]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2])), all_m_phot_nom[2]-0.03), xytext=(all_m_dyn_nom[2]+0.03, all_m_phot_nom[2]-0.03),size=25, color ='green')
+    #ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =5)
+    #ax8.plot([all_m_dyn_nom[5],all_m_dyn_nom[4]], [all_m_phot_nom[5],all_m_phot_nom[4]], color = 'blue', linewidth =5)
+    #ax8.plot([all_m_dyn_nom[8],all_m_dyn_nom[7]], [all_m_phot_nom[8],all_m_phot_nom[7]], color = 'green', linewidth =5)
+    #ax8.annotate('Feh =-0.1', xy=(all_m_dyn_nom[2]+0.03, all_m_phot_nom[5]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2]))), xytext=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2]))), color = 'red',size=25)
+    #ax8.annotate('Feh =0.0', xy=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]), xytext=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]), color = 'blue',size=25)
+    #ax8.annotate('Feh =0.1', xy=(all_m_dyn_nom[8]+0.03, all_m_phot_nom[5]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[8]))), xytext=(all_m_dyn_nom[8]+00.03, all_m_phot_nom[5]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[8]))), color = 'green',size=25)
+    #ax8.annotate('d=-$\sigma$', xy=(all_m_dyn_nom[1]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2])), all_m_phot_nom[0]-0.03), xytext=(all_m_dyn_nom[0]-0.07, all_m_phot_nom[0]-0.03), color = 'red',size=25)
+    #ax8.annotate('d=0$\sigma$', xy=(all_m_dyn_nom[1], all_m_phot_nom[1]-0.03), xytext=(all_m_dyn_nom[1]-0.01, all_m_phot_nom[1]-0.05),color = 'blue',size=25)
+    #ax8.annotate('d=+$\sigma$', xy=(all_m_dyn_nom[1]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2])), all_m_phot_nom[2]-0.03), xytext=(all_m_dyn_nom[2]+0.03, all_m_phot_nom[2]-0.03),size=25, color ='green')
     ax8.axline((0, 0), slope=1., color='green', label='M_dyn = M_phot')
     #ax8.axvline(x=all_m_dyn[1].nominal_value, color='salmon')
     ax8.legend(fontsize=35)
