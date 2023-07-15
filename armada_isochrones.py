@@ -1364,16 +1364,22 @@ for target_hd in Target_List:
     p = np.round(float(df_armada['P (yr)'][idx]),2)
     #pdb.set_trace()
     ax7.set_aspect('equal')
+    e = ufloat(float(df_armada['e'][idx]),float(df_armada['e_err'][idx]))
+
     ax7.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
     ax7.annotate(f"PA(deg)= {df_photometry['PA(deg)_tycoDouble'][idx]}", xy=(0, 0), xytext=(2000, -300), color = 'black',size=35)
     ax7.annotate(f"Sep(arcsec) ={df_photometry['Sep(arcsec)'][idx]}", xy=(0, 0), xytext=(2000, -100), color = 'black',size=35)
     ax7.annotate(f"Triple = {df_armada['triple'][idx]}", xy=(0, 0), xytext=(0.0, -300), color = 'black',size=35)
     ax7.annotate(f"Residual ={df_armada['residual (micro-as)'][idx]}", xy=(0, 0), xytext=(0.0, -100), color = 'black',size=35)
-    ax7.annotate(f"e={df_armada['e'][idx]}", xy=(0, 0), xytext=(0.0, 4300), color = 'black',size=35)
-    ax7.annotate(f"a(mas)={df_armada['a (mas)'][idx]}", xy=(0, 0), xytext=(2000, 4300), color = 'black',size=35)
-    ax7.annotate(f"P(Yr)={df_armada['P (yr)'][idx]}", xy=(0, 0), xytext=(0, 4100), color = 'black',size=35)
+    ax7.annotate(f"e={e:4f}", xy=(0, 0), xytext=(0.0, 4300), color = 'black',size=35)
+    ax7.annotate(f"a(mas)={a_mas:.3f}", xy=(0, 0), xytext=(2000, 4300), color = 'black',size=35)
+    ax7.annotate(f"P(Yr)={p_yr:.3f}", xy=(0, 0), xytext=(0, 4100), color = 'black',size=35)
     ax7.annotate(f"d(pc)={distance_best:.2f}", xy=(0, 0), xytext=(2000, 4100), color = 'black',size=35)
     ax7.annotate(f"Spectral Type={df_armada['SpType (primary?)'][idx]}", xy=(0, 0), xytext=(0, 3900), color = 'black',size=35)
+    ax7.annotate(f"M_Dyn Orbit={all_m_dyn_orbit[4]}", xy=(0, 0), xytext=(2000, 3900), color = 'black',size=35)
+    ax7.annotate(f"M_Dyn McMc={all_m_dyn_mcmc[4]}", xy=(0, 0), xytext=(2000, 3700), color='black', size=35)
+    ax7.annotate(f"M_Phot={all_m_phot[4]}", xy=(0, 0), xytext=(0, 3700), color='black', size=35)
+
 
 
     #ax7.annotate(f"a={df_armada['plx (mas)'][idx]}", xy=(0.6, 0.01), xytext=(0.6, 0.01), color='black', size=5)
