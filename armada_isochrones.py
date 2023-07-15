@@ -85,9 +85,7 @@ Target_List = ['47105', '48581', '49643', '60107', '64235',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
 
-Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
-    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
-               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
+Target_List = ['75974', '78316', '82446', '87652', '87822', '107259', '112846'
     , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
               '145589', '148283', '153370', '154569', '156190', '158140'
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
@@ -1300,9 +1298,9 @@ for target_hd in Target_List:
         all_mass= np.append(all_mass, plus_sig_phot)
         all_mass= np.append(all_mass, minus_sig_phot)
         all_mass= np.append(all_mass, plus_sig_mcmc)
+        all_mass= np.append(all_mass, minus_sig_mcmc)
+        all_mass= np.append(all_mass, plus_sig_orbit)
         all_mass= np.append(all_mass, minus_sig_orbit)
-
-
 
 
     all_mass = np.append(all_mass, all_m_dyn_mcmc_nom)
@@ -1316,12 +1314,12 @@ for target_hd in Target_List:
     ax8.plot(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], color = 'red', linewidth =5)
     ax8.plot(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], color = 'blue', linewidth =5)
     ax8.plot(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], color = 'green',linewidth =5)
-    ax8.errorbar(all_m_dyn_mcmc_nom[0:3], all_m_phot_nom[0:3], all_m_dyn_mcmc_err[0:3], all_m_phot_err[0:3],  color = 'darkred', linewidth =5)
-    ax8.errorbar(all_m_dyn_mcmc_nom[3:6], all_m_phot_nom[3:6], all_m_dyn_mcmc_err[3:6], all_m_phot_err[3:6], color = 'navy', linewidth =5)
-    ax8.errorbar(all_m_dyn_mcmc_nom[6:9], all_m_phot_nom[6:9], all_m_dyn_mcmc_err[6:9], all_m_phot_err[6:9], color = 'darkgreen',linewidth =5)
-    ax8.errorbar(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], all_m_dyn_orbit_err[0:3], all_m_phot_err[0:3],color = 'red', linewidth =5)
-    ax8.errorbar(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], all_m_dyn_orbit_err[3:6], all_m_phot_err[3:6], color = 'blue', linewidth =5)
-    ax8.errorbar(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], all_m_dyn_orbit_err[6:9], all_m_phot_err[6:9], color = 'green',linewidth =5)
+    ax8.errorbar(all_m_dyn_mcmc_nom[0:3], all_m_phot_nom[0:3], all_m_phot_err[0:3], all_m_dyn_mcmc_err[0:3],  color = 'darkred', linewidth =3)
+    ax8.errorbar(all_m_dyn_mcmc_nom[3:6], all_m_phot_nom[3:6], all_m_phot_err[3:6], all_m_dyn_mcmc_err[3:6], color = 'navy', linewidth =3)
+    ax8.errorbar(all_m_dyn_mcmc_nom[6:9], all_m_phot_nom[6:9], all_m_phot_err[6:9], all_m_dyn_mcmc_err[6:9], color = 'darkgreen',linewidth =3)
+    ax8.errorbar(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], all_m_phot_err[0:3], all_m_dyn_orbit_err[0:3],color = 'red', linewidth =3)
+    ax8.errorbar(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], all_m_phot_err[3:6], all_m_dyn_orbit_err[3:6], color = 'blue', linewidth =3)
+    ax8.errorbar(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], all_m_phot_err[6:9], all_m_dyn_orbit_err[6:9], color = 'green',linewidth =3)
     ax8.set_xlim(min,max)
     ax8.set_ylim(min,max)
     #ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =5)
