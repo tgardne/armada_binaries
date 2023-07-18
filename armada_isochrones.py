@@ -1315,8 +1315,10 @@ for target_hd in Target_List:
     ax8.errorbar(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], all_m_phot_err[0:3], all_m_dyn_orbit_err[0:3],color = 'red', linewidth =3)
     ax8.errorbar(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], all_m_phot_err[3:6], all_m_dyn_orbit_err[3:6], color = 'blue', linewidth =3)
     ax8.errorbar(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], all_m_phot_err[6:9], all_m_dyn_orbit_err[6:9], color = 'green',linewidth =3)
-    ax8.set_xlim(min,max)
-    ax8.set_ylim(min,max)
+    #ax8.set_xlim(min,max)
+    #ax8.set_ylim(min,max)
+    ax8.set_xlim(-1,2)
+    #ax8.set_ylim(-1,2)
     #ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =5)
     #ax8.plot([all_m_dyn_nom[5],all_m_dyn_nom[4]], [all_m_phot_nom[5],all_m_phot_nom[4]], color = 'blue', linewidth =5)
     #ax8.plot([all_m_dyn_nom[8],all_m_dyn_nom[7]], [all_m_phot_nom[8],all_m_phot_nom[7]], color = 'green', linewidth =5)
@@ -1344,10 +1346,10 @@ for target_hd in Target_List:
         #pix.save(f'{orbit_directory}HD{target_hd}.png')  # store image as a PNG
 
     # Store Pdf with convert_from_path function
-    images = convert_from_path(f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf',700)
-    for i in range(len(images)):
+    #images = convert_from_path(f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf',700)
+    #for i in range(len(images)):
         # Save pages as images in the pdf
-        images[i].save(f'{orbit_directory}HD{target_hd}.png', 'PNG')
+        #images[i].save(f'{orbit_directory}HD{target_hd}.png', 'PNG')
 
 
 
