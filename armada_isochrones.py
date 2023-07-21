@@ -1248,7 +1248,8 @@ for target_hd in Target_List:
             elif np.isnan(comb_yvals[1]) == True:
                 y_axis_min = np.min(all_modely_best[i])-0.15
                 y_axis_max = np.max(all_modely_best[i]) - 0.15
-            ax1.set_ylim(y_axis_min,y_axis_max)
+            #ax1.set_ylim(y_axis_min,y_axis_max)
+            ax1.set_xlim(-1,2)
             ax1.invert_yaxis()
             ax1.tick_params(axis='both', labelsize=30)
             ax1.set_aspect('auto')
@@ -1315,9 +1316,9 @@ for target_hd in Target_List:
     ax8.errorbar(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], all_m_phot_err[0:3], all_m_dyn_orbit_err[0:3],color = 'red', linewidth =3)
     ax8.errorbar(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], all_m_phot_err[3:6], all_m_dyn_orbit_err[3:6], color = 'blue', linewidth =3)
     ax8.errorbar(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], all_m_phot_err[6:9], all_m_dyn_orbit_err[6:9], color = 'green',linewidth =3)
-    #ax8.set_xlim(min,max)
-    #ax8.set_ylim(min,max)
-    ax8.set_xlim(-1,2)
+    ax8.set_xlim(min,max)
+    ax8.set_ylim(min,max)
+    #ax8.set_xlim(-1,2)
     #ax8.set_ylim(-1,2)
     #ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =5)
     #ax8.plot([all_m_dyn_nom[5],all_m_dyn_nom[4]], [all_m_phot_nom[5],all_m_phot_nom[4]], color = 'blue', linewidth =5)
