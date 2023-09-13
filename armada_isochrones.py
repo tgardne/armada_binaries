@@ -37,7 +37,7 @@ summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved fi
 save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
 corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
 photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-armada_file = '/home/colton/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
+armada_file = '/home/colton/armada_binaries/full_target_list_10_3.csv' ## path to csv target file
 orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
 csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
 
@@ -168,6 +168,7 @@ def best_distance(gaia, hip, kervella):
     #pdb.set_trace()
     return(distances[idx_lowest])
 
+    pdb.set_trace()
 ## Objective function for binaries to be minimized for lmfit
 def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
     TOT_mag_absolute = TOT_mag_star - d_mod
@@ -438,7 +439,7 @@ for target_hd in Target_List:
             #cdiff_h = ufloat(float(np.nan), float(np.nan))
             #cdiff_k = ufloat(float(np.nan), float(np.nan))
             cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
-            cdiff_b = ufloat(float(df_armada['dmag_speckle_b'][idx]),float(df_armada['dmag_speckle_b_err'][idx]))
+            cdiff_b = ufloat(float(df_armada['dmag_speckle_v'][idx]),float(df_armada['dmag_speckle_v_err'][idx]))
             cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
             #pdb.set_trace()
 
