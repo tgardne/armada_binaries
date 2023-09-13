@@ -40,6 +40,7 @@ photometry_file = '/home/colton/armada_binaries/Photometry.csv'
 armada_file = '/home/colton/armada_binaries/full_target_list_10_3.csv' ## path to csv target file
 orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
 csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
+wds = '/home/colton/ARMADA_binaries/WDS/'
 
 #summary_directory = '/users/coltonmp/ARMADA_binaries/summary/' ## path for saved file
 #save_directory = '/users/coltonmp/ARMADA_binaries/' ## path for saved files
@@ -997,6 +998,8 @@ for target_hd in Target_List:
         # ax3.axhline(y=1, color="red", alpha=0.6, label=r"$\chi^2=1$")
         ax2.legend(fontsize= 25)
         ax2.set_yscale("log")
+        ax2.set_yscale("log")
+        ax2.grid()
         ax2.set_xlabel('Mass (solar)', fontsize=35)
         ax2.set_ylabel(r'$\chi^2$', fontsize=35)
         ax2.set_title('Mass 1 & 2 Guess, log age = %s'%np.around(age1_best,2), fontsize=40)
