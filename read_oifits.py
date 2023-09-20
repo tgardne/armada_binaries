@@ -319,7 +319,7 @@ def read_vlti(dir,interact='n',exclude=''):
     fluxerr=[]
 
     for file in os.listdir(dir):
-        if file.endswith("singlescivis.fits"):
+        if file.endswith("fits"):
             filename = os.path.join(dir, file)
             oifile = fits.open(filename,quiet=True)
             oi_t3 = oifile['OI_T3',10].data
@@ -332,6 +332,8 @@ def read_vlti(dir,interact='n',exclude=''):
 
             eff_wave.append(oifile['OI_WAVELENGTH',10].data.field('EFF_WAVE')[cut:-cut])
             time_obs.append(oifile[0].header['MJD-OBS'])
+            target = oifile[0].header['OBJECT']
+            print(filename, target)
 
             for i in eachindex(oi_t3):
                 t3 = oi_t3[i]['T3PHI']
@@ -747,5 +749,111 @@ def read_chara_old(file,interact='n',exclude=''):
         vis2err = vis2err.reshape((15*n_v2,n_wl))
 
     ########################################################
+
+    return t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs
+
+def read_vlti_special(dir):
+    t3phi=[]
+    t3phierr=[]
+    eff_wave = []
+    time_obs = []
+    tels = []
+    u_coords = []
+    v_coords = []
+    vis2=[]
+    vis2err=[]
+    visphi=[]
+    visphierr=[]
+    visamp=[]
+    visamperr=[]
+    vistels=[]
+    ucoords=[]
+    vcoords=[]
+    flux=[]
+    fluxerr=[]
+
+    for file in sorted(os.listdir(dir)):
+        if file.endswith('.oifits'):
+
+            filename = os.path.join(dir, file)
+            print(filename)
+            hdu = fits.open(filename)
+
+            for table in hdu:
+            
+                ## t3phi data:
+                wl_i=1
+                if table.name=='OI_T3':
+                    for i in eachindex(table.data):
+                        t3 = table.data[i]['T3PHI']
+                        t3err = table.data[i]['T3PHIERR']
+                        t3flag = np.where(table.data[i].field('FLAG')==True)
+                        t3[t3flag] = np.nan
+                        t3err[t3flag] = np.nan
+                        t3phi.append(t3)
+                        t3phierr.append(t3err)
+                        tels.append(table.data[i]['STA_INDEX'])
+                        eff_wave.append(hdu['OI_WAVELENGTH',wl_i].data['EFF_WAVE'])
+                        time = table.data[i]['MJD']
+                        time_obs.append(time)
+                        u1coord = table.data[i]['U1COORD']
+                        v1coord = table.data[i]['V1COORD']
+                        u2coord = table.data[i]['U2COORD']
+                        v2coord = table.data[i]['V2COORD']
+                        u3coord = -u1coord - u2coord
+                        v3coord = -v1coord - v2coord
+                        u_coords.append([u1coord,u2coord,u3coord])
+                        v_coords.append([v1coord,v2coord,v3coord])
+                    wl_i+=1
+
+                ## vis2 data:
+                if table.name=='OI_VIS2':
+                    for i in eachindex(table.data):
+                        vis = table.data[i]['VIS2DATA']
+                        viserr = table.data[i]['VIS2ERR']
+                        visflag = np.where(table.data[i].field('FLAG')==True)
+                        vis[visflag] = np.nan
+                        viserr[visflag] = np.nan
+                        vis2.append(vis)
+                        vis2err.append(viserr)
+                        #print(table.data[i]['STA_INDEX'])
+                        #vistels_cal.append([beam_map[a] for a in table.data[i]['STA_INDEX']])
+                        vistels.append(table.data[i]['STA_INDEX'])
+                        ucoords.append(table.data[i]['UCOORD'])
+                        vcoords.append(table.data[i]['VCOORD'])
+
+                ## vphi data:
+                if table.name=='OI_VIS':
+                    for i in eachindex(table.data):
+                        vis = table.data[i]['VISPHI']
+                        viserr = table.data[i]['VISPHIERR']
+                        vamp = table.data[i]['VISAMP']
+                        vamperr = table.data[i]['VISAMPERR']
+                        visflag = np.where(table.data[i].field('FLAG')==True)
+                        vis[visflag] = np.nan
+                        viserr[visflag] = np.nan
+                        visphi.append(vis)
+                        visphierr.append(viserr)
+                        visamp.append(vamp)
+                        visamperr.append(vamperr)
+            hdu.close()
+    t3phi=np.array(t3phi)
+    t3phierr=np.array(t3phierr)
+    eff_wave=np.array(eff_wave)
+    tels=np.array(tels)
+    u_coords=np.array(u_coords)
+    v_coords=np.array(v_coords)
+    time_obs=np.array(time_obs)
+    vis2=np.array(vis2)
+    vis2err=np.array(vis2err)
+    visphi=np.array(visphi)
+    visphierr=np.array(visphierr)
+    visamp=np.array(visamp)
+    visamperr=np.array(visamperr)
+    vistels=np.array(vistels)
+    ucoords=np.array(ucoords)
+    vcoords=np.array(vcoords)
+    flux=np.array(flux)
+    fluxerr=np.array(fluxerr)
 
     return t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs

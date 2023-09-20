@@ -11,7 +11,7 @@
 
 from chara_uvcalc import uv_calc
 from binary_disks_vector import binary_disks_vector
-from read_oifits import read_chara,read_vlti,read_chara_old
+from read_oifits import read_chara,read_vlti,read_chara_old,read_vlti_special
 import numpy as np
 import matplotlib.pyplot as plt
 from lmfit import minimize, Minimizer, Parameters, Parameter, report_fit
@@ -279,14 +279,16 @@ if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
 ## Uncomment this if you want to drop LONG baselines
-#bl_drop = input('Drop long baselines? (y/n): ')
-bl_drop='n'
+bl_drop = input('Drop long baselines? (y/n): ')
+#bl_drop='n'
 
 ## get information from fits file
 if dtype=='chara':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs,az = read_chara(dir,target_id,interact,exclude,bl_drop)
 if dtype=='vlti':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs,flux,fluxerr = read_vlti(dir,interact)
+if dtype=='vlti2':
+    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs,flux,fluxerr = read_vlti_special(dir,interact)
 if dtype=='chara_old':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
 ########################################################
@@ -395,7 +397,7 @@ dec_grid = np.linspace(ddec-grid_size,ddec+grid_size,steps)
 ######################################################################
 
 ## medfilt HR VLTI to get rid of outliers
-if dtype=='vlti':
+if dtype=='vlti' or dtype=='vlti2':
     nloop = 0
     while nloop<3:
         t3phi_filtered = medfilt(t3phi,(1,11))
@@ -468,7 +470,7 @@ for ra_try in tqdm(ra_grid):
             params.add('f5',value=0,vary=False)
             params.add('f6',value=0,vary=False)
 
-            if dtype=='vlti':
+            if dtype=='vlti' or dtype=='vlti2':
                 minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi[:,::50],t3phierr[:,::50],visphi_new[:,::50],visphierr[:,::50],vis2[:,::50],vis2err[:,::50],visamp[:,::50],visamperr[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50],vistels,fitting_vars),nan_policy='omit')
                 result = minner.minimize()
             else:
@@ -486,7 +488,7 @@ for ra_try in tqdm(ra_grid):
         else:
             ## fixed params (faster)
             params = [ra_try,dec_try,a3,a4,a5,a6,1,1,1,1,1,1,0,0,0,0,0,0]
-            if dtype=='vlti':
+            if dtype=='vlti' or dtype=='vlti2':
                 chi = combined_minimizer(params,t3phi[:,::50],t3phierr[:,::50],visphi_new[:,::50],visphierr[:,::50],vis2[:,::50],vis2err[:,::50],visamp[:,::50],visamperr[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50],vistels,fitting_vars)
             else:
                 chi = combined_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave[0],vistels,fitting_vars)
@@ -715,60 +717,61 @@ vis2_model = np.swapaxes(vis2_model,0,1)
 #############################################
 ## drop tel by tel and refit -- test pupil
 #############################################
-xfit = []
-yfit = []
-for exclude in ['none','E1','W2','W1','S2','S1','E2']:
-    # get information from fits file
-    if dtype=='chara':
-        t3phi_d,t3phierr_d,vis2_d,vis2err_d,visphi_d,visphierr_d,visamp_d,visamperr_d,u_coords_d,v_coords_d,ucoords_d,vcoords_d,eff_wave_d,tels_d,vistels_d,time_obs_d,az_d = read_chara(dir,target_id,interact,exclude,bl_drop)
-    #if dtype=='vlti':
-    #    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
-    #if dtype=='chara_old':
-    #    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
-    else:
-        xfit.append(0)
-        yfit.append(0)
-        continue
-    ########################################################
-    ## do polynomial dispersion fit for each visphi measurement
-    if 'dphase' in fitting_vars:
-        dispersion=[]
-        for vis in visphi_d:
-            if np.count_nonzero(~np.isnan(vis))>0:
-                y=vis
-                x=eff_wave_d[0]
-                idx = np.isfinite(x) & np.isfinite(y)
-                z=np.polyfit(x[idx],y[idx],2)
-                p = np.poly1d(z)
-                dispersion.append(p(x))
-            else:
-                dispersion.append(vis)
-        dispersion=np.array(dispersion)
-        ## subtract dispersion (FIXME: should fit dispersion at each measurement)
-        visphi_new_d = visphi_d-dispersion
-    else:
-        visphi_new_d = visphi_d
+if bl_drop != 'y':
+    xfit = []
+    yfit = []
+    for exclude in ['none','E1','W2','W1','S2','S1','E2']:
+        # get information from fits file
+        if dtype=='chara':
+            t3phi_d,t3phierr_d,vis2_d,vis2err_d,visphi_d,visphierr_d,visamp_d,visamperr_d,u_coords_d,v_coords_d,ucoords_d,vcoords_d,eff_wave_d,tels_d,vistels_d,time_obs_d,az_d = read_chara(dir,target_id,interact,exclude,bl_drop)
+        #if dtype=='vlti':
+        #    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_vlti(dir,interact)
+        #if dtype=='chara_old':
+        #    t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
+        else:
+            xfit.append(0)
+            yfit.append(0)
+            continue
+        ########################################################
+        ## do polynomial dispersion fit for each visphi measurement
+        if 'dphase' in fitting_vars:
+            dispersion=[]
+            for vis in visphi_d:
+                if np.count_nonzero(~np.isnan(vis))>0:
+                    y=vis
+                    x=eff_wave_d[0]
+                    idx = np.isfinite(x) & np.isfinite(y)
+                    z=np.polyfit(x[idx],y[idx],2)
+                    p = np.poly1d(z)
+                    dispersion.append(p(x))
+                else:
+                    dispersion.append(vis)
+            dispersion=np.array(dispersion)
+            ## subtract dispersion (FIXME: should fit dispersion at each measurement)
+            visphi_new_d = visphi_d-dispersion
+        else:
+            visphi_new_d = visphi_d
 
-    print('Computing best fit -- dropping %s'%exclude)
+        print('Computing best fit -- dropping %s'%exclude)
 
-    ra_start = np.random.uniform(ra_best-0.05,ra_best+0.05)
-    dec_start = np.random.uniform(dec_best-0.05,dec_best+0.05)
+        ra_start = np.random.uniform(ra_best-0.05,ra_best+0.05)
+        dec_start = np.random.uniform(dec_best-0.05,dec_best+0.05)
 
-    params = Parameters()
-    params.add('ra',   value= ra_start)
-    params.add('dec', value= dec_start)
-    params.add('ratio', value= ratio_best, min=1.0)
-    params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=2.0)
-    params.add('ud2', value= ud2_best, vary=False)#min=0.0,max=2.0)
-    params.add('bw', value=bw_best, min=0.0, max=0.1)
+        params = Parameters()
+        params.add('ra',   value= ra_start)
+        params.add('dec', value= dec_start)
+        params.add('ratio', value= ratio_best, min=1.0)
+        params.add('ud1',   value= ud1_best, vary=False)#min=0.0,max=2.0)
+        params.add('ud2', value= ud2_best, vary=False)#min=0.0,max=2.0)
+        params.add('bw', value=bw_best, min=0.0, max=0.1)
 
-    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_d,t3phierr_d,visphi_new_d,visphierr_d,vis2_d,vis2err_d,visamp_d,visamperr_d,u_coords_d,v_coords_d,ucoords_d,vcoords_d,eff_wave_d[0],vistels_d,fitting_vars),nan_policy='omit')
-    result = minner.minimize()
+        minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_d,t3phierr_d,visphi_new_d,visphierr_d,vis2_d,vis2err_d,visamp_d,visamperr_d,u_coords_d,v_coords_d,ucoords_d,vcoords_d,eff_wave_d[0],vistels_d,fitting_vars),nan_policy='omit')
+        result = minner.minimize()
 
-    xfit.append(result.params['ra'].value)
-    yfit.append(result.params['dec'].value)
-xfit=np.array(xfit)
-yfit=np.array(yfit)
+        xfit.append(result.params['ra'].value)
+        yfit.append(result.params['dec'].value)
+    xfit=np.array(xfit)
+    yfit=np.array(yfit)
 
 ## plot results
 full_plot='y'
@@ -803,7 +806,7 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
         if dtype=='chara' or dtype=='chara_old':
             ntri=20
             nbl=15
-        if dtype=='vlti':
+        if dtype=='vlti' or dtype=='vlti2':
             ntri=4
             nbl=6
 
@@ -822,7 +825,7 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
         vis2_plot = np.array(np.array_split(vis2,n_v2))
         vis2err_plot = np.array(np.array_split(vis2err,n_v2))
         vis2_model_plot = np.array(np.array_split(vis2_model,n_v2))
-        if dtype=='vlti':
+        if dtype=='vlti' or dtype=='vlti2':
             flux_plot = np.array(np.array_split(flux,n_v2))
             fluxerr_plot = np.array(np.array_split(fluxerr,n_v2))
 
@@ -836,7 +839,7 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
 
             if dtype=='chara' or dtype=='chara_old':
                 fig,axs = plt.subplots(4,5,figsize=(10,7),facecolor='w',edgecolor='k')
-            if dtype=='vlti':
+            if dtype=='vlti' or dtype=='vlti2':
                 fig,axs = plt.subplots(2,2,figsize=(10,7),facecolor='w',edgecolor='k')
             fig.subplots_adjust(hspace=0.5,wspace=.001)
             axs=axs.ravel()
@@ -863,7 +866,7 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
 
             if dtype=='chara' or dtype=='chara_old':
                 fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
-            if dtype=='vlti':
+            if dtype=='vlti' or dtype=='vlti2':
                 fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
             fig.subplots_adjust(hspace=0.5,wspace=.001)
             axs=axs.ravel()
@@ -890,7 +893,7 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
 
             if dtype=='chara' or dtype=='chara_old':
                 fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
-            if dtype=='vlti':
+            if dtype=='vlti' or dtype=='vlti2':
                 fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
             fig.subplots_adjust(hspace=0.5,wspace=.001)
             axs=axs.ravel()
@@ -917,7 +920,7 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
 
             if dtype=='chara' or dtype=='chara_old':
                 fig,axs = plt.subplots(3,5,figsize=(10,7),facecolor='w',edgecolor='k')
-            if dtype=='vlti':
+            if dtype=='vlti' or dtype=='vlti2':
                 fig,axs = plt.subplots(2,3,figsize=(10,7),facecolor='w',edgecolor='k')
             fig.subplots_adjust(hspace=0.5,wspace=.001)
             axs=axs.ravel()
@@ -934,7 +937,7 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
             pdf.savefig()
             plt.close()
 
-        if dtype=='vlti':
+        if dtype=='vlti' or dtype=='vlti2':
 
             plt.figure(figsize=(10, 7))
 
@@ -957,23 +960,24 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
             pdf.savefig()
             plt.close()
 
-        ## next page -- tel drop
-        if dtype=='chara':
-            spread = np.sqrt((xfit-xfit[0])**2+(yfit-yfit[0])**2)
-            for x,y,label in zip(xfit,yfit,['none','E1','W2','W1','S2','S1','E2']):
-                if label=='none':
-                    plt.scatter(x, y, marker='*', zorder=2, label=label)
-                else:
-                    plt.scatter(x, y, marker='o', label=label)
-
-            plt.title('STDEV = %s mas'%np.around(np.std(spread),4))
-            plt.xlabel('d_RA (mas)')
-            plt.ylabel('d_DE (mas)')
-            plt.gca().invert_xaxis()
-            plt.axis('equal')
-            plt.legend()
-            pdf.savefig()  
-            plt.close()
+        if bl_drop != 'y':
+            ## next page -- tel drop
+            if dtype=='chara':
+                spread = np.sqrt((xfit-xfit[0])**2+(yfit-yfit[0])**2)
+                for x,y,label in zip(xfit,yfit,['none','E1','W2','W1','S2','S1','E2']):
+                    if label=='none':
+                        plt.scatter(x, y, marker='*', zorder=2, label=label)
+                    else:
+                        plt.scatter(x, y, marker='o', label=label)
+    
+                plt.title('STDEV = %s mas'%np.around(np.std(spread),4))
+                plt.xlabel('d_RA (mas)')
+                plt.ylabel('d_DE (mas)')
+                plt.gca().invert_xaxis()
+                plt.axis('equal')
+                plt.legend()
+                pdf.savefig()  
+                plt.close()
 
         ## next page - reduction and fit parameters
         textfig = plt.figure(figsize=(11.69,8.27))
@@ -990,7 +994,7 @@ with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_summary.pdf"%{"1"
 ### Now do errors
 ###########################################################
 print('Computing errors from CHI2 SURFACE')
-if dtype=='vlti':
+if dtype=='vlti' or dtype=='vlti2':
     size = 1.0
     steps = 100
 else:
