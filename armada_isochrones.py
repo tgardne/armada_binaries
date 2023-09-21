@@ -25,30 +25,23 @@ Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
-#orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
-#corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
+save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
+summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
+armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
+photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
+csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
+corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
+wds_file = '/Users/tgardner/ARMADA_isochrones/WDS_Data/'
 
-summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
-save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-armada_file = '/home/colton/armada_binaries/full_target_list_10_3.csv' ## path to csv target file
-orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
-csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
-wds = '/home/colton/ARMADA_binaries/WDS/'
-
-#summary_directory = '/users/coltonmp/ARMADA_binaries/summary/' ## path for saved file
-#save_directory = '/users/coltonmp/ARMADA_binaries/' ## path for saved files
-#corner_directory = '/husers/coltonmp/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-#photometry_file = '/users/coltonmp/armada_binaries/Photometry.csv'
-#armada_file = '/users/coltonmp/armada_binaries/full_target_list_newest_version3.csv' ## path to csv target file
-#orbit_directory = '/husers/coltonmp/ARMADA_binaries/ARMADA_orbits/'
-#csv = '/husers/coltonmp/target_info_all_sigma.csv'
+#summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
+#save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
+#photometry_file = '/home/colton/armada_binaries/Photometry.csv'
+#armada_file = '/home/colton/armada_binaries/full_target_list_10_3.csv' ## path to csv target file
+#orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
+#csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
+#wds_file = '/home/colton/ARMADA_binaries/WDS_Data/'
 
 Header =["HD", "M_Dyn_mcmc", "M_Dyn_mcmc_err", "M_Dyn_orbital", "M_Dyn_orbital_err",
                         "M_Tot", "M_Tot_err", "M1",
@@ -67,17 +60,6 @@ if (switch == 'no') == True or (switch == 'No')== True:
 if (switch == 'yes') == True or (switch == 'Yes')== True:
     note = note_first+'_main_seq'
 #pdb.set_trace()
-# Problem target  '2772'
-"""
-Target_List = ['6456','1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
-    , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
-               '75974', '78316', '82446', '87652', '87822', '107259', '112846'
-    , '114993', '118889', '127726', '128415', '129246', '133484', '133955', '137798', '140159', '140436', '144892',
-              '145589', '148283', '153370', '154569', '156190', '158140'
-    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
-               '196089', '196867', '198183', '199766', '201038', '206901'
-    , '217676', '217782', '220278', '224512']"""
-
 
 Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094', '27176', '29316', '29573', '31093', '31297', '34319', '36058',  '37711', '38545'
     , '38769', '40932', '41040', '43358', '43525', '45542', '46273', '47105', '48581', '49643', '60107', '64235',
@@ -87,13 +69,14 @@ Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094',
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
-#pdb.set_trace()
+
+Target_List = ['1976']
 
 Target_List_Fail = []
 
 
 ## Fuction to fit a single star model
-def single_star_fit(params,split_mag_star,d_mod,Av):
+def single_star_fit(params,split_mag_star,wave_star,d_mod,Av):
     split_mag_absolute = split_mag_star - d_mod
     split_mag_val = unumpy.nominal_values(split_mag_absolute)
     split_mag_err = unumpy.std_devs(split_mag_absolute)
@@ -104,63 +87,24 @@ def single_star_fit(params,split_mag_star,d_mod,Av):
 
     a1 = tracks.generate(mass, age, feh, return_dict=True)
 
-    split_mag_model = np.array([(a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           a1["H_mag"],
-                           a1["K_mag"]])
+    split_mag_model_all = np.array([(a1['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                                (a1['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                                (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                                (a1['Mbol'] - bc_grid_R.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                                (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                                (a1['Mbol'] - bc_grid_J.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                                (a1['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                                (a1['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
+    ## UBVRIJHK
+    wave_model = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
+
+    split_mag_model = np.interp(wave_star,wave_model,split_mag_model_all)
     diff = (split_mag_val - split_mag_model) / split_mag_err
 
     if np.isnan(a1['Mbol']):
         diff[:] = FAIL ## can do this more elegantly. This will just kill the minimization :)
 
     return(diff)
-
-## Objective function for binaries to be minimized for lmfit
-def isochrone_model(params, TOT_mag_star, D_mag_star, d_mod, Av):
-    TOT_mag_absolute = TOT_mag_star - d_mod
-    TOT_mag_val = unumpy.nominal_values(TOT_mag_absolute)
-    TOT_mag_err = unumpy.std_devs(TOT_mag_absolute)
-
-    D_mag_val = unumpy.nominal_values(D_mag_star)
-    D_mag_err = unumpy.std_devs(D_mag_star)
-
-    age = params['age']
-    m1 = params['mass1']
-    m2 = params['mass2']
-    feh = params['feh']
-
-    a1 = tracks.generate(m1, age, feh, return_dict=True)
-    a2 = tracks.generate(m2, age, feh, return_dict=True)
-
-
-    mag1_model = np.array([(a1['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           a1["J_mag"],
-                           a1["H_mag"],
-                           a1["K_mag"]])
-
-    mag2_model = np.array([(a2['Mbol'] - bc_grid_B.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           a1["J_mag"],
-                           a2["H_mag"],
-                           a2["K_mag"]])
-
-    D_mag_model = mag2_model - mag1_model
-    TOT_mag_model = -2.5 * np.log10(10 ** (-0.4 * mag1_model) + 10 ** (-0.4 * mag2_model))
-
-    diff1 = (D_mag_val - D_mag_model) / D_mag_err
-    diff2 = (TOT_mag_val - TOT_mag_model) / TOT_mag_err
-
-    # print(age.value, m1.value, m2.value,diff1,diff2)
-    if np.isnan(a1['Mbol']) or np.isnan(a2['Mbol']):
-        #print('ALL NAN ENCOUNTERED. NEED TO FIX!!')
-        diff1[:] = FAIL
-        diff2[:] = FAIL ## kill the minimization in these cases. Need to fix
-
-    return np.concatenate([diff1, diff2])
 
 ## Objective function to find the best distance
 def best_distance(gaia, hip, kervella):
@@ -169,9 +113,8 @@ def best_distance(gaia, hip, kervella):
     #pdb.set_trace()
     return(distances[idx_lowest])
 
-    pdb.set_trace()
 ## Objective function for binaries to be minimized for lmfit
-def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
+def isochrone_model(params, TOT_mag_star, D_mag_star, mag_wave_star, dmag_wave_star, d_mod, Av):
     TOT_mag_absolute = TOT_mag_star - d_mod
     TOT_mag_val = unumpy.nominal_values(TOT_mag_absolute)
     TOT_mag_err = unumpy.std_devs(TOT_mag_absolute)
@@ -191,52 +134,41 @@ def isochrone_model_v2(params, TOT_mag_star, D_mag_star, d_mod, Av):
        #print('ALL NAN ENCOUNTERED. NEED TO FIX!!')
        FAIL ## kill the program
 
-    mag1_model = np.array([(a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           a1["H_mag"],
-                           a1["K_mag"]])
-
-    mag2_model = np.array([(a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           a2["H_mag"],
-                           a2["K_mag"]])
-
-    D_mag_model = mag2_model - mag1_model
-
-    diff1 = (D_mag_val - D_mag_model) / D_mag_err
-
-    ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
-    # Wavelengths = np.array([365, 445, 551, 675, 673, 806, 905, 1250, 1650, 2150])
-
-    mag1_model = np.array([(a1['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+    mag1_model_all = np.array([(a1['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_R.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_J.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           a1["H_mag"],
-                           a1["K_mag"]])
+                           (a1['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
 
-    mag2_model = np.array([(a2['Mbol'] - bc_grid_U.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_B.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_R.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_J.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           a2["H_mag"],
-                           a2["K_mag"]])
+    mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_R.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_J.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
+    ## UBVRIJHK
+    wave_model = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
 
+    mag1_model = np.interp(dmag_wave_star,wave_model,mag1_model_all)
+    mag2_model = np.interp(dmag_wave_star,wave_model,mag2_model_all)
+    D_mag_model = mag2_model - mag1_model
+    diff1 = (D_mag_val - D_mag_model) / D_mag_err
+
+    mag1_model = np.interp(mag_wave_star,wave_model,mag1_model_all)
+    mag2_model = np.interp(mag_wave_star,wave_model,mag2_model_all)
     TOT_mag_model = -2.5 * np.log10(10 ** (-0.4 * mag1_model) + 10 ** (-0.4 * mag2_model))
-
     diff2 = (TOT_mag_val - TOT_mag_model) / TOT_mag_err
     # print(np.concatenate([diff1,diff2]).size)
 
     return np.concatenate([diff1, diff2])
 
 ## Objective function for binaries to be minimized for lmfit
-def isochrone_model_mcmc(params, TOT_mag_star, D_mag_star, d_mod, Av):
+def isochrone_model_mcmc(params, TOT_mag_star, D_mag_star, mag_wave_star, dmag_wave_star, d_mod, Av):
     TOT_mag_absolute = TOT_mag_star - d_mod
     TOT_mag_val = unumpy.nominal_values(TOT_mag_absolute)
     TOT_mag_err = unumpy.std_devs(TOT_mag_absolute)
@@ -252,45 +184,35 @@ def isochrone_model_mcmc(params, TOT_mag_star, D_mag_star, d_mod, Av):
     a1 = tracks.generate(m1, age, feh, return_dict=True)
     a2 = tracks.generate(m2, age, feh, return_dict=True)
 
-    mag1_model = np.array([(a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           a1["H_mag"],
-                           a1["K_mag"]])
-
-    mag2_model = np.array([(a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           a2["H_mag"],
-                           a2["K_mag"]])
-
-    D_mag_model = mag2_model - mag1_model
-
-    diff1 = (D_mag_val - D_mag_model) / D_mag_err
-
-    ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Gaia_G, Bessel_I, SDSS_z, 2MASS_J, 2MASS_H, 2MASS_K
-    # Wavelengths = np.array([365, 445, 551, 675, 673, 806, 905, 1250, 1650, 2150])
-
-    mag1_model = np.array([(a1['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+    mag1_model_all = np.array([(a1['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_R.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_J.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           a1["H_mag"],
-                           a1["K_mag"]])
+                           (a1['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a1['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
 
-    mag2_model = np.array([(a2['Mbol'] - bc_grid_U.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_B.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_R.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_J.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
-                           a2["H_mag"],
-                           a2["K_mag"]])
+    mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_R.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_J.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
 
+    ## UBVRIJHK
+    wave_model = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
+
+    mag1_model = np.interp(dmag_wave_star,wave_model,mag1_model_all)
+    mag2_model = np.interp(dmag_wave_star,wave_model,mag2_model_all)
+    D_mag_model = mag2_model - mag1_model
+    diff1 = (D_mag_val - D_mag_model) / D_mag_err
+
+    mag1_model = np.interp(mag_wave_star,wave_model,mag1_model_all)
+    mag2_model = np.interp(mag_wave_star,wave_model,mag2_model_all)
     TOT_mag_model = -2.5 * np.log10(10 ** (-0.4 * mag1_model) + 10 ** (-0.4 * mag2_model))
-
     diff2 = (TOT_mag_val - TOT_mag_model) / TOT_mag_err
     # print(np.concatenate([diff1,diff2]).size)
 
@@ -299,7 +221,7 @@ def isochrone_model_mcmc(params, TOT_mag_star, D_mag_star, d_mod, Av):
     else:
         return np.concatenate([diff1, diff2])
 
-def mass_search(mass1_grid,mass2_grid,log_age_guess,split_mag1,split_mag2,d_modulus,Av,feh):
+def mass_search(mass1_grid,mass2_grid,log_age_guess,split_mag1,split_mag2,dmag_wave_star,d_modulus,Av,feh):
         
     ## search for mass 1
     chi2_grid1 = []
@@ -310,7 +232,7 @@ def mass_search(mass1_grid,mass2_grid,log_age_guess,split_mag1,split_mag2,d_modu
             params.add('age', value=log_age_guess, vary=False) ## NOTE: I could vary this!
             params.add('mass', value=mm, vary=False)
             params.add('feh', value=feh, vary=False)
-            minner = Minimizer(single_star_fit, params, fcn_args=(split_mag1, d_modulus.nominal_value, Av),
+            minner = Minimizer(single_star_fit, params, fcn_args=(split_mag1,dmag_wave_star,d_modulus.nominal_value,Av),
                             nan_policy='omit')
             result = minner.minimize()
             chi2_grid1.append(result.redchi)
@@ -328,7 +250,7 @@ def mass_search(mass1_grid,mass2_grid,log_age_guess,split_mag1,split_mag2,d_modu
             params.add('age', value=log_age_guess, vary=False) ## NOTE: I could vary this!
             params.add('mass', value=mm, vary=False)
             params.add('feh', value=feh, vary=False)
-            minner = Minimizer(single_star_fit, params, fcn_args=(split_mag2, d_modulus.nominal_value, Av),
+            minner = Minimizer(single_star_fit, params, fcn_args=(split_mag2,dmag_wave_star,d_modulus.nominal_value,Av),
                             nan_policy='omit')
             result = minner.minimize()
             chi2_grid2.append(result.redchi)
@@ -339,7 +261,7 @@ def mass_search(mass1_grid,mass2_grid,log_age_guess,split_mag1,split_mag2,d_modu
 
     return chi2_grid1,mass1_result,chi2_grid2,mass2_result
 
-def find_max_mass(age,m1_grid,feh,TOT_Mag,DiffM,d_modulus,Av):
+def find_max_mass(age,m1_grid,feh,TOT_Mag,DiffM,mag_wave_star,dmag_wave_star,d_modulus,Av):
     m1_max = np.nanmax(m1_grid)
     for m1 in m1_grid:
         try:
@@ -348,15 +270,13 @@ def find_max_mass(age,m1_grid,feh,TOT_Mag,DiffM,d_modulus,Av):
             params.add('mass1', value=m1, vary=False)
             params.add('mass2', value=0.5, vary=False)
             params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
-            minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
+            minner = Minimizer(isochrone_model, params, fcn_args=(TOT_Mag, DiffM, mag_wave_star, dmag_wave_star, d_modulus.nominal_value, Av),
                             nan_policy='omit')
             result = minner.minimize()
         except:
             m1_max = m1
             break
     return (m1_max)
-    
-
 
 feh_set = [-0.1,0,0.1]
 
@@ -364,6 +284,9 @@ for target_hd in Target_List:
     print('--' * 10)
     print('--' * 10)
     print("Doing Target HD %s" % target_hd)
+
+    df_wds = pd.read_csv("%s/HD_%s_wds.csv"%(wds_file,target_hd))
+
     # For Combined 3x3 plots
     all_mass1_result = []
     all_chi2_grid = []
@@ -372,16 +295,18 @@ for target_hd in Target_List:
     all_ages = []
     all_chi2_grid3 = []
     all_mass = []
-    all_xwave = []
+    all_TOTmag_model_wave = []
+    all_TOTmag_wave = []
     all_TOTmag_model = []
-    all_data_wave = []
+    all_TOTmag = []
     all_split_mag1 = []
     all_split_mag2 = []
     all_model1 = []
     all_model2 = []
-    all_yplot = []
-    all_yplot1 = []
     all_Dmag_model = []
+    all_Dmag_model_wave = []
+    all_Dmag = []
+    all_Dmag_wave = []
     all_modelx_best = []
     all_modely_best = []
     all_age_best = []
@@ -400,8 +325,6 @@ for target_hd in Target_List:
     all_m_dyn_mcmc = []
     all_m_dyn_orbit = []
 
-
-
     ## Create directory for saved files, if it doesn't already exist
     directory_corner = "%s/HD_%s/" % (corner_directory, target_hd)
     if os.path.exists(directory_corner):
@@ -417,7 +340,6 @@ for target_hd in Target_List:
             print('--' * 10)
             print("Doing Metallicity [Fe/H] = %s" % feh)
 
-
             ## Create directory for saved files, if it doesn't already exist
             directory = "%s/HD_%s" % (save_directory, target_hd)
             if not os.path.exists(directory):
@@ -429,26 +351,37 @@ for target_hd in Target_List:
                 print("Creating directory")
                 os.makedirs(directory2)
 
+            ## Get magnitude differences for target
+            ## from WDS measurements:
+            cdiff_wds = unumpy.uarray(df_wds['f_ratio'].values,df_wds['f_ratio_err'].values)
+            fratio_wds = 10 ** (cdiff_wds / 2.5)
+            fratio_wds_wl = df_wds['Wavelength'].values
 
             ## Get target from spreadsheet
             idx = np.where(df_armada['HD'] == target_hd)[0][0]
             Av = float(df_armada['Av'][idx])
 
-            ## Get magnitude differences for target
             cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
             cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
             #cdiff_h = ufloat(float(np.nan), float(np.nan))
             #cdiff_k = ufloat(float(np.nan), float(np.nan))
             cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
             cdiff_b = ufloat(float(df_armada['dmag_speckle_v'][idx]),float(df_armada['dmag_speckle_v_err'][idx]))
-            cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
-            #pdb.set_trace()
-
+            #cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
+            ##pdb.set_trace()
             fratio_h = 10 ** (cdiff_h / 2.5)
             fratio_k = 10 ** (cdiff_k / 2.5)
             fratio_i = 10 ** (cdiff_i / 2.5)
             fratio_b = 10 ** (cdiff_b / 2.5)
-            fratio_wds = 10 ** (cdiff_wds / 2.5)
+            
+            fratio_data = np.array([fratio_b,fratio_i,fratio_h,fratio_k])
+            cdiff_data = np.array([cdiff_b,cdiff_i,cdiff_h,cdiff_k])
+            cdiff_data_fit = np.array([cdiff_b,cdiff_i,np.nan,np.nan]) ## NOTE: I am setting H and K bands to nan for fitting!!!!
+            fratio_data_wl = np.array([562,832,1650,2150])
+            
+            fratio_all = np.concatenate([fratio_wds,fratio_data_wl])
+            cdiff_all = np.concatenate([cdiff_wds,cdiff_data])
+            fratio_all_wl = np.concatenate([fratio_wds_wl,fratio_data_wl])
 
             ## get total magnitudes and errors from photometry file. Set minimum error 
             err_min = 0.02        
@@ -477,22 +410,17 @@ for target_hd in Target_List:
             else:
                 ktot = ufloat(float(df_photometry['K_ II/246/out'][idx]), float(df_photometry['K_err'][idx]))
 
-            ## Compute individual magnitudes from flux ratios and total magnitudes
-            ## Mostly for plotting. Though we will use these to estimate M1 and M2 roughly
-            data_wave = np.array([551, 562, 832, 1630, 2190])
-            k1 = -2.5 * log10(10 ** (-ktot / 2.5) / (1 + 10 ** (-cdiff_k / 2.5)))
-            k2 = cdiff_k + k1
-            h1 = -2.5 * log10(10 ** (-htot / 2.5) / (1 + 10 ** (-cdiff_h / 2.5)))
-            h2 = cdiff_h + h1
-            i1 = -2.5 * log10(10 ** (-rtot / 2.5) / (1 + 10 ** (-cdiff_i / 2.5)))  ## NOTE: R is not the best here probably
-            i2 = cdiff_i + i1
-            v1 = -2.5 * log10(10 ** (-vtot / 2.5) / (1 + 10 ** (-cdiff_wds / 2.5)))
-            v2 = cdiff_wds + v1
-            b1 = -2.5 * log10(10 ** (-vtot / 2.5) / (1 + 10 ** (-cdiff_b / 2.5)))
-            b2 = cdiff_b + b1
+            ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Bessel_I, 2MASS_J, 2MASS_H, 2MASS_K
+            ## Choose observables for fitting
+            TOT_Mag = np.array([utot, btot, vtot, rtot, itot, jtot, htot, ktot])
+            TOT_Mag_wl = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
 
-            split_mag1 = np.array([b1, v1, i1, h1, k1])
-            split_mag2 = np.array([b2, v2, i2, h2, k2])
+            ## Compute individual magnitudes at wavelengths with measure fratios
+            tot_mag_ratios_val = np.interp(fratio_all_wl,TOT_Mag_wl,unumpy.nominal_values(TOT_Mag))
+            tot_mag_ratios_err = np.interp(fratio_all_wl,TOT_Mag_wl,unumpy.std_devs(TOT_Mag))
+            tot_mag_ratios = unumpy.uarray(tot_mag_ratios_val,tot_mag_ratios_err)
+            split_mag1 = -2.5 * unumpy.log10(10 ** (-tot_mag_ratios / 2.5) / (1 + 10 ** (-cdiff_all / 2.5)))
+            split_mag2 = cdiff_all + split_mag1
 
             ## A new isochrone model that interpolate the model photometry to add more constraint
             tracks = get_ichrone('mist', tracks=True, accurate=True)
@@ -501,8 +429,10 @@ for target_hd in Target_List:
             bc_grid_V = MISTBolometricCorrectionGrid(['V'])
             bc_grid_R = MISTBolometricCorrectionGrid(['R'])
             bc_grid_I = MISTBolometricCorrectionGrid(['I'])
-            bc_grid_Z = MISTBolometricCorrectionGrid(['z'])
             bc_grid_J = MISTBolometricCorrectionGrid(['J'])
+            bc_grid_H = MISTBolometricCorrectionGrid(['H'])
+            bc_grid_K = MISTBolometricCorrectionGrid(['K'])
+            TOT_Mag_model_wl = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
 
             ## choose which distance to use -- Gaia, HIP, or something else
             distance_gaia = ufloat(float(df_armada['Gaia_distance (pc)'][idx]), float(df_armada['Gaia_distance_err (pc)'][idx]))
@@ -527,10 +457,6 @@ for target_hd in Target_List:
                 d_modulus = 5 * log10(distance) - 5
                 name = f"{note}_{feh}_{distance.nominal_value}"
 
-                ## Choose observables for fitting
-                TOT_Mag = np.array([utot, btot, vtot, rtot, itot, jtot, htot, ktot])
-                DiffM = np.array([cdiff_wds, cdiff_b, cdiff_i, np.nan, np.nan]) ## TG NOTE --> do NOT fit to H/K ratios
-
                 ##################
                 ## Now let's find best masses and age
                 ##################
@@ -545,20 +471,20 @@ for target_hd in Target_List:
                 ages = []
                 for aa in tqdm(age_grid):
                     try:
-                        chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,aa,split_mag1,split_mag2,d_modulus,Av,feh)
+                        chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,aa,split_mag1[:-2],split_mag2[:-2],fratio_all_wl[:-2],d_modulus,Av,feh)
                         idx_mass1 = np.argmin(chi2_grid1)
                         mass1_guess = mass1_result[idx_mass1]
                         idx_mass2 = np.argmin(chi2_grid2)
                         mass2_guess = mass2_result[idx_mass2]
 
-                        max_mass = find_max_mass(aa,mass1_grid,feh,TOT_Mag,DiffM,d_modulus,Av)
+                        max_mass = find_max_mass(aa,mass1_grid,feh,TOT_Mag,cdiff_all[:-2],TOT_Mag_model_wl,fratio_all_wl[:-2],d_modulus,Av)
 
                         params = Parameters()
                         params.add('age', value=aa, vary=False)
                         params.add('mass1', value=mass1_guess, min=0, max=max_mass)
                         params.add('mass2', value=mass2_guess, min=0, max=max_mass)
                         params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
-                        minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
+                        minner = Minimizer(isochrone_model, params, fcn_args=(TOT_Mag, cdiff_all[:-2], TOT_Mag_model_wl, fratio_all_wl[:-2], d_modulus.nominal_value, Av),
                                         nan_policy='omit')
                         result = minner.minimize()
 
@@ -594,7 +520,7 @@ for target_hd in Target_List:
                     age_best = best_age_total
 
                 ## Make chi2 plot of masses at best age
-                chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,age_best,split_mag1,split_mag2,d_modulus,Av,feh)
+                chi2_grid1,mass1_result,chi2_grid2,mass2_result = mass_search(mass1_grid,mass2_grid,age_best,split_mag1[:-2],split_mag2[:-2],fratio_all_wl[:-2],d_modulus,Av,feh)
 
                 idx_mass1 = np.argmin(chi2_grid1)
                 mass1_best = mass1_result[idx_mass1]
@@ -627,14 +553,14 @@ for target_hd in Target_List:
                 ax3.set_ylabel(r'$\chi^2$', fontsize=15)
 
                 ## Do one more least squares fit to minimize all parameters
-                max_mass = find_max_mass(age_best,mass1_grid,feh,TOT_Mag,DiffM,d_modulus,Av)
+                max_mass = find_max_mass(age_best,mass1_grid,feh,TOT_Mag,cdiff_all[:-2],TOT_Mag_model_wl,fratio_all_wl[:-2],d_modulus,Av)
 
                 params = Parameters()
                 params.add('age', value=age_best, min=6, max=age_max)
                 params.add('mass1', value=mass1_best, min=0, max=max_mass)
                 params.add('mass2', value=mass2_best, min=0, max=max_mass)
                 params.add('feh', value=feh, vary=False)  # min=-0.5, max=0.5)
-                minner = Minimizer(isochrone_model_v2, params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
+                minner = Minimizer(isochrone_model, params, fcn_args=(TOT_Mag, cdiff_all[:-2], TOT_Mag_model_wl, fratio_all_wl[:-2], d_modulus.nominal_value, Av),
                                    nan_policy='omit')
                 result = minner.minimize()
                 #report_fit(result)
@@ -661,7 +587,7 @@ for target_hd in Target_List:
 
                 print("Running MCMC chains: ")
                 ## Do MCMC fit (this cell could take some time, depending on steps)
-                minner = Minimizer(isochrone_model_mcmc, emcee_params, fcn_args=(TOT_Mag, DiffM, d_modulus.nominal_value, Av),
+                minner = Minimizer(isochrone_model_mcmc, emcee_params, fcn_args=(TOT_Mag, cdiff_all[:-2], TOT_Mag_model_wl, fratio_all_wl[:-2], d_modulus.nominal_value, Av),
                                    nan_policy='omit')
                 result = minner.minimize(method='emcee', steps=steps, burn=burn, thin=thin, nwalkers=nwalkers)
                 #print(report_fit(result))
@@ -722,8 +648,8 @@ for target_hd in Target_List:
                      (a1_best['Mbol'] - bc_grid_R.interp([a1_best['Teff'], a1_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
                      (a1_best['Mbol'] - bc_grid_I.interp([a1_best['Teff'], a1_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
                      (a1_best['Mbol'] - bc_grid_J.interp([a1_best['Teff'], a1_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
-                     a1_best["H_mag"] + d_modulus.nominal_value,
-                     a1_best["K_mag"] + d_modulus.nominal_value])
+                     (a1_best['Mbol'] - bc_grid_H.interp([a1_best['Teff'], a1_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
+                     (a1_best['Mbol'] - bc_grid_K.interp([a1_best['Teff'], a1_best['logg'], feh, Av]) + d_modulus.nominal_value)[0]])
 
                 model2 = np.array(
                     [(a2_best['Mbol'] - bc_grid_U.interp([a2_best['Teff'], a2_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
@@ -732,26 +658,22 @@ for target_hd in Target_List:
                      (a2_best['Mbol'] - bc_grid_R.interp([a2_best['Teff'], a2_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
                      (a2_best['Mbol'] - bc_grid_I.interp([a2_best['Teff'], a2_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
                      (a2_best['Mbol'] - bc_grid_J.interp([a2_best['Teff'], a2_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
-                     a2_best["H_mag"] + d_modulus.nominal_value,
-                     a2_best["K_mag"] + d_modulus.nominal_value])
+                     (a2_best['Mbol'] - bc_grid_H.interp([a2_best['Teff'], a2_best['logg'], feh, Av]) + d_modulus.nominal_value)[0],
+                     (a2_best['Mbol'] - bc_grid_K.interp([a2_best['Teff'], a2_best['logg'], feh, Av]) + d_modulus.nominal_value)[0]])
 
-                Dmag_model = model2 - model1
-                TOTmag_model = -2.5 * np.log10(10 ** (-0.4 * model1) + 10 ** (-0.4 * model2))
-
-                ## central wavelengths of magnitudes chosen above, smallest to largest - ubvrgjhk
-                ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Bessel_I, 2MASS_J, 2MASS_H, 2MASS_K
-                x_wave = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
+                D_mag_model = model2 - model1
+                TOT_mag_model = -2.5 * np.log10(10 ** (-0.4 * model1) + 10 ** (-0.4 * model2))
 
                 #fig, (ax1, ax2, ax3) = plt.subplots(3, sharex=True)
                 #fig.tight_layout()
-                yplot = TOT_Mag
-                all_yplot.append(yplot)
-                all_xwave.append(x_wave)
-                all_TOTmag_model.append(TOTmag_model)
+                all_TOTmag_wave.append(TOT_Mag_wl)
+                all_TOTmag.append(TOT_Mag)
+                all_TOTmag_model_wave.append(TOT_Mag_model_wl)
+                all_TOTmag_model.append(TOT_mag_model)
                 #pdb.set_trace()
                 ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
-                ax4.errorbar(x_wave, unumpy.nominal_values(yplot), unumpy.std_devs(yplot), fmt='o', color='black')
-                ax4.plot(x_wave, TOTmag_model, '--', color='red')
+                ax4.errorbar(TOT_Mag_wl, unumpy.nominal_values(TOT_Mag), unumpy.std_devs(TOT_Mag), fmt='o', color='black')
+                ax4.plot(TOT_Mag_model_wl, TOT_mag_model, '--', color='red')
                 # ax1.set_xlabel('Wavelength (nm)')
                 ax4.set_ylabel('Total Mag')
                 ax4.invert_yaxis()
@@ -759,14 +681,15 @@ for target_hd in Target_List:
                 # ax1.gca().invert_yaxis()
                 # plt.savefig("%s/HD_%s_%s_TOTmag_fit.pdf"%(directory,target_hd,note))
 
-                yplot1 = DiffM
-                all_data_wave.append(data_wave)
-                all_yplot1.append(yplot1)
-                all_Dmag_model.append(Dmag_model)
+                all_Dmag_wave.append(fratio_all_wl)
+                all_Dmag.append(cdiff_all)
+                all_Dmag_model.append(D_mag_model)
+                all_Dmag_model_wave.append(TOT_Mag_model_wl)
 
                 ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
-                ax5.errorbar(data_wave, unumpy.nominal_values(yplot1), unumpy.std_devs(yplot1), fmt='o', color='black')
-                ax5.plot(x_wave, Dmag_model, '--', color='red')
+                ax5.errorbar(fratio_all_wl[:-2], unumpy.nominal_values(cdiff_all[:-2]), unumpy.std_devs(cdiff_all[:-2]), fmt='o', color='black')
+                ax5.errorbar(fratio_all_wl[-2:], unumpy.nominal_values(cdiff_all[-2:]), unumpy.std_devs(cdiff_all[-2:]), fmt='o', color='lightgrey')
+                ax5.plot(TOT_Mag_model_wl, D_mag_model, '--', color='red')
                 # ax2.set_xlabel('Wavelength (nm)')
                 ax5.invert_yaxis()
                 ax5.set_ylabel('Diff Mag')
@@ -780,10 +703,12 @@ for target_hd in Target_List:
                 all_model2.append(model2)
 
                 ax6.set_title("Split SED Model Fit, HD %s" % target_hd)
-                ax6.errorbar(data_wave, unumpy.nominal_values(split_mag1), unumpy.std_devs(split_mag1), fmt='o', color='black')
-                ax6.errorbar(data_wave, unumpy.nominal_values(split_mag2), unumpy.std_devs(split_mag2), fmt='o', color='black')
-                ax6.plot(x_wave, model1, '--', color='red')
-                ax6.plot(x_wave, model2, '--', color='red')
+                ax6.errorbar(fratio_all_wl[:-2], unumpy.nominal_values(split_mag1[:-2]), unumpy.std_devs(split_mag1[:-2]), fmt='o', color='black')
+                ax6.errorbar(fratio_all_wl[-2:], unumpy.nominal_values(split_mag1[-2:]), unumpy.std_devs(split_mag1[-2:]), fmt='o', color='lightgrey')
+                ax6.errorbar(fratio_all_wl[:-2], unumpy.nominal_values(split_mag2[:-2]), unumpy.std_devs(split_mag2[:-2]), fmt='o', color='grey')
+                ax6.errorbar(fratio_all_wl[-2:], unumpy.nominal_values(split_mag2[-2:]), unumpy.std_devs(split_mag2[-2:]), fmt='o', color='lightgrey')
+                ax6.plot(TOT_Mag_model_wl, model1, '--', color='red')
+                ax6.plot(TOT_Mag_model_wl, model2, '--', color='red')
                 ax6.invert_yaxis()
                 ax6.set_xlabel('Wavelength (nm)')
                 ax6.set_ylabel('Apparent Mag')
@@ -836,18 +761,18 @@ for target_hd in Target_List:
                     K_best.append(iso['K_mag'])
 
                 ## Choose x/y axis for isochrone plot. For example, V-H vs V-K
-                if np.isnan(h1.nominal_value) == True:
-                    xval1 = v1 - k1  ## component 1
-                    yval1 = v1 - d_modulus
-                    xval2 = v2 - k2  ## component 2
-                    yval2 = v2 - d_modulus
+                if np.isnan(split_mag1[-2].nominal_value) == True:
+                    xval1 = split_mag1[-4] - split_mag1[-1]  ## component 1
+                    yval1 = split_mag1[-4] - d_modulus
+                    xval2 = split_mag2[-4] - split_mag2[-1]  ## component 2
+                    yval2 = split_mag2[-4] - d_modulus
                     xlabel = "V - K"
                     ylabel = "V"
-                elif np.isnan(h1.nominal_value) == False:
-                    xval1 = v1 - h1  ## component 1
-                    yval1 = v1 - d_modulus
-                    xval2 = v2 - h2  ## component 2
-                    yval2 = v2 - d_modulus
+                elif np.isnan(split_mag1[-2].nominal_value) == False:
+                    xval1 = split_mag1[-4] - split_mag1[-2]  ## component 1
+                    yval1 = split_mag1[-4] - d_modulus
+                    xval2 = split_mag2[-4] - split_mag2[-2]  ## component 2
+                    yval2 = split_mag2[-4] - d_modulus
                     xlabel = "V - H"
                     ylabel = "V"
 
@@ -923,10 +848,9 @@ for target_hd in Target_List:
             #print('Target HD%s Failed'%target_hd)
             #Target_List_Fail.append(target_hd)
 
-
-    df = pd.read_csv(f'{save_directory}/HD_{target_hd}/target_info_{file_name}.csv', header=None, index_col= None)
-    df.to_csv(f'{save_directory}/HD_{target_hd}/target_info_{file_name}.csv', header = Header, index= False)
-    df2 = pd.read_csv(f"{save_directory}/HD_{target_hd}/target_info_{file_name}.csv")
+    df = pd.read_csv('%s/HD_%s/target_info_%s.csv'%(save_directory,target_hd,file_name), header=None, index_col= None)
+    df.to_csv('%s/HD_%s/target_info_%s.csv'%(save_directory,target_hd,file_name), header = Header, index= False)
+    df2 = pd.read_csv("%s/HD_%s/target_info_%s.csv"%(save_directory,target_hd,file_name))
     #print(df2)
 
     fig = plt.figure(figsize=(55.0,42.5), constrained_layout=False)
@@ -977,7 +901,7 @@ for target_hd in Target_List:
         #ax2.legend()
         ax2.set_yscale("log")
         ax2.set_xlabel('Mass (solar)', fontsize=30)
-        ax2.set_ylabel(r'$\chi^2$', fontsize=30)
+        ax2.set_ylabel('$\chi^2$', fontsize=30)
         ax2.set_title('Mass 1 & 2 Guess', fontsize=35)
         #pdb.set_trace()
 
@@ -1001,7 +925,7 @@ for target_hd in Target_List:
         ax2.set_yscale("log")
         ax2.grid()
         ax2.set_xlabel('Mass (solar)', fontsize=35)
-        ax2.set_ylabel(r'$\chi^2$', fontsize=35)
+        ax2.set_ylabel('$\chi^2$', fontsize=35)
         ax2.set_title('Mass 1 & 2 Guess, log age = %s'%np.around(age1_best,2), fontsize=40)
         ax2.tick_params(axis='both', labelsize=30)
         ax2.set_aspect('auto')
@@ -1062,7 +986,7 @@ for target_hd in Target_List:
     for i in [1]:
         #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
         #ax4.errorbar(all_xwave, unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black')
-        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='blue', linewidth=5)
+        ax4.plot(all_TOTmag_model_wave[i], all_TOTmag_model[i], '--', color='blue', linewidth=5)
         # ax1.set_xlabel('Wavelength (nm)')
         #ax4.set_ylabel('Total Mag', fontsize=5)
         #ax4.invert_yaxis()
@@ -1070,7 +994,7 @@ for target_hd in Target_List:
     for i in [7]:
         #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
         #ax4.errorbar(all_xwave, unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black')
-        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='green', linewidth=5)
+        ax4.plot(all_TOTmag_model_wave[i], all_TOTmag_model[i], '--', color='green', linewidth=5)
         # ax1.set_xlabel('Wavelength (nm)')
         #ax4.set_ylabel('Total Mag', fontsize=5)
         #ax4.invert_yaxis()
@@ -1078,16 +1002,16 @@ for target_hd in Target_List:
     for i in [3,5]:
         #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd)
         #ax4.errorbar(all_xwave, unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black')
-        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='red', linewidth=5)
+        ax4.plot(all_TOTmag_model_wave[i], all_TOTmag_model[i], '--', color='red', linewidth=5)
         # ax1.set_xlabel('Wavelength (nm)')
         #ax4.set_ylabel('Total Mag', fontsize=5)
         #ax4.invert_yaxis()
 
     for i in [4]:
         #ax4.set_title("Total Mag Model Fit, HD %s" % target_hd, fontsize=8)
-        ax4.errorbar(all_xwave[i], unumpy.nominal_values(all_yplot[i]), unumpy.std_devs(all_yplot[i]), fmt='o', color='black', ms=1, elinewidth=5,
+        ax4.errorbar(all_TOTmag_wave[i], unumpy.nominal_values(all_TOTmag[i]), unumpy.std_devs(all_TOTmag[i]), fmt='o', color='black', ms=1, elinewidth=5,
              ecolor='black', capsize=5, capthick=5)
-        ax4.plot(all_xwave[i], all_TOTmag_model[i], '--', color='black', linewidth=5)
+        ax4.plot(all_TOTmag_model_wave[i], all_TOTmag_model[i], '--', color='black', linewidth=5)
         # ax1.set_xlabel('Wavelength (nm)')
         ax4.set_ylabel('Total Mag', fontsize=35)
         ax4.tick_params(axis='both', labelsize=30)
@@ -1099,14 +1023,14 @@ for target_hd in Target_List:
 
     for i in [1]:
         #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
-        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='blue', linewidth=5)
+        ax5.plot(all_Dmag_model_wave[i], all_Dmag_model[i], '--', color='blue', linewidth=5)
         # ax2.set_xlabel('Wavelength (nm)')
         #ax5.invert_yaxis()
         #ax5.set_ylabel('Diff Mag')
 
     for i in [7]:
         #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
-        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='green', linewidth=5)
+        ax5.plot(all_Dmag_model_wave[i], all_Dmag_model[i], '--', color='green', linewidth=5)
         # ax2.set_xlabel('Wavelength (nm)')
         #ax5.invert_yaxis()
         #ax5.set_ylabel('Diff Mag')
@@ -1115,16 +1039,18 @@ for target_hd in Target_List:
         #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd)
         #ax5.errorbar(all_data_wave[i], unumpy.nominal_values(all_yplot1[i]), unumpy.std_devs(all_yplot1[i]), fmt='o', color='blue', elinewidth=1,
              #ecolor='black', capsize=1, capthick=1)
-        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='red', linewidth=5)
+        ax5.plot(all_Dmag_model_wave[i], all_Dmag_model[i], '--', color='red', linewidth=5)
         # ax2.set_xlabel('Wavelength (nm)')
         #ax5.invert_yaxis()
         #ax5.set_ylabel('Diff Mag')
 
     for i in [4]:
         #ax5.set_title("Diff Mag Model Fit, HD %s" % target_hd, fontsize=8)
-        ax5.errorbar(all_data_wave[i], unumpy.nominal_values(all_yplot1[i]), unumpy.std_devs(all_yplot1[i]), fmt='o', color='black', ms=5, elinewidth=5,
+        ax5.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_Dmag[i][:-2]), unumpy.std_devs(all_Dmag[i][:-2]), fmt='o', color='black', ms=5, elinewidth=5,
              ecolor='black', capsize=5, capthick=5)
-        ax5.plot(all_xwave[i], all_Dmag_model[i], '--', color='black', linewidth=5)
+        ax5.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_Dmag[i][-2:]), unumpy.std_devs(all_Dmag[i][-2:]), fmt='o', color='lightgrey', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax5.plot(all_Dmag_model_wave[i], all_Dmag_model[i], '--', color='black', linewidth=5)
         #ax5.set_xlabel('Wavelength (nm)', fontsize=6)
         ax5.invert_yaxis()
         ax5.set_ylabel('Diff Mag', fontsize=35)
@@ -1135,47 +1061,63 @@ for target_hd in Target_List:
 
     for i in [1]:
         #ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='blue', ms=5, elinewidth=5,
+        ax6.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_split_mag1[i][:-2]), unumpy.std_devs(all_split_mag1[i][:-2]), fmt='o', color='blue', ms=5, elinewidth=5,
              ecolor='black', capsize=5, capthick=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='blue', ms=5, elinewidth=5,
-             ecolor='black', capsize=5, capthick=5)
-        ax6.plot(all_xwave[i], all_model1[i], '--', color='blue', linewidth=5)
-        ax6.plot(all_xwave[i], all_model2[i], '--', color='blue', linewidth=5)
+        ax6.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_split_mag1[i][-2:]), unumpy.std_devs(all_split_mag1[i][-2:]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax6.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_split_mag2[i][:-2]), unumpy.std_devs(all_split_mag2[i][:-2]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='grey', capsize=5, capthick=5)
+        ax6.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_split_mag2[i][-2:]), unumpy.std_devs(all_split_mag2[i][-2:]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax6.plot(all_TOTmag_model_wave[i], all_model1[i], '--', color='blue', linewidth=5)
+        ax6.plot(all_TOTmag_model_wave[i], all_model2[i], '--', color='blue', linewidth=5)
         #ax6.invert_yaxis()
         ax6.set_xlabel('Wavelength (nm)', fontsize=25)
         ax6.set_ylabel('Apparent Mag', fontsize=25)
 
     for i in [7]:
         #ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='green', ms=5, elinewidth=5,
+        ax6.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_split_mag1[i][:-2]), unumpy.std_devs(all_split_mag1[i][:-2]), fmt='o', color='blue', ms=5, elinewidth=5,
              ecolor='black', capsize=5, capthick=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='green', ms=5, elinewidth=5,
-             ecolor='black', capsize=5, capthick=5)
-        ax6.plot(all_xwave[i], all_model1[i], '--', color='green', linewidth=5)
-        ax6.plot(all_xwave[i], all_model2[i], '--', color='green', linewidth=5)
+        ax6.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_split_mag1[i][-2:]), unumpy.std_devs(all_split_mag1[i][-2:]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax6.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_split_mag2[i][:-2]), unumpy.std_devs(all_split_mag2[i][:-2]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='grey', capsize=5, capthick=5)
+        ax6.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_split_mag2[i][-2:]), unumpy.std_devs(all_split_mag2[i][-2:]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax6.plot(all_TOTmag_model_wave[i], all_model1[i], '--', color='green', linewidth=5)
+        ax6.plot(all_TOTmag_model_wave[i], all_model2[i], '--', color='green', linewidth=5)
         #ax6.invert_yaxis()
         ax6.set_xlabel('Wavelength (nm)', fontsize=25)
         ax6.set_ylabel('Apparent Mag', fontsize=25)
 
     for i in [3,5]:
         ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=8)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='red', ms=5, elinewidth=5,
+        ax6.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_split_mag1[i][:-2]), unumpy.std_devs(all_split_mag1[i][:-2]), fmt='o', color='blue', ms=5, elinewidth=5,
              ecolor='black', capsize=5, capthick=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='red', ms=5, elinewidth=5,
-             ecolor='black', capsize=5, capthick=5)
-        ax6.plot(all_xwave[i], all_model1[i], '--', color='red', linewidth=5)
-        ax6.plot(all_xwave[i], all_model2[i], '--', color='red', linewidth=5)
+        ax6.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_split_mag1[i][-2:]), unumpy.std_devs(all_split_mag1[i][-2:]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax6.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_split_mag2[i][:-2]), unumpy.std_devs(all_split_mag2[i][:-2]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='grey', capsize=5, capthick=5)
+        ax6.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_split_mag2[i][-2:]), unumpy.std_devs(all_split_mag2[i][-2:]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax6.plot(all_TOTmag_model_wave[i], all_model1[i], '--', color='red', linewidth=5)
+        ax6.plot(all_TOTmag_model_wave[i], all_model2[i], '--', color='red', linewidth=5)
         #ax6.invert_yaxis()
         ax6.set_xlabel('Wavelength (nm)', fontsize=25)
         ax6.set_ylabel('Apparent Mag', fontsize=25)
     for i in [4]:
         ax6.set_title("Split SED Model Fit, HD %s" % target_hd, fontsize=8)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag1[i]), unumpy.std_devs(all_split_mag1[i]), fmt='o', color='black', ms=5, elinewidth=5,
+        ax6.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_split_mag1[i][:-2]), unumpy.std_devs(all_split_mag1[i][:-2]), fmt='o', color='blue', ms=5, elinewidth=5,
              ecolor='black', capsize=5, capthick=5)
-        ax6.errorbar(all_data_wave[i], unumpy.nominal_values(all_split_mag2[i]), unumpy.std_devs(all_split_mag2[i]), fmt='o', color='black', ms=5, elinewidth=5,
-             ecolor='black', capsize=1, capthick=1)
-        ax6.plot(all_xwave[i], all_model1[i], '--', color='black', linewidth=5)
-        ax6.plot(all_xwave[i], all_model2[i], '--', color='black', linewidth=5)
+        ax6.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_split_mag1[i][-2:]), unumpy.std_devs(all_split_mag1[i][-2:]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax6.errorbar(all_Dmag_wave[i][:-2], unumpy.nominal_values(all_split_mag2[i][:-2]), unumpy.std_devs(all_split_mag2[i][:-2]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='grey', capsize=5, capthick=5)
+        ax6.errorbar(all_Dmag_wave[i][-2:], unumpy.nominal_values(all_split_mag2[i][-2:]), unumpy.std_devs(all_split_mag2[i][-2:]), fmt='o', color='blue', ms=5, elinewidth=5,
+             ecolor='lightgrey', capsize=5, capthick=5)
+        ax6.plot(all_TOTmag_model_wave[i], all_model1[i], '--', color='black', linewidth=5)
+        ax6.plot(all_TOTmag_model_wave[i], all_model2[i], '--', color='black', linewidth=5)
         ax6.invert_yaxis()
         ax6.set_xlabel('Wavelength (nm)', fontsize=35)
         ax6.set_ylabel('Apparent Mag', fontsize=35)
