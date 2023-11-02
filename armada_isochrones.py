@@ -25,23 +25,23 @@ Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
-orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
-corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
-wds_file = '/Users/tgardner/ARMADA_isochrones/WDS_Data/'
+#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
+#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
+#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
+#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
+#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
+#orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
+#corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
+#wds_file = '/Users/tgardner/ARMADA_isochrones/WDS_Data/'
 
-#summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
-#save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-#corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-#photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-#armada_file = '/home/colton/armada_binaries/full_target_list_10_3.csv' ## path to csv target file
-#orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
-#csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
-#wds_file = '/home/colton/ARMADA_binaries/WDS_Data/'
+summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
+save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
+corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
+photometry_file = '/home/colton/armada_binaries/Photometry.csv'
+armada_file = '/home/colton/armada_binaries/full_target_list_10_3.csv' ## path to csv target file
+orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
+csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
+wds_file = '/home/colton/ARMADA_binaries/WDS_Data_converted'
 
 Header =["HD", "M_Dyn_mcmc", "M_Dyn_mcmc_err", "M_Dyn_orbital", "M_Dyn_orbital_err",
                         "M_Tot", "M_Tot_err", "M1",
@@ -69,6 +69,7 @@ Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094',
     , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
                '196089', '196867', '198183', '199766', '201038', '206901'
     , '217676', '217782', '220278', '224512']
+
 
 Target_List = ['1976']
 
@@ -285,7 +286,7 @@ for target_hd in Target_List:
     print('--' * 10)
     print("Doing Target HD %s" % target_hd)
 
-    df_wds = pd.read_csv("%s/HD_%s_wds.csv"%(wds_file,target_hd))
+    df_wds = pd.read_csv("%s/HD_%s.csv"%(wds_file,target_hd))
 
     # For Combined 3x3 plots
     all_mass1_result = []
@@ -353,8 +354,39 @@ for target_hd in Target_List:
 
             ## Get magnitude differences for target
             ## from WDS measurements:
-            cdiff_wds = unumpy.uarray(df_wds['f_ratio'].values,df_wds['f_ratio_err'].values)
+            #pdb.set_trace()
+            err_array1 = df_wds['F1_err'].values
+            idx_err_nan = np.where(np.isnan(err_array1))
+            err_array1[idx_err_nan] = 0.1
+
+            err_array2 = df_wds['F2_err'].values
+            idx_err_nan = np.where(np.isnan(err_array2))
+            err_array2[idx_err_nan] = 0.1
+
+
+            F1 = unumpy.uarray(df_wds['F1'].values, err_array1)
+            F2 = unumpy.uarray(df_wds['F2'].values, err_array2)
+
+            cdiff_wds = F2-F1
+
+            idx_nan = np.where(np.isnan(unumpy.nominal_values(cdiff_wds)))
+
+
+            cdiff_wds[idx_nan] = F2[idx_nan]
+
+
+            pdb.set_trace()
+            #if np.isnan(df_wds['F1']) == True:
+                #cdiff_wds = unumpy.uarray(df_wds['F2'].values, df_wds['F2_err'].values)
+            #else:
+
+               #f_ratio = np.abs(df_wds['F1'].values - df_wds['F2'].values)
+                #fratio_err = df_wds['F1_err']+ df_wds['F2_err']
+                #cdiff_wds = unumpy.uarray(f_ratio, fratio_err)
+                #pdb.set_trace()
+            #cdiff_wds = unumpy.uarray(df_wds['f_ratio'].values,df_wds['f_ratio_err'].values)
             fratio_wds = 10 ** (cdiff_wds / 2.5)
+            pdb.set_trace()
             fratio_wds_wl = df_wds['Wavelength'].values
 
             ## Get target from spreadsheet
@@ -377,7 +409,7 @@ for target_hd in Target_List:
             fratio_data = np.array([fratio_b,fratio_i,fratio_h,fratio_k])
             cdiff_data = np.array([cdiff_b,cdiff_i,cdiff_h,cdiff_k])
             cdiff_data_fit = np.array([cdiff_b,cdiff_i,np.nan,np.nan]) ## NOTE: I am setting H and K bands to nan for fitting!!!!
-            fratio_data_wl = np.array([562,832,1650,2150])
+            fratio_data_wl = np.array([562,832,1650,2150]) # Speckle
             
             fratio_all = np.concatenate([fratio_wds,fratio_data_wl])
             cdiff_all = np.concatenate([cdiff_wds,cdiff_data])
