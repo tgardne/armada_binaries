@@ -144,14 +144,14 @@ def isochrone_model(params, TOT_mag_star, D_mag_star, mag_wave_star, dmag_wave_s
                            (a1['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
 
-    mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_R.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_J.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
+    mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_B.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_V.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_R.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_I.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_J.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_H.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_K.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0]])
     ## UBVRIJHK
     wave_model = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
 
@@ -194,14 +194,14 @@ def isochrone_model_mcmc(params, TOT_mag_star, D_mag_star, mag_wave_star, dmag_w
                            (a1['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
 
-    mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_B.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_R.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_J.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
+    mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_B.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_V.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_R.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_I.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_J.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_H.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
+                           (a2['Mbol'] - bc_grid_K.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0]])
 
     ## UBVRIJHK
     wave_model = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
@@ -355,9 +355,13 @@ for target_hd in Target_List:
             ## Get magnitude differences for target
             ## from WDS measurements:
             #pdb.set_trace()
+            filtered_df_wds = df_wds[~df_wds['Method'].isin(['Ma', 'Mb'])]
+            df_wds = filtered_df_wds
             err_array1 = df_wds['F1_err'].values
             idx_err_nan = np.where(np.isnan(err_array1))
             err_array1[idx_err_nan] = 0.1
+
+            pdb.set_trace()
 
             err_array2 = df_wds['F2_err'].values
             idx_err_nan = np.where(np.isnan(err_array2))
