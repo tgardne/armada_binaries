@@ -39,6 +39,20 @@ def cart2pol(x,y):
         theta_new=theta
     return(r,theta_new)
 
+def add_planet(period,wobble,bigomega,inc,t0,epochs):
+    omega = 0
+    ecc = 0
+    bigomega = bigomega
+    inc = inc
+    
+    ## other method:
+    ke = pyasl.KeplerEllipse(wobble,period,e=ecc,Omega=bigomega,i=inc,w=omega,tau=t0)
+    pos = ke.xyzPos(epochs)
+    xx = pos[::,1]
+    yy = pos[::,0]
+
+    return(xx,yy)
+
 ###########################################
 ## SETUP PATHS
 ###########################################
@@ -69,8 +83,8 @@ mass_star = 2
 #target = input('Target HIP #: ')
 #target_wds = input('Target WDS #: ')
 
-emethod = input('bootstrap errors? (y/n) ')
-#emethod = 'n'
+#emethod = input('bootstrap errors? (y/n) ')
+emethod = 'n'
 #mirc_scale = input('Scale OLD MIRCX data? (y/n) ')
 mirc_scale = 'n'
 
@@ -93,12 +107,18 @@ except:
 ###########################################
 ## Read in ARMADA data
 ###########################################
-if emethod == 'y':
-    print('reading bootstrap errors')
-    file=open('%s/HD_%s_bootstrap.txt'%(path,target_hd))
+
+own_files = input('Input your own orbit files? (y,[n]): ')
+if own_files=='y':
+    file = input('Path to armada orbit file: ')
+    file = open(file)
 else:
-    print('reading chi2 errors')
-    file=open('%s/HD_%s_chi2err.txt'%(path,target_hd))
+    if emethod == 'y':
+        print('reading bootstrap errors')
+        file=open('%s/HD_%s_bootstrap.txt'%(path,target_hd))
+    else:
+        print('reading chi2 errors')
+        file=open('%s/HD_%s_chi2err.txt'%(path,target_hd))
 weight=1
 
 t,p,theta,error_maj,error_min,error_pa,error_deg = read_data(file,weight)
@@ -150,6 +170,8 @@ for i,j in zip(t,etalon_factor):
     print(i,j)
 
 ## apply etalon correction
+if own_files=='y':
+    print('WARNING: Do not apply etalon correction if your own file has it already!')
 etalon = input('Apply etalon correction? (y/n) ')
 
 ## FIXME: make it easier to choose vlti data
@@ -181,15 +203,21 @@ vlti_mask[vlti_idx] = False
 input_wds = input('Include WDS? (y/n): ')
 if input_wds == 'y':
     try:
-        file=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
-        weight = 10
-        dtype = input('dtype for wds (e.g. S, leave blank for ALL data): ')
+        if own_files=='y':
+            file = input('Path to WDS orbit file: ')
+            file = open(file)
+            t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_data(file,1)
+            print('Number of WDS data points = %s'%len(p_wds))
+        else:
+            file=open(os.path.expanduser("%s/wds%s.txt"%(path_wds,target_wds)))
+            weight = 10
+            dtype = input('dtype for wds (e.g. S, leave blank for ALL data): ')
 
-        t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_wds(file,weight,dtype)
-        print('Number of WDS data points = %s'%len(p_wds))
+            t_wds,p_wds,theta_wds,error_maj_wds,error_min_wds,error_pa_wds,error_deg_wds = read_wds(file,weight,dtype)
+            print('Number of WDS data points = %s'%len(p_wds))
 
-        ## correct WDS for PA
-        theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
+            ## correct WDS for PA
+            theta_wds -= (0.00557*np.sin(ra)/np.cos(dec)*((t_wds-51544.5)/365.25))/180*np.pi
 
         xpos_wds=p_wds*np.sin(theta_wds)
         ypos_wds=p_wds*np.cos(theta_wds)
@@ -377,12 +405,12 @@ if guess_params=='y':
         x4 = random.uniform(0,0.9)
         x5 = random.uniform(astart,aend)
         x6 = random.uniform(Pstart,Pend)
-        x7 = random.uniform(30000,80000)
+        x7 = random.uniform(58000,60000)
         #x7 = random.uniform(58500,59000)
 
         params = Parameters()
-        params.add('w',   value= x1, min=0, max=360)
-        params.add('bigw', value= x2, min=0, max=360)
+        params.add('w',   value= x1)#, min=0, max=360)
+        params.add('bigw', value= x2)#, min=-0, max=360)
         params.add('inc', value= x3, min=0, max=180)
         params.add('e', value= x4, min=0, max=0.99)
         params.add('a', value= x5, min=0)
@@ -433,8 +461,8 @@ if guess_params=='y':
     print(P/365, a, e, inc, omega, bigomega, T, mirc_scale)
 
 params = Parameters()
-params.add('w',   value= omega, min=0, max=360)
-params.add('bigw', value= bigomega, min=0, max=360)
+params.add('w',   value= omega)#, min=0, max=360)
+params.add('bigw', value= bigomega)#, min=0, max=360)
 params.add('inc', value= inc, min=0, max=180)
 params.add('e', value= e, min=0, max=0.99)
 params.add('a', value= a, min=0)
@@ -583,8 +611,8 @@ while filter_wds == 'y':
 
 
     params = Parameters()
-    params.add('w',   value= omega, min=0, max=360)
-    params.add('bigw', value= bigomega, min=0, max=360)
+    params.add('w',   value= omega)#, min=0, max=360)
+    params.add('bigw', value= bigomega)#, min=0, max=360)
     params.add('inc', value= inc, min=0, max=180)
     params.add('e', value= e, min=0, max=0.99)
     params.add('a', value= a, min=0)
@@ -641,8 +669,8 @@ while rescale=='y':
     ## Do a least-squares fit
     ###########################################
     params = Parameters()
-    params.add('w',   value= omega, min=0, max=360)
-    params.add('bigw', value= bigomega, min=0, max=360)
+    params.add('w',   value= omega)#, min=0, max=360)
+    params.add('bigw', value= bigomega)#, min=0, max=360)
     params.add('inc', value= inc, min=0, max=180)
     params.add('e', value= e, min=0, max=0.99)
     params.add('a', value= a, min=0)
@@ -701,7 +729,7 @@ w_start = result.params['w']
 bigw_start = result.params['bigw']
 T_start = result.params['T']
 mirc_scale_start = result.params['mirc_scale']
-chi2_best_binary = result.chisqr
+chi2_best_binary = chi2_armada*(ndata_armada-len(result.params))
 ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
                                         w_start,bigw_start,P_start,
                                         T_start,t_all)
@@ -965,11 +993,11 @@ if specify_period=='y':
     pe = float(input('period search end (days): '))
     steps = int(input('steps: '))
     P2 = np.logspace(np.log10(ps),np.log10(pe),steps)
-    #P2 = np.logspace(np.log10(1),np.log10(10),1000)
+    #P2 = np.linspace(ps,pe,steps)
 else:
     time_span = max(t) - min(t)
     print('Time span of data = %s days'%time_span)
-    f = 5
+    f = 3
     min_per = float(input('minimum period to search (days) = '))
     #min_per = 2
     max_k = int(2*f*time_span / min_per)
@@ -991,18 +1019,18 @@ print('Grid Searching over period')
 params_inner=[]
 params_outer=[]
 chi2 = []
-#chi2_noise = []
+chi2_noise = []
 
 params = Parameters()
-params.add('w',   value= w_start, min=0, max=360)
-params.add('bigw', value= bigw_start, min=0, max=360)
+params.add('w',   value= w_start)#, min=0, max=360)
+params.add('bigw', value= bigw_start)#, min=0, max=360)
 params.add('inc', value= inc_start, min=0, max=180)
 params.add('e', value= e_start, min=0, max=0.99)
 params.add('a', value= a_start, min=0)
 params.add('P', value= P_start, min=0)
 params.add('T', value= T_start, min=0)
 params.add('w2',   value= 0, vary=False)
-params.add('bigw2', value= 100, min=0, max=360)
+params.add('bigw2', value= 100)#, min=0, max=360)
 params.add('inc2', value= 100, min=0, max=180)
 params.add('e2', value= 0, vary=False)
 params.add('a2', value= a2, min=0)
@@ -1017,7 +1045,11 @@ else:
 niter = 20
 bigw2 = np.random.uniform(0,360,niter)
 inc2 = np.random.uniform(0,180,niter)
-T2 = np.random.uniform(58000,60000,niter)
+T2 = np.random.uniform(np.nanmean(t)-max(P2),np.nanmean(t)+max(P2),niter)
+
+#w1 = np.random.uniform(0,360,niter)
+#bigw1 = np.random.uniform(0,360,niter)
+#inc1 = np.random.uniform(0,180,niter)
 
 iter_num = 0
 for period in tqdm(P2):
@@ -1034,6 +1066,10 @@ for period in tqdm(P2):
         params['P2'].value = period
         params['T2'].value = T2[i]
 
+        #params['w'].value = w1[i]
+        #params['bigw'].value = bigw1[i]
+        #params['inc'].value = inc1[i]
+
         #do fit, minimizer uses LM for least square fitting of model to data
         if len(vlti_idx)>0:
             minner = Minimizer(triple_model_circular_vlti, params, fcn_args=(xpos_all[vlti_mask_all],ypos_all[vlti_mask_all],t_all[vlti_mask_all],
@@ -1043,25 +1079,34 @@ for period in tqdm(P2):
                                                                 error_maj_all[vlti_idx],error_min_all[vlti_idx],
                                                                 error_pa_all[vlti_idx]),
                                 nan_policy='omit')
-            result = minner.leastsq(xtol=1e-5,ftol=1e-5)
         else:
             minner = Minimizer(triple_model_circular, params, fcn_args=(xpos_all,ypos_all,t_all,
                                                                 error_maj_all,error_min_all,
                                                                 error_pa_all),
                                 nan_policy='omit')
-            result = minner.leastsq(xtol=1e-5,ftol=1e-5)
+        
+        result = minner.leastsq(xtol=1e-5,ftol=1e-5)
+        #result = minner.minimize()
 
         params_inner_n.append([period,result.params['a2'],result.params['e2'],result.params['w2']
                             ,result.params['bigw2'],result.params['inc2'],result.params['T2'],result.params['mirc_scale']])
         params_outer_n.append([result.params['P'],result.params['a'],result.params['e'],result.params['w']
                             ,result.params['bigw'],result.params['inc'],result.params['T']])
         #chi2_n.append(result.redchi)
-        chi2_n.append(result.chisqr)
-        #resids_armada = triple_model_circular(result.params,xpos,ypos,t,error_maj,
-        #                    error_min,error_pa)
+        #chi2_n.append(result.chisqr)
+        if len(vlti_idx)>0:
+            resids_armada = triple_model_circular_vlti(result.params,xpos[vlti_mask],ypos[vlti_mask],t[vlti_mask],
+                                                                error_maj[vlti_mask],error_min[vlti_mask],
+                                                                error_pa[vlti_mask],xpos[vlti_idx],ypos[vlti_idx],
+                                                                t[vlti_idx],error_maj[vlti_idx],error_min[vlti_idx],
+                                                                error_pa[vlti_idx])
+        else:
+            resids_armada = triple_model_circular(result.params,xpos,ypos,t,error_maj,
+                            error_min,error_pa)
+            
         #ndata_armada = 2*sum(~np.isnan(xpos))
-        #chi2_armada = np.nansum(resids_armada**2)/(ndata_armada-12)
-        #chi2_n.append(chi2_armada)
+        chi2_armada = np.nansum(resids_armada**2)#/(ndata_armada-12)
+        chi2_n.append(chi2_armada)
 
         ### noise for period search
         #ra,dec,rapoints,decpoints = orbit_model(result.params['a'],result.params['e'],
@@ -1104,7 +1149,7 @@ for period in tqdm(P2):
     chi2_n = np.array(chi2_n)
     #chi2_noise_n = np.array(chi2_noise_n)
 
-    idx = np.argmin(chi2_n)
+    idx = np.nanargmin(chi2_n)
     #idx_n = np.argmin(chi2_noise_n)
     chi2.append(chi2_n[idx])
     #chi2_noise.append(chi2_noise_n[idx_n])
@@ -1116,9 +1161,13 @@ params_inner=np.array(params_inner)
 params_outer=np.array(params_outer)
 chi2 = np.array(chi2)
 #chi2_noise = np.array(chi2_noise)
-zval = ((4*sum(~np.isnan(xpos_all))-11)/(11-7))*(chi2_best_binary-chi2)/min(chi2)
+zval = ((4*sum(~np.isnan(xpos))-11)/(11-7))*(chi2_best_binary-chi2)/min(chi2)
+zval_max = np.nanmax(zval)
 
 idx = np.argmin(chi2)
+chi2_best = np.nanmin(chi2)
+chi2_median = np.nanmedian(chi2)
+n_over_median = chi2_median / chi2_best
 #idx = np.argmax(zval)
 period_best = params_inner[:,0][idx]
 
@@ -1160,15 +1209,15 @@ print('Best inner period = %s'%period_best)
 
 ## Do a fit at best period
 params = Parameters()
-params.add('w',   value= params_outer[:,3][idx], min=0, max=360)
-params.add('bigw', value= params_outer[:,4][idx], min=0, max=360)
+params.add('w',   value= params_outer[:,3][idx])#, min=0, max=360)
+params.add('bigw', value= params_outer[:,4][idx])#, min=0, max=360)
 params.add('inc', value= params_outer[:,5][idx], min=0, max=180)
 params.add('e', value= params_outer[:,2][idx], min=0, max=0.99)
 params.add('a', value=params_outer[:,1][idx], min=0)
 params.add('P', value= params_outer[:,0][idx], min=0)
 params.add('T', value= params_outer[:,6][idx], min=0)
 params.add('w2',   value= 0, vary=False)#w2, min=0, max=360)
-params.add('bigw2', value= params_inner[:,4][idx], min=0, max=360)
+params.add('bigw2', value= params_inner[:,4][idx])#, min=0, max=360)
 params.add('inc2', value= params_inner[:,5][idx], min=0, max=180)
 params.add('e2', value= 0, vary=False)#0.1, min=0,max=0.99)
 params.add('a2', value= params_inner[:,1][idx], min=0)
@@ -1190,13 +1239,12 @@ if len(vlti_idx)>0:
                                                         error_maj_all[vlti_idx],error_min_all[vlti_idx],
                                                         error_pa_all[vlti_idx]),
                         nan_policy='omit')
-    result = minner.minimize()
 else:
     minner = Minimizer(triple_model_circular, params, fcn_args=(xpos_all,ypos_all,t_all,
                                                         error_maj_all,error_min_all,
                                                         error_pa_all),
                         nan_policy='omit')
-    result = minner.minimize()
+result = minner.minimize()
 
 best_inner = [result.params['P2'],result.params['a2'],result.params['e2'],result.params['w2']
                     ,result.params['bigw2'],result.params['inc2'],result.params['T2'],result.params['mirc_scale']]
@@ -1266,7 +1314,21 @@ for semi in tqdm(a_grid):
                             ,result.params['bigw2'],angle,result.params['T2'],result.params['mirc_scale']])
         params_outer.append([result.params['P'],result.params['a'],result.params['e'],result.params['w']
                             ,result.params['bigw'],result.params['inc'],result.params['T']])
-        chi2.append(result.redchi)
+        
+        if len(vlti_idx)>0:
+            resids_armada = triple_model_circular_vlti(result.params,xpos[vlti_mask],ypos[vlti_mask],t[vlti_mask],
+                                                                error_maj[vlti_mask],error_min[vlti_mask],
+                                                                error_pa[vlti_mask],xpos[vlti_idx],ypos[vlti_idx],
+                                                                t[vlti_idx],error_maj[vlti_idx],error_min[vlti_idx],
+                                                                error_pa[vlti_idx])
+        else:
+            #chi2.append(result.redchi)
+            resids_armada = triple_model_circular(result.params,xpos,ypos,t,error_maj,
+                            error_min,error_pa)
+        
+        chi2_armada = np.nansum(resids_armada**2)#/(ndata_armada-12)
+        chi2.append(chi2_armada)
+
 params_inner = np.array(params_inner)
 params_outer = np.array(params_outer)
 chi2 = np.array(chi2)

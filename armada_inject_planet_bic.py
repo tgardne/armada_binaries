@@ -649,7 +649,7 @@ for per in tqdm(P2):
             #psem = float(input('Planet wobble semi-major (uas): '))/1000
             bigw_p = np.random.uniform(0,360)
             inc_p = np.arcsin(np.random.uniform(0,1))*180/np.pi
-            T_p = np.random.uniform(min(t),max(t))
+            T_p = np.random.uniform(np.nanmean(t)-per/2,np.nanmean(t)+per/2)
 
             planet_xy_all = add_planet(per,semi_p,bigw_p,inc_p,T_p,t_all)
             xpos_all_new = xpos_all + planet_xy_all[0]

@@ -578,7 +578,7 @@ for item1,item2 in zip(ucoords,vcoords):
 vis2_model=np.array(vis2_model)
 
 ## plot results
-with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_TRIPLE_search.pdf"%{"1":target_id,"2":date}) as pdf:
+with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_TRIPLE_search.pdf"%{"1":target_id,"2":date}) as pdf:
     
     ## first page - chisq grid
     plt.scatter(ra_results, dec_results, c=1/chi_sq, cmap=cm.inferno)
@@ -754,7 +754,7 @@ plt.colorbar()
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.axis('equal')
-plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
+plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
 ## isolate region where delta_chisq < 2.296
@@ -783,7 +783,7 @@ plt.title('a,b,thet=%s'%ellipse_params)
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.axis('equal')
-plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp1.pdf'%{"1":target_id,"2":date})
+plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp1.pdf'%{"1":target_id,"2":date})
 plt.close()
 
 #############################################
@@ -851,7 +851,7 @@ plt.colorbar()
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.axis('equal')
-plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
+plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
 ## isolate region where delta_chisq < 2.296
@@ -880,7 +880,7 @@ plt.title('a,b,thet=%s'%ellipse_params2)
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.axis('equal')
-plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp2.pdf'%{"1":target_id,"2":date})
+plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
 txt_fit_cp = ('Best fit (ra12,dec12,ra13,dec13,ratio12,ratio13,ud1,ud2,ud2,bw,redchi2): %s'%best_fit)
@@ -888,7 +888,7 @@ txt_fit_cp = ('Best fit (ra12,dec12,ra13,dec13,ratio12,ratio13,ud1,ud2,ud2,bw,re
 t = np.around(np.nanmedian(time_obs),4)
 sep12,pa12 = np.around(cart2pol(best_fit[0],best_fit[1]),decimals=4)
 sep13,pa13 = np.around(cart2pol(best_fit[2],best_fit[3]),decimals=4)
-f = open("/Users/tgardne/ARMADA_epochs/%s/%s_%s_triple.txt"%(target_id,target_id,date),"w+")
+f = open("/Users/tgardner/ARMADA_epochs/%s/%s_%s_triple.txt"%(target_id,target_id,date),"w+")
 f.write("# date mjd sep12(mas) pa12(Deg) sep13(mas) pa13(Deg) err_maj12(mas) err_min12(mas) err_pa12(deg) err_maj13(mas) err_min13(mas) err_pa13(deg)\r\n")
 f.write("%s %s %s %s %s %s %s %s %s %s %s %s"%(date,t,sep12,pa12,ellipse_params[0],ellipse_params[1],ellipse_params[2],sep13,pa13,ellipse_params2[0],ellipse_params2[1],ellipse_params2[2]))
 f.close()
