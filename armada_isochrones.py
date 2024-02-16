@@ -71,9 +71,9 @@ Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094',
     , '217676', '217782', '220278', '224512']
 
 
-Target_List = ['1976']
+Target_List = [ '217676', '217782', '220278' ]
 
-Target_List_Fail = []
+#Target_List_Fail = ['37269' (Need Image),'38769' (Nan Failure),'43525' (Needs to Be ran Next), '82446'(Success) , '129246' (Dtype error) ,'133484', '179950','137798','140159','140436']
 
 
 ## Fuction to fit a single star model
@@ -358,10 +358,12 @@ for target_hd in Target_List:
             filtered_df_wds = df_wds[~df_wds['Method'].isin(['Ma', 'Mb'])]
             df_wds = filtered_df_wds
             err_array1 = df_wds['F1_err'].values
+            #pdb.set_trace()
+
             idx_err_nan = np.where(np.isnan(err_array1))
             err_array1[idx_err_nan] = 0.1
 
-            pdb.set_trace()
+            #pdb.set_trace()
 
             err_array2 = df_wds['F2_err'].values
             idx_err_nan = np.where(np.isnan(err_array2))
@@ -379,7 +381,7 @@ for target_hd in Target_List:
             cdiff_wds[idx_nan] = F2[idx_nan]
 
 
-            pdb.set_trace()
+            #pdb.set_trace()
             #if np.isnan(df_wds['F1']) == True:
                 #cdiff_wds = unumpy.uarray(df_wds['F2'].values, df_wds['F2_err'].values)
             #else:
@@ -390,7 +392,7 @@ for target_hd in Target_List:
                 #pdb.set_trace()
             #cdiff_wds = unumpy.uarray(df_wds['f_ratio'].values,df_wds['f_ratio_err'].values)
             fratio_wds = 10 ** (cdiff_wds / 2.5)
-            pdb.set_trace()
+            #pdb.set_trace()
             fratio_wds_wl = df_wds['Wavelength'].values
 
             ## Get target from spreadsheet
@@ -1200,6 +1202,10 @@ for target_hd in Target_List:
             main_xvals = [all_modely_best[i]]
             #pdb.set_trace()
 
+            comb_err_xvals = np.array(comb_err_xvals)
+
+            # Replace NaN values with zeros
+            comb_err_xvals[np.isnan(comb_err_xvals)] = 0
 
             if (np.min(comb_xvals) < np.median(all_modelx_best[i])) == True:
                 x_axis_max = np.median(all_modelx_best[i]) + 0.15
