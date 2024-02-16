@@ -1,6 +1,7 @@
 import pdb
 import shutil
 import numpy as np
+import fitz
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -71,7 +72,7 @@ Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094',
     , '217676', '217782', '220278', '224512']
 
 
-Target_List = [ '217676', '217782', '220278' ]
+Target_List = [ '1976','217676', '217782', '220278' ]
 
 #Target_List_Fail = ['37269' (Need Image),'38769' (Nan Failure),'43525' (Needs to Be ran Next), '82446'(Success) , '129246' (Dtype error) ,'133484', '179950','137798','140159','140436']
 
@@ -500,7 +501,7 @@ for target_hd in Target_List:
                 ##################
                 mass1_grid = np.linspace(0.5,5,50)
                 mass2_grid = np.linspace(0.5,5,50)
-                age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
+                age_grid = np.linspace(6, 10, 10)  ## do fewer steps to go faster
 
                 print('Grid Searching over AGE to find best fit')
                 #pdb.set_trace()
@@ -1328,17 +1329,17 @@ for target_hd in Target_List:
 
 
     #pdb.set_trace()
-    #file = f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf'
-    #pdf_file = fitz.open(file)
-    #for page in pdf_file:  # iterate through the pages
-        #pix = page.get_pixmap()  # render page to an image
-        #pix.save(f'{orbit_directory}HD{target_hd}.png')  # store image as a PNG
+    file = f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf'
+    pdf_file = fitz.open(file)
+    for page in pdf_file:  # iterate through the pages
+        pix = page.get_pixmap()  # render page to an image
+        pix.save(f'{orbit_directory}HD{target_hd}.png')  # store image as a PNG
 
     # Store Pdf with convert_from_path function
-    #images = convert_from_path(f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf',700)
-    #for i in range(len(images)):
+    images = convert_from_path(f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf',700)
+    for i in range(len(images)):
         # Save pages as images in the pdf
-        #images[i].save(f'{orbit_directory}HD{target_hd}.png', 'PNG')
+        images[i].save(f'{orbit_directory}HD{target_hd}.png', 'PNG')
 
 
 
