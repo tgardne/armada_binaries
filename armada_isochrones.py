@@ -1362,7 +1362,7 @@ for target_hd in Target_List:
     p = np.round(float(df_armada['P (yr)'][idx_armada]),2)
     #pdb.set_trace()
     ax7.set_aspect('equal')
-    e = ufloat(float(df_armada['e'][idx]),float(df_armada['e_err'][idx]))
+    e = ufloat(float(df_armada['e'][idx_armada]),float(df_armada['e_err'][idx_armada]))
 
     ax7.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
     ax7.annotate(f"PA(deg)= {df_photometry['PA(deg)_tycoDouble'][idx_phot]}", xy=(0, 0), xytext=(2000, -300), color = 'black',size=35)
