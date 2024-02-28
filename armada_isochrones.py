@@ -72,7 +72,11 @@ Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094',
     , '217676', '217782', '220278', '224512']
 
 
-Target_List = [ '224512']
+Target_List = [ '140159', '140436', '144892',
+              '145589', '148283', '153370', '154569', '156190', '158140'
+    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
+               '196089', '196867', '198183', '199766', '201038', '206901'
+    , '217676', '217782', '220278', '224512']
 
 #Target_List_Fail = [82446'(Success) , '129246' (Dtype error) ,'133484#','137798#','140159','140436']
 
@@ -856,16 +860,16 @@ for target_hd in Target_List:
                 fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory, target_hd, name))
 
                 #Finding Dynamical Mass
-                Mdyn_over_d3 = float(df_armada['Mdyn_over_d3 (x10e-6)'][idx])
-                Mdyn_over_d3_err = float(df_armada['Mdyn_over_d3_err (x10e-6)'][idx])
+                Mdyn_over_d3 = float(df_armada['Mdyn_over_d3 (x10e-6)'][idx_armada])
+                Mdyn_over_d3_err = float(df_armada['Mdyn_over_d3_err (x10e-6)'][idx_armada])
                 mdyn_over_d3_float = ufloat(Mdyn_over_d3, Mdyn_over_d3_err) * 10 ** (-6)
                 mdyn_mcmc = mdyn_over_d3_float * (distance.nominal_value ** 3)
 
                 #pdb.set_trace()
-                a_mas = ufloat(float(df_armada['a (mas)'][idx]),float(df_armada['a_err (mas)'][idx]))
-                a_mas = float(df_armada['a (mas)'][idx])
+                a_mas = ufloat(float(df_armada['a (mas)'][idx_armada]),float(df_armada['a_err (mas)'][idx_armada]))
+                a_mas = float(df_armada['a (mas)'][idx_armada])
                 a_au = (a_mas/1000)*distance.nominal_value
-                p_yr = ufloat(float(df_armada['P (yr)'][idx]),float(df_armada['P_err (yr)'][idx]))
+                p_yr = ufloat(float(df_armada['P (yr)'][idx_armada]),float(df_armada['P_err (yr)'][idx_armada]))
                 mdyn_orbit = a_au**3/p_yr**2
 
                 #pdb.set_trace()
@@ -1353,23 +1357,23 @@ for target_hd in Target_List:
     box.y0 = box.y0 - 4000
     box.y1 = box.y1 + 4000
     ax7.set_position(box)
-    e = np.round(float(df_armada['e'][idx]),2)
-    a = np.round(float(df_armada['a (mas)'][idx]),2)
-    p = np.round(float(df_armada['P (yr)'][idx]),2)
+    e = np.round(float(df_armada['e'][idx_armada]),2)
+    a = np.round(float(df_armada['a (mas)'][idx_armada]),2)
+    p = np.round(float(df_armada['P (yr)'][idx_armada]),2)
     #pdb.set_trace()
     ax7.set_aspect('equal')
     e = ufloat(float(df_armada['e'][idx]),float(df_armada['e_err'][idx]))
 
     ax7.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
-    ax7.annotate(f"PA(deg)= {df_photometry['PA(deg)_tycoDouble'][idx]}", xy=(0, 0), xytext=(2000, -300), color = 'black',size=35)
-    ax7.annotate(f"Sep(arcsec) ={df_photometry['Sep(arcsec)'][idx]}", xy=(0, 0), xytext=(2000, -100), color = 'black',size=35)
-    ax7.annotate(f"Triple = {df_armada['triple'][idx]}", xy=(0, 0), xytext=(0.0, -300), color = 'black',size=35)
-    ax7.annotate(f"Residual ={df_armada['residual (micro-as)'][idx]}", xy=(0, 0), xytext=(0.0, -100), color = 'black',size=35)
+    ax7.annotate(f"PA(deg)= {df_photometry['PA(deg)_tycoDouble'][idx_phot]}", xy=(0, 0), xytext=(2000, -300), color = 'black',size=35)
+    ax7.annotate(f"Sep(arcsec) ={df_photometry['Sep(arcsec)'][idx_phot]}", xy=(0, 0), xytext=(2000, -100), color = 'black',size=35)
+    ax7.annotate(f"Triple = {df_armada['triple'][idx_armada]}", xy=(0, 0), xytext=(0.0, -300), color = 'black',size=35)
+    ax7.annotate(f"Residual ={df_armada['residual (micro-as)'][idx_armada]}", xy=(0, 0), xytext=(0.0, -100), color = 'black',size=35)
     ax7.annotate(f"e={e:4f}", xy=(0, 0), xytext=(0.0, 4300), color = 'black',size=35)
     ax7.annotate(f"a(mas)={a_mas:.3f}", xy=(0, 0), xytext=(2000, 4300), color = 'black',size=35)
     ax7.annotate(f"P(Yr)={p_yr:.3f}", xy=(0, 0), xytext=(0, 4100), color = 'black',size=35)
     ax7.annotate(f"d(pc)={distance_best:.2f}", xy=(0, 0), xytext=(2000, 4100), color = 'black',size=35)
-    ax7.annotate(f"Spectral Type={df_armada['SpType (primary?)'][idx]}", xy=(0, 0), xytext=(0, 3900), color = 'black',size=35)
+    ax7.annotate(f"Spectral Type={df_armada['SpType (primary?)'][idx_armada]}", xy=(0, 0), xytext=(0, 3900), color = 'black',size=35)
     ax7.annotate(f"M_Dyn Orbit={all_m_dyn_orbit[4]}", xy=(0, 0), xytext=(2000, 3900), color = 'black',size=35)
     ax7.annotate(f"M_Dyn McMc={all_m_dyn_mcmc[4]}", xy=(0, 0), xytext=(2000, 3700), color='black', size=35)
     ax7.annotate(f"M_Phot={all_m_phot[4]}", xy=(0, 0), xytext=(0, 3700), color='black', size=35)
