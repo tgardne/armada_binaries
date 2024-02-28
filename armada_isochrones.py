@@ -72,9 +72,9 @@ Target_List = ['1976','2772', '5143', '6456','10453', '11031', '16753', '17094',
     , '217676', '217782', '220278', '224512']
 
 
-Target_List = [ '1976','217676', '217782', '220278' ]
+Target_List = [ '224512']
 
-#Target_List_Fail = ['37269' (Need Image),'38769' (Nan Failure),'43525' (Needs to Be ran Next), '82446'(Success) , '129246' (Dtype error) ,'133484', '179950','137798','140159','140436']
+#Target_List_Fail = [82446'(Success) , '129246' (Dtype error) ,'133484#','137798#','140159','140436']
 
 
 ## Fuction to fit a single star model
@@ -370,7 +370,7 @@ for target_hd in Target_List:
             idx_err_nan = np.where(np.isnan(err_array2))
             err_array2[idx_err_nan] = 0.1
 
-
+            #pdb.set_trace()
             F1 = unumpy.uarray(df_wds['F1'].values, err_array1)
             F2 = unumpy.uarray(df_wds['F2'].values, err_array2)
 
@@ -397,15 +397,16 @@ for target_hd in Target_List:
             fratio_wds_wl = df_wds['Wavelength'].values
 
             ## Get target from spreadsheet
-            idx = np.where(df_armada['HD'] == target_hd)[0][0]
-            Av = float(df_armada['Av'][idx])
+            idx_armada = np.where(df_armada['HD'] == target_hd)[0][0]
+            idx_phot = np.where(df_photometry['HD'] == target_hd)[0][0]
+            Av = float(df_armada['Av'][idx_armada])
 
-            cdiff_h = ufloat(float(df_armada['dmag_h'][idx]), float(df_armada['dmag_h_err'][idx]) )
-            cdiff_k = ufloat(float(df_armada['dmag_k'][idx]),float(df_armada['dmag_k_err'][idx]))
+            cdiff_h = ufloat(float(df_armada['dmag_h'][idx_armada]), float(df_armada['dmag_h_err'][idx_armada]) )
+            cdiff_k = ufloat(float(df_armada['dmag_k'][idx_armada]),float(df_armada['dmag_k_err'][idx_armada]))
             #cdiff_h = ufloat(float(np.nan), float(np.nan))
             #cdiff_k = ufloat(float(np.nan), float(np.nan))
-            cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx]), float(df_armada['dmag_speckle_i_err'][idx]))
-            cdiff_b = ufloat(float(df_armada['dmag_speckle_v'][idx]),float(df_armada['dmag_speckle_v_err'][idx]))
+            cdiff_i = ufloat(float(df_armada['dmag_speckle_i'][idx_armada]), float(df_armada['dmag_speckle_i_err'][idx_armada]))
+            cdiff_b = ufloat(float(df_armada['dmag_speckle_v'][idx_armada]),float(df_armada['dmag_speckle_v_err'][idx_armada]))
             #cdiff_wds = ufloat(float(df_armada['dmag_wds_v'][idx]), float(df_armada['dmag_wds_v_err'][idx]))
             ##pdb.set_trace()
             fratio_h = 10 ** (cdiff_h / 2.5)
@@ -425,29 +426,29 @@ for target_hd in Target_List:
             ## get total magnitudes and errors from photometry file. Set minimum error 
             err_min = 0.02        
             utot = ufloat(np.nan, np.nan)
-            if np.isnan(float(df_photometry['B_err_complete'][idx])) or float(df_photometry['B_err_complete'][idx]) < err_min:
-                btot = ufloat(float(df_photometry['B_complete'][idx]), err_min)
+            if np.isnan(float(df_photometry['B_err_complete'][idx_phot])) or float(df_photometry['B_err_complete'][idx_phot]) < err_min:
+                btot = ufloat(float(df_photometry['B_complete'][idx_phot]), err_min)
             else:
-                btot = ufloat(float(df_photometry['B_complete'][idx]), float(df_photometry['B_err_complete'][idx]))
-            if np.isnan(float(df_photometry['V_err_complete'][idx])) or float(df_photometry['V_err_complete'][idx]) < err_min:
-                vtot = ufloat(float(df_photometry['V_complete'][idx]), err_min)
+                btot = ufloat(float(df_photometry['B_complete'][idx_phot]), float(df_photometry['B_err_complete'][idx_phot]))
+            if np.isnan(float(df_photometry['V_err_complete'][idx_phot])) or float(df_photometry['V_err_complete'][idx_phot]) < err_min:
+                vtot = ufloat(float(df_photometry['V_complete'][idx_phot]), err_min)
             else:
-                vtot = ufloat(float(df_photometry['V_complete'][idx]), float(df_photometry['V_err_complete'][idx]))
-            rtot = ufloat(float(df_photometry['R2_I/284'][idx]), 0.15)
+                vtot = ufloat(float(df_photometry['V_complete'][idx_phot]), float(df_photometry['V_err_complete'][idx_phot]))
+            rtot = ufloat(float(df_photometry['R2_I/284'][idx_phot]), 0.15)
             gtot = ufloat(np.nan, np.nan)
             itot = ufloat(np.nan, np.nan)
-            if np.isnan(float(df_photometry['J_err'][idx])) or float(df_photometry['J_err'][idx]) < err_min:
-                jtot = ufloat(float(df_photometry['J_ II/246/out'][idx]), err_min)
+            if np.isnan(float(df_photometry['J_err'][idx_phot])) or float(df_photometry['J_err'][idx_phot]) < err_min:
+                jtot = ufloat(float(df_photometry['J_ II/246/out'][idx_phot]), err_min)
             else:
-                jtot = ufloat(float(df_photometry['J_ II/246/out'][idx]), float(df_photometry['J_err'][idx]))
-            if np.isnan(float(df_photometry['H_err'][idx])) or float(df_photometry['H_err'][idx]) < err_min:
-                htot = ufloat(float(df_photometry['H_ II/246/out'][idx]), err_min)
+                jtot = ufloat(float(df_photometry['J_ II/246/out'][idx_phot]), float(df_photometry['J_err'][idx_phot]))
+            if np.isnan(float(df_photometry['H_err'][idx_phot])) or float(df_photometry['H_err'][idx_phot]) < err_min:
+                htot = ufloat(float(df_photometry['H_ II/246/out'][idx_phot]), err_min)
             else:
-                htot = ufloat(float(df_photometry['H_ II/246/out'][idx]), float(df_photometry['H_err'][idx]))
-            if np.isnan(float(df_photometry['K_err'][idx])) or float(df_photometry['K_err'][idx]) < err_min:
-                ktot = ufloat(float(df_photometry['K_ II/246/out'][idx]), err_min)
+                htot = ufloat(float(df_photometry['H_ II/246/out'][idx_phot]), float(df_photometry['H_err'][idx_phot]))
+            if np.isnan(float(df_photometry['K_err'][idx_phot])) or float(df_photometry['K_err'][idx_phot]) < err_min:
+                ktot = ufloat(float(df_photometry['K_ II/246/out'][idx_phot]), err_min)
             else:
-                ktot = ufloat(float(df_photometry['K_ II/246/out'][idx]), float(df_photometry['K_err'][idx]))
+                ktot = ufloat(float(df_photometry['K_ II/246/out'][idx_phot]), float(df_photometry['K_err'][idx_phot]))
 
             ## Bessel_U, Bessel_B, Bessel_V, Johnson_R, Bessel_I, 2MASS_J, 2MASS_H, 2MASS_K
             ## Choose observables for fitting
@@ -455,6 +456,7 @@ for target_hd in Target_List:
             TOT_Mag_wl = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
 
             ## Compute individual magnitudes at wavelengths with measure fratios
+            #pdb.set_trace()
             tot_mag_ratios_val = np.interp(fratio_all_wl,TOT_Mag_wl,unumpy.nominal_values(TOT_Mag))
             tot_mag_ratios_err = np.interp(fratio_all_wl,TOT_Mag_wl,unumpy.std_devs(TOT_Mag))
             tot_mag_ratios = unumpy.uarray(tot_mag_ratios_val,tot_mag_ratios_err)
@@ -474,9 +476,9 @@ for target_hd in Target_List:
             TOT_Mag_model_wl = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
 
             ## choose which distance to use -- Gaia, HIP, or something else
-            distance_gaia = ufloat(float(df_armada['Gaia_distance (pc)'][idx]), float(df_armada['Gaia_distance_err (pc)'][idx]))
-            distance_hip = ufloat(float(df_armada['HIP_distance (pc)'][idx]), float(df_armada['HIP_distance_err (pc)'][idx]))
-            distance_kervella = ufloat(float(df_armada['kerv_dist'][idx]), float(df_armada['e_kerv'][idx]))
+            distance_gaia = ufloat(float(df_armada['Gaia_distance (pc)'][idx_armada]), float(df_armada['Gaia_distance_err (pc)'][idx_armada]))
+            distance_hip = ufloat(float(df_armada['HIP_distance (pc)'][idx_armada]), float(df_armada['HIP_distance_err (pc)'][idx_armada]))
+            distance_kervella = ufloat(float(df_armada['kerv_dist'][idx_armada]), float(df_armada['e_kerv'][idx_armada]))
             distance_best = best_distance(distance_gaia, distance_hip, distance_kervella)
             distance_low = distance_best - distance_best.std_dev
             distance_high = distance_best + distance_best.std_dev
@@ -501,7 +503,7 @@ for target_hd in Target_List:
                 ##################
                 mass1_grid = np.linspace(0.5,5,50)
                 mass2_grid = np.linspace(0.5,5,50)
-                age_grid = np.linspace(6, 10, 10)  ## do fewer steps to go faster
+                age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
 
                 print('Grid Searching over AGE to find best fit')
                 #pdb.set_trace()
