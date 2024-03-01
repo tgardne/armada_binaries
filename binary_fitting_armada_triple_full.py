@@ -431,7 +431,9 @@ minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new
 result = minner.minimize()
 report_fit(result)
 
-chi_sq_best = result.redchi
+chi_sq_best = result.chisqr
+redchi_sq_best = result.redchi
+nfree = result.nfree
 ra12_best = result.params['ra12'].value
 dec12_best = result.params['dec12'].value
 ra13_best = result.params['ra13'].value

@@ -25,6 +25,36 @@ def orbit_model(a,e,inc,w,bigw,P,T,tepoch,tmodel=[]):
     
     return(ra,dec,rapoints,decpoints)
 
+def orbit_model_ti(A,B,F,G,e,P,T,tepoch,tmodel=[]):
+    if len(tmodel)==0:
+        tmodel=np.linspace(tepoch[0],tepoch[0]+P,1000)
+
+    X = []
+    Y = []
+    for tt in tmodel:
+        M=2*np.pi/P*(tt-T)
+        E=ks.getE(M,e)
+        X.append(np.cos(E)-e)
+        Y.append((1-e**2)**(1/2)*np.sin(E))
+    X = np.array(X)
+    Y = np.array(Y)
+    dec = A*X+F*Y
+    ra = B*X+G*Y
+
+    X = []
+    Y = []
+    for tt in tepoch:
+        M=2*np.pi/P*(tt-T)
+        E=ks.getE(M,e)
+        X.append(np.cos(E)-e)
+        Y.append((1-e**2)**(1/2)*np.sin(E))
+    X = np.array(X)
+    Y = np.array(Y)
+    decpoints = A*X+F*Y
+    rapoints = B*X+G*Y
+    
+    return(ra,dec,rapoints,decpoints)
+
 def triple_orbit_model(a,e,inc,w,bigw,P,T,a2,e2,inc2,w2,bigw2,P2,T2,tepoch,tmodel=[]):
     if len(tmodel)==0:
         tmodel=np.linspace(tepoch[0],tepoch[0]+P,1000)

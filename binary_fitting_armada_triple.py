@@ -283,6 +283,7 @@ else:
     report_fit(result)
 
 chi_sq_best_inner = result.redchi
+nfree = result.nfree
 ra_best_inner = result.params['ra'].value
 dec_best_inner = result.params['dec'].value
 ratio_best_inner = result.params['ratio'].value
@@ -354,6 +355,7 @@ dec_grid = np.linspace(ddec-grid_size,ddec+grid_size,steps)
 vary_ratio = input('vary ratio? (y,[n]): ')
 
 chi_sq = []
+redchi_sq = []
 ra_results = []
 dec_results = []
 
@@ -380,13 +382,16 @@ for ra_try in tqdm(ra_grid):
             if dtype=='vlti':
                 minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_subtracted[:,::50],t3phierr[:,::50],visphi_subtracted[:,::50],visphierr[:,::50],vis2_subtracted[:,::50],vis2err[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50]),nan_policy='omit')
                 result = minner.minimize()
-                chi2 = result.redchi
+                chi2 = result.chisqr
+                redchi2 = result.redchi
             else:
                 minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi_subtracted,t3phierr,visphi_subtracted,visphierr,vis2_subtracted,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
                 result = minner.minimize()
-                chi2 = result.redchi
+                chi2 = result.chisqr
+                redchi2 = result.redchi
 
             chi_sq.append(chi2)
+            redchi_sq.append(redchi2)
             ra_results.append(ra_try)
             dec_results.append(dec_try)
 
@@ -401,8 +406,10 @@ for ra_try in tqdm(ra_grid):
 
             else:
                 chi = combined_minimizer(params,t3phi_subtracted,t3phierr,visphi_subtracted,visphierr,vis2_subtracted,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
-            red_chi2 = np.nansum(chi**2)
-            chi_sq.append(red_chi2)
+            chi2 = np.nansum(chi**2)
+            redchi2 = chi2 / nfree
+            chi_sq.append(chi2)
+            redchi_sq.append(redchi2)
             ra_results.append(ra_try)
             dec_results.append(dec_try)
     
@@ -425,6 +432,7 @@ if plot_grid=='y':
 ra_results = np.array(ra_results)
 dec_results = np.array(dec_results)
 chi_sq = np.array(chi_sq)
+redchi_sq = np.array(redchi_sq)
 
 index = np.argmin(chi_sq)
 best_params = [ra_results[index],dec_results[index],a3,a4,a5,a6]
@@ -447,6 +455,7 @@ result = minner.minimize()
 report_fit(result)
 
 chi_sq_best = result.redchi
+nfree = result.nfree
 ra_best = result.params['ra'].value
 dec_best = result.params['dec'].value
 ratio_best = result.params['ratio'].value
@@ -492,7 +501,9 @@ minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new
 result = minner.minimize()
 report_fit(result)
 
-chi_sq_best = result.redchi
+chi_sq_best = result.chisqr
+redchi_sq_best = result.redchi
+nfree = result.nfree
 ra12_best = result.params['ra12'].value
 dec12_best = result.params['dec12'].value
 ra13_best = result.params['ra13'].value
@@ -696,6 +707,7 @@ ra_grid = np.linspace(ra12_best-size,ra12_best+size,steps)
 dec_grid = np.linspace(dec12_best-size,dec12_best+size,steps)
 
 chi_sq = []
+redchi_sq = []
 ra_results = []
 dec_results = []
 
@@ -714,8 +726,10 @@ for ra_try in tqdm(ra_grid):
         #do fit, minimizer uses LM for least square fitting of model to data
         chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
         raw_chi2 = np.nansum(chi**2)#/(len(np.ndarray.flatten(t3phi))-len(params))
+        red_chi2 = np.nansum(chi**2) / nfree
 
         chi_sq.append(raw_chi2)
+        redchi_sq.append(red_chi2)
         ra_results.append(ra_try)
         dec_results.append(dec_try)
 
@@ -737,10 +751,11 @@ if plot_grid=='y':
 ra_results = np.array(ra_results)
 dec_results = np.array(dec_results)
 chi_sq = np.array(chi_sq)
+redchi_sq = np.array(redchi_sq)
 
 # write results
 #report_fit(result)
-index = np.argmin(chi_sq)
+index = np.argmin(redchi_sq)
 
 print('-----RESULTS-------')
 print('ra12 = %s'%ra_results[index])
@@ -749,7 +764,7 @@ print('rawchi12 = %s'%chi_sq[index])
 print('-------------------')
 
 ## plot chisq surface grid
-plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
+plt.scatter(ra_results, dec_results, c=redchi_sq, cmap=cm.inferno_r)
 plt.colorbar()
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
@@ -757,9 +772,12 @@ plt.axis('equal')
 plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
-## isolate region where delta_chisq < 2.296
-index_err = np.where(chi_sq < (chi_sq[index]+2.296) )
-chi_err = chi_sq[index_err]
+#chi2_best = chi_sq_best
+chi2_best = redchi_sq_best
+#index_err = np.where(chi_sq < (chi2_best+2.296) )
+index_err = np.where(redchi_sq < (chi2_best+1) )
+#chi_err = chi_sq[index_err]
+chi_err = redchi_sq[index_err]
 ra_err = ra_results[index_err]
 dec_err = dec_results[index_err]
 
@@ -794,6 +812,7 @@ ra_grid = np.linspace(ra13_best-size,ra13_best+size,steps)
 dec_grid = np.linspace(dec13_best-size,dec13_best+size,steps)
 
 chi_sq = []
+redchi_sq = []
 ra_results = []
 dec_results = []
 
@@ -812,8 +831,10 @@ for ra_try in tqdm(ra_grid):
         #do fit, minimizer uses LM for least square fitting of model to data
         chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
         raw_chi2 = np.nansum(chi**2)#/(len(np.ndarray.flatten(t3phi))-len(params))
+        red_chi2 = np.nansum(chi**2) / nfree
 
         chi_sq.append(raw_chi2)
+        redchi_sq.append(red_chi2)
         ra_results.append(ra_try)
         dec_results.append(dec_try)
     if plot_grid=='y':
@@ -822,7 +843,7 @@ for ra_try in tqdm(ra_grid):
         ax.set_ylim(min(dec_grid),max(dec_grid))
         ax.set_xlabel('d_RA (mas)')
         ax.set_ylabel('d_DE (mas)')
-        ax.scatter(ra_results,dec_results,c=chi_sq,cmap=cm.inferno_r)
+        ax.scatter(ra_results,dec_results,c=redchi_sq,cmap=cm.inferno_r)
         ax.invert_xaxis()
         #plt.colorbar()
         plt.draw()
@@ -834,6 +855,7 @@ if plot_grid=='y':
 ra_results = np.array(ra_results)
 dec_results = np.array(dec_results)
 chi_sq = np.array(chi_sq)
+redchi_sq = np.array(redchi_sq)
 
 # write results
 #report_fit(result)
@@ -846,7 +868,7 @@ print('rawchi13 = %s'%chi_sq[index])
 print('-------------------')
 
 ## plot chisq surface grid
-plt.scatter(ra_results, dec_results, c=chi_sq, cmap=cm.inferno_r)
+plt.scatter(ra_results, dec_results, c=redchi_sq, cmap=cm.inferno_r)
 plt.colorbar()
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
@@ -855,8 +877,12 @@ plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1
 plt.close()
 
 ## isolate region where delta_chisq < 2.296
-index_err = np.where(chi_sq < (chi_sq[index]+2.296) )
-chi_err = chi_sq[index_err]
+#chi2_best = chi_sq_best
+chi2_best = redchi_sq_best
+#index_err = np.where(chi_sq < (chi2_best+2.296) )
+index_err = np.where(redchi_sq < (chi2_best+1) )
+#chi_err = chi_sq[index_err]
+chi_err = redchi_sq[index_err]
 ra_err = ra_results[index_err]
 dec_err = dec_results[index_err]
 

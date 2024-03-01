@@ -62,6 +62,101 @@ def astrometry_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     #resids[idx]*=10
     return (resids)
 
+def astrometry_model_ti(params, data_x, data_y, t, error_maj, error_min, error_pa):
+   
+    #orbital parameters:
+    try:
+        A = params[0]
+        B = params[1]
+        F = params[2]
+        G = params[3]
+        e = params[4]
+        P = params[5]
+        T = params[6]
+        mirc_scale = params[7]
+    except:
+        A = params['A']
+        B = params['B']
+        F = params['F']
+        G = params['G']
+        e = params['e']
+        P = params['P']
+        T = params['T']
+        mirc_scale = params['mirc_scale']
+
+    X = []
+    Y = []
+    for tt in t:
+        M=2*np.pi/P*(tt-T)
+        E=ks.getE(M,e)
+        X.append(np.cos(E)-e)
+        Y.append((1-e**2)**(1/2)*np.sin(E))
+    X = np.array(X)
+    Y = np.array(Y)
+    model_y = A*X+F*Y
+    model_x = B*X+G*Y
+
+    #idx = np.where((t<58362) & (t>57997))
+    idx = np.where(t<58757)
+    model_y[idx]/=mirc_scale
+    model_x[idx]/=mirc_scale
+    
+    major_vector_x=np.sin(error_pa)
+    major_vector_y=np.cos(error_pa)
+    minor_vector_x=-major_vector_y
+    minor_vector_y=major_vector_x
+    resid_x=data_x-model_x
+    resid_y=data_y-model_y
+    resid_major=(resid_x*major_vector_x+resid_y*major_vector_y)/error_maj
+    resid_minor=(resid_x*minor_vector_x+resid_y*minor_vector_y)/error_min
+    resids=np.concatenate([resid_major,resid_minor])
+    
+    #resids[idx]*=10
+    return (resids)
+
+def astrometry_model_solve_linear(params, data_x, data_y, t, error_maj, error_min, error_pa):
+   
+   #orbital parameters:
+    e = params['e']
+    P = params['P']
+    T = params['T']
+    mirc_scale = params['mirc_scale']
+    #mratio = params['mratio']
+
+    X = []
+    Y = []
+    for tt in t:
+        M=2*np.pi/P*(tt-T)
+        E=ks.getE(M,e)
+        X.append(np.cos(E)-e)
+        Y.append((1-e**2)**(1/2)*np.sin(E))
+    X = np.array(X)
+    Y = np.array(Y)
+
+    # Measure TI coefficients
+    #unit = X*0. + 1.;
+    A = np.array([X,Y]);
+    result_y = np.linalg.lstsq(A.T,data_y,rcond=-1);
+    result_x = np.linalg.lstsq(A.T,data_x,rcond=-1);
+    model_y = result_y[0][0]*X + result_y[0][1]*Y
+    model_x = result_x[0][0]*X + result_x[0][1]*Y
+    
+    #idx = np.where((t<58362) & (t>57997))
+    idx = np.where(t<58757)
+    model_y[idx]/=mirc_scale
+    model_x[idx]/=mirc_scale
+    
+    major_vector_x=np.sin(error_pa)
+    major_vector_y=np.cos(error_pa)
+    minor_vector_x=-major_vector_y
+    minor_vector_y=major_vector_x
+    resid_x=data_x-model_x
+    resid_y=data_y-model_y
+    resid_major=(resid_x*major_vector_x+resid_y*major_vector_y)/error_maj
+    resid_minor=(resid_x*minor_vector_x+resid_y*minor_vector_y)/error_min
+    resids=np.concatenate([resid_major,resid_minor])
+    return (resids)
+
 def rv_model(params, data_rv, t, error_rv):
    
     #orbital parameters:
@@ -286,6 +381,122 @@ def triple_model(params, data_x, data_y, t, error_maj, error_min, error_pa):
     pos2 = ke2.xyzPos(t)
     model_x = pos[::,1] + pos2[::,1]
     model_y = pos[::,0] + pos2[::,0]
+    
+    #idx = np.where((t<58362) & (t>57997))
+    idx = np.where(t<58757)
+    model_y[idx]/=mirc_scale
+    model_x[idx]/=mirc_scale
+    
+    major_vector_x=np.sin(error_pa)
+    major_vector_y=np.cos(error_pa)
+    minor_vector_x=-major_vector_y
+    minor_vector_y=major_vector_x
+    resid_x=data_x-model_x
+    resid_y=data_y-model_y
+    resid_major=(resid_x*major_vector_x+resid_y*major_vector_y)/error_maj
+    resid_minor=(resid_x*minor_vector_x+resid_y*minor_vector_y)/error_min
+    resids=np.concatenate([resid_major,resid_minor])
+    return (resids)
+
+def triple_model_ti(params, data_x, data_y, t, error_maj, error_min, error_pa):
+   
+   #orbital parameters:
+    A = params['A']
+    B = params['B']
+    F = params['F']
+    G = params['G']
+    e = params['e']
+    P = params['P']
+    T = params['T']
+    
+    A2 = params['A2']
+    B2 = params['B2']
+    F2 = params['F2']
+    G2 = params['G2']
+    e2 = params['e2']
+    P2 = params['P2']
+    T2 = params['T2']
+    mirc_scale = params['mirc_scale']
+    #mratio = params['mratio']
+
+    X = []
+    Y = []
+    for tt in t:
+        M=2*np.pi/P*(tt-T)
+        E=ks.getE(M,e)
+        X.append(np.cos(E)-e)
+        Y.append((1-e**2)**(1/2)*np.sin(E))
+    X = np.array(X)
+    Y = np.array(Y)
+
+    X2 = []
+    Y2 = []
+    for tt in t:
+        M=2*np.pi/P2*(tt-T2)
+        E=ks.getE(M,e2)
+        X2.append(np.cos(E)-e2)
+        Y2.append((1-e2**2)**(1/2)*np.sin(E))
+    X2 = np.array(X2)
+    Y2 = np.array(Y2)
+
+    model_y = A*X+F*Y + A2*X2+F2*Y2
+    model_x = B*X+G*Y + B2*X2+G2*Y2
+    
+    #idx = np.where((t<58362) & (t>57997))
+    idx = np.where(t<58757)
+    model_y[idx]/=mirc_scale
+    model_x[idx]/=mirc_scale
+    
+    major_vector_x=np.sin(error_pa)
+    major_vector_y=np.cos(error_pa)
+    minor_vector_x=-major_vector_y
+    minor_vector_y=major_vector_x
+    resid_x=data_x-model_x
+    resid_y=data_y-model_y
+    resid_major=(resid_x*major_vector_x+resid_y*major_vector_y)/error_maj
+    resid_minor=(resid_x*minor_vector_x+resid_y*minor_vector_y)/error_min
+    resids=np.concatenate([resid_major,resid_minor])
+    return (resids)
+
+def triple_model_solve_linear(params, data_x, data_y, t, error_maj, error_min, error_pa):
+   
+   #orbital parameters:
+    e = params['e']
+    P = params['P']
+    T = params['T']
+    
+    e2 = params['e2']
+    P2 = params['P2']
+    T2 = params['T2']
+    mirc_scale = params['mirc_scale']
+    #mratio = params['mratio']
+
+    X = []
+    Y = []
+    X2 = []
+    Y2 = []
+    for tt in t:
+        M=2*np.pi/P*(tt-T)
+        E=ks.getE(M,e)
+        X.append(np.cos(E)-e)
+        Y.append((1-e**2)**(1/2)*np.sin(E))
+
+        M=2*np.pi/P2*(tt-T2)
+        E=ks.getE(M,e2)
+        X2.append(np.cos(E)-e2)
+        Y2.append((1-e2**2)**(1/2)*np.sin(E))
+    X = np.array(X)
+    Y = np.array(Y)
+    X2 = np.array(X2)
+    Y2 = np.array(Y2)
+
+    # Measure TI coefficients
+    #unit = X*0. + 1.;
+    A = np.array([X,Y,X2,Y2]);
+    result_y = np.linalg.lstsq(A.T,data_y,rcond=-1);
+    result_x = np.linalg.lstsq(A.T,data_x,rcond=-1);
+    model_y = result_y[0][0]*X + result_y[0][1]*Y + result_y[0][2]*X2 + result_y[0][3]*Y2;
+    model_x = result_x[0][0]*X + result_x[0][1]*Y + result_x[0][2]*X2 + result_x[0][3]*Y2;
     
     #idx = np.where((t<58362) & (t>57997))
     idx = np.where(t<58757)
@@ -1180,6 +1391,117 @@ def triple_model_circular(params, data_x, data_y, t, error_maj, error_min, error
     pos2 = ke2.xyzPos(t)
     model_x = pos[::,1] + pos2[::,1]
     model_y = pos[::,0] + pos2[::,0]
+    
+    #idx = np.where((t<58362) & (t>57997))
+    idx = np.where(t<58757)
+    model_y[idx]/=mirc_scale
+    model_x[idx]/=mirc_scale
+    
+    major_vector_x=np.sin(error_pa)
+    major_vector_y=np.cos(error_pa)
+    minor_vector_x=-major_vector_y
+    minor_vector_y=major_vector_x
+    resid_x=data_x-model_x
+    resid_y=data_y-model_y
+    resid_major=(resid_x*major_vector_x+resid_y*major_vector_y)/error_maj
+    resid_minor=(resid_x*minor_vector_x+resid_y*minor_vector_y)/error_min
+    resids=np.concatenate([resid_major,resid_minor])
+    return (resids)
+
+def triple_model_circular_ti(params, data_x, data_y, t, error_maj, error_min, error_pa):
+   
+   #orbital parameters:
+    A = params['A']
+    B = params['B']
+    F = params['F']
+    G = params['G']
+    e = params['e']
+    P = params['P']
+    T = params['T']
+    
+    A2 = params['A2']
+    B2 = params['B2']
+    F2 = params['F2']
+    G2 = params['G2']
+    P2 = params['P2']
+    T2 = params['T2']
+    mirc_scale = params['mirc_scale']
+    #mratio = params['mratio']
+
+    X = []
+    Y = []
+    X2 = []
+    Y2 = []
+    for tt in t:
+        M=2*np.pi/P*(tt-T)
+        E=ks.getE(M,e)
+        X.append(np.cos(E)-e)
+        Y.append((1-e**2)**(1/2)*np.sin(E))
+
+        E2=2*np.pi/P2*(tt-T2)
+        X2.append(np.cos(E2))
+        Y2.append(np.sin(E2))
+    X = np.array(X)
+    Y = np.array(Y)
+    X2 = np.array(X2)
+    Y2 = np.array(Y2)
+
+    model_y = A*X+F*Y + A2*X2+F2*Y2
+    model_x = B*X+G*Y + B2*X2+G2*Y2
+    
+    #idx = np.where((t<58362) & (t>57997))
+    idx = np.where(t<58757)
+    model_y[idx]/=mirc_scale
+    model_x[idx]/=mirc_scale
+    
+    major_vector_x=np.sin(error_pa)
+    major_vector_y=np.cos(error_pa)
+    minor_vector_x=-major_vector_y
+    minor_vector_y=major_vector_x
+    resid_x=data_x-model_x
+    resid_y=data_y-model_y
+    resid_major=(resid_x*major_vector_x+resid_y*major_vector_y)/error_maj
+    resid_minor=(resid_x*minor_vector_x+resid_y*minor_vector_y)/error_min
+    resids=np.concatenate([resid_major,resid_minor])
+    return (resids)
+
+def triple_model_circular_solve_linear(params, data_x, data_y, t, error_maj, error_min, error_pa):
+   
+   #orbital parameters:
+    e = params['e']
+    P = params['P']
+    T = params['T']
+    
+    P2 = params['P2']
+    T2 = params['T2']
+    mirc_scale = params['mirc_scale']
+    #mratio = params['mratio']
+
+    X = []
+    Y = []
+    X2 = []
+    Y2 = []
+    for tt in t:
+        M=2*np.pi/P*(tt-T)
+        E=ks.getE(M,e)
+        X.append(np.cos(E)-e)
+        Y.append((1-e**2)**(1/2)*np.sin(E))
+
+        E2=2*np.pi/P2*(tt-T2)
+        X2.append(np.cos(E2))
+        Y2.append(np.sin(E2))
+    X = np.array(X)
+    Y = np.array(Y)
+    X2 = np.array(X2)
+    Y2 = np.array(Y2)
+
+    # Measure TI coefficients
+    #unit = X*0. + 1.;
+    A = np.array([X,Y,X2,Y2]);
+    result_y = np.linalg.lstsq(A.T,data_y,rcond=-1);
+    result_x = np.linalg.lstsq(A.T,data_x,rcond=-1);
+    model_y = result_y[0][0]*X + result_y[0][1]*Y + result_y[0][2]*X2 + result_y[0][3]*Y2;
+    model_x = result_x[0][0]*X + result_x[0][1]*Y + result_x[0][2]*X2 + result_x[0][3]*Y2;
     
     #idx = np.where((t<58362) & (t>57997))
     idx = np.where(t<58757)
