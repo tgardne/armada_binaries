@@ -1,11 +1,7 @@
 import pdb
 import shutil
 import numpy as np
-<<<<<<< HEAD
 #import fitz
-=======
-import fitz
->>>>>>> b4a171e56b94c556049c5857f3cb1e02b4f1a7d3
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -30,7 +26,6 @@ Mist_evoTrack = MIST_EvolutionTrack()
 
 matplotlib.rcParams['figure.figsize'] = (8, 5)
 
-<<<<<<< HEAD
 save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
 summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
 armada_file = '/Users/tgardner/ARMADA_final/full_target_list.csv' ## path to csv target file
@@ -48,25 +43,6 @@ wds_file = '/Users/tgardner/ARMADA_final/WDS_Data/WDS_Data_converted/'
 #csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
 #orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
 #wds_file = '/home/colton/ARMADA_binaries/WDS_Data_converted'
-=======
-#save_directory = '/Users/tgardner/ARMADA_isochrones/' ## path for saved files
-#summary_directory = '/Users/tgardner/ARMADA_isochrones/summary/' ## path for saved files
-#armada_file = '/Users/tgardner/armada_binaries/full_target_list.csv' ## path to csv target file
-#photometry_file = '/Users/tgardner/armada_binaries/Photometry.csv'
-#csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
-#orbit_directory = '/Users/tgardner/ARMADA_isochrones/ARMADA_orbits/'
-#corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
-#wds_file = '/Users/tgardner/ARMADA_isochrones/WDS_Data/'
-
-summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
-save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
-corner_directory = '/home/colton/ARMADA_binaries/summary/corner_plots/' ## path for saved files
-photometry_file = '/home/colton/armada_binaries/Photometry.csv'
-armada_file = '/home/colton/armada_binaries/full_target_list_10_3.csv' ## path to csv target file
-orbit_directory = '/home/colton/ARMADA_binaries/ARMADA_orbits/'
-csv = '/home/colton/armada_binaries/target_info_all_sigma.csv'
-wds_file = '/home/colton/ARMADA_binaries/WDS_Data_converted'
->>>>>>> b4a171e56b94c556049c5857f3cb1e02b4f1a7d3
 
 Header =["HD", "M_Dyn_mcmc", "M_Dyn_mcmc_err", "M_Dyn_orbital", "M_Dyn_orbital_err",
                         "M_Tot", "M_Tot_err", "M1",
@@ -94,7 +70,6 @@ Target_List = [1976,2772,5143,6456,10453,11031,16753,17094,27176,29316,29573,310
                201038,206901,217676,217782,220278,224512]
 
 
-<<<<<<< HEAD
 #Target_List = [ '140159', '140436', '144892',
 #              '145589', '148283', '153370', '154569', '156190', '158140'
 #    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
@@ -103,15 +78,6 @@ Target_List = [1976,2772,5143,6456,10453,11031,16753,17094,27176,29316,29573,310
 
 #Target_List_Fail = [82446'(Success) , '129246' (Dtype error) ,'133484#','137798#','140159','140436']
 Target_List_Fail = []
-=======
-Target_List = [ '140159', '140436', '144892',
-              '145589', '148283', '153370', '154569', '156190', '158140'
-    , '160935', '166045', '173093', '178475', '179950', '185404', '185762', '189037', '189340', '195206',
-               '196089', '196867', '198183', '199766', '201038', '206901'
-    , '217676', '217782', '220278', '224512']
-
-#Target_List_Fail = [82446'(Success) , '129246' (Dtype error) ,'133484#','137798#','140159','140436']
->>>>>>> b4a171e56b94c556049c5857f3cb1e02b4f1a7d3
 
 
 ## Fuction to fit a single star model
@@ -182,7 +148,6 @@ def isochrone_model(params, TOT_mag_star, D_mag_star, mag_wave_star, dmag_wave_s
                            (a1['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
 
-<<<<<<< HEAD
     mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
                            (a2['Mbol'] - bc_grid_B.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
                            (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
@@ -191,16 +156,6 @@ def isochrone_model(params, TOT_mag_star, D_mag_star, mag_wave_star, dmag_wave_s
                            (a2['Mbol'] - bc_grid_J.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
                            (a2['Mbol'] - bc_grid_H.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
                            (a2['Mbol'] - bc_grid_K.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0]])
-=======
-    mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_B.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_R.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_J.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_H.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_K.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0]])
->>>>>>> b4a171e56b94c556049c5857f3cb1e02b4f1a7d3
     ## UBVRIJHK
     wave_model = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
 
@@ -243,7 +198,6 @@ def isochrone_model_mcmc(params, TOT_mag_star, D_mag_star, mag_wave_star, dmag_w
                            (a1['Mbol'] - bc_grid_H.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0],
                            (a1['Mbol'] - bc_grid_K.interp([a1['Teff'], a1['logg'], feh, Av]))[0][0]])
 
-<<<<<<< HEAD
     mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
                            (a2['Mbol'] - bc_grid_B.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
                            (a2['Mbol'] - bc_grid_V.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
@@ -252,16 +206,6 @@ def isochrone_model_mcmc(params, TOT_mag_star, D_mag_star, mag_wave_star, dmag_w
                            (a2['Mbol'] - bc_grid_J.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
                            (a2['Mbol'] - bc_grid_H.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0],
                            (a2['Mbol'] - bc_grid_K.interp([a2['Teff'], a2['logg'], feh, Av]))[0][0]])
-=======
-    mag2_model_all = np.array([(a2['Mbol'] - bc_grid_U.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_B.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_V.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_R.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_I.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_J.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_H.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0],
-                           (a2['Mbol'] - bc_grid_K.interp([a1['Teff'], a2['logg'], feh, Av]))[0][0]])
->>>>>>> b4a171e56b94c556049c5857f3cb1e02b4f1a7d3
 
     ## UBVRIJHK
     wave_model = np.array([365, 445, 551, 675, 806, 1250, 1650, 2150])
@@ -494,12 +438,8 @@ for target_hd in Target_List:
                 vtot = ufloat(float(df_photometry['V_complete'][idx_phot]), err_min)
             else:
                 vtot = ufloat(float(df_photometry['V_complete'][idx_phot]), float(df_photometry['V_err_complete'][idx_phot]))
-<<<<<<< HEAD
             #rtot = ufloat(float(df_photometry['R2_I/284'][idx_phot]), 0.15)
             rtot = ufloat(np.nan, np.nan)
-=======
-            rtot = ufloat(float(df_photometry['R2_I/284'][idx_phot]), 0.15)
->>>>>>> b4a171e56b94c556049c5857f3cb1e02b4f1a7d3
             gtot = ufloat(np.nan, np.nan)
             itot = ufloat(np.nan, np.nan)
             if np.isnan(float(df_photometry['J_err'][idx_phot])) or float(df_photometry['J_err'][idx_phot]) < err_min:
@@ -1005,7 +945,6 @@ for target_hd in Target_List:
             ax2.set_ylabel('$\chi^2$', fontsize=30)
             ax2.set_title('Mass 1 & 2 Guess', fontsize=35)
             #pdb.set_trace()
-<<<<<<< HEAD
         for i in [4]:
             idx_mass1 = np.array(all_chi2_grid[i]).argmin()
             mass1_best = all_mass1_result[i][idx_mass1]
@@ -1408,210 +1347,6 @@ for target_hd in Target_List:
         fig.savefig(f'{corner_directory}_{target_hd}', dpi=fig.dpi)
     except:
         print("Summary failed for HD%s"%target_hd)
-=======
-
-            comb_err_xvals = np.array(comb_err_xvals)
-
-            # Replace NaN values with zeros
-            comb_err_xvals[np.isnan(comb_err_xvals)] = 0
-
-            if (np.min(comb_xvals) < np.median(all_modelx_best[i])) == True:
-                x_axis_max = np.median(all_modelx_best[i]) + 0.15
-                idx_xmax = comb_xvals.index(np.max(comb_xvals))
-                idx_xmin = comb_xvals.index(np.min(comb_xvals))
-                x_axis_min =np.min(comb_xvals) - comb_err_xvals[idx_xmin] - 0.1- comb_err_xvals[idx_xmin] - 0.1
-            elif (np.min(comb_xvals) < np.median(all_modelx_best[i])) == False and np.isnan(comb_xvals[1]) == False:
-                idx_xmax = comb_xvals.index(np.max(comb_xvals))
-                x_axis_max = np.max(comb_xvals) + comb_err_xvals[idx_xmax] + 0.1
-                x_axis_min = np.median(all_modelx_best[i]) - 0.15
-            elif np.isnan(comb_xvals[1]) == True:
-                x_axis_min = np.min(all_modelx_best[i])-0.15
-                x_axis_max = np.max(all_modelx_best[i]) - 0.15
-            ax1.set_xlim(x_axis_min,x_axis_max)
-
-            comb_yvals = [all_yval2[i].nominal_value, all_yval1[i].nominal_value]
-            comb_err_yvals = [all_yval2[i].std_dev, all_yval1[i].std_dev]
-            if (np.min(comb_yvals) < np.median(all_modely_best[i])) == True:
-                idx_ymin = comb_yvals.index(np.min(comb_yvals))
-                idx_ymax = comb_yvals.index(np.max(comb_yvals))
-                y_axis_max = np.median(all_modely_best[i]) + 0.15
-                y_axis_min = np.min(comb_yvals) - comb_err_yvals[idx_ymin] - 0.1
-            elif (np.min(comb_yvals) > np.median(all_modely_best[i])) == True  and np.isnan(comb_yvals[1]) == False:
-                idx_ymin = comb_yvals.index(np.min(comb_yvals))
-                idx_ymax = comb_yvals.index(np.max(comb_yvals))
-                y_axis_max = np.max(comb_yvals) + comb_err_yvals[idx_ymax] + 0.1
-                y_axis_min = np.median(all_modely_best[i]) - 0.15
-            elif np.isnan(comb_yvals[1]) == True:
-                y_axis_min = np.min(all_modely_best[i])-0.15
-                y_axis_max = np.max(all_modely_best[i]) - 0.15
-            #ax1.set_ylim(y_axis_min,y_axis_max)
-            ax1.set_xlim(-1,2)
-            ax1.invert_yaxis()
-            ax1.tick_params(axis='both', labelsize=30)
-            ax1.set_aspect('auto')
-    #pdb.set_trace()
-    for i in range(len(all_m_dyn_mcmc)):
-
-        ax8.scatter(all_m_dyn_orbit[i].nominal_value, all_m_phot[i].nominal_value, s=25, color ='black')
-        ax8.set_title('M_dyn vs M_phot', fontsize=40)
-        ax8.set_xlim(all_m_dyn_orbit[0].nominal_value - 0.2, all_m_dyn_orbit[8].nominal_value + 0.2)
-        ax8.set_ylim(all_m_phot[0].nominal_value - 0.3, all_m_phot[8].nominal_value + 0.3)
-        #ax8.set_xlim(3.3,7.8)
-        #ax8.set_ylim(3.3,7.8)
-        #ax8.axvline(x= all_m_dyn[i].nominal_value, color='grey')
-        ax8.tick_params(axis='both', labelsize=30)
-
-    #pdb.set_trace()
-    for i in range(len(all_m_dyn_mcmc)):
-        all_m_dyn_mcmc_nom.append(all_m_dyn_mcmc[i].nominal_value)
-        all_m_dyn_mcmc_err.append(all_m_dyn_mcmc[i].std_dev)
-
-
-
-
-    for i in range(len(all_m_dyn_orbit)):
-        all_m_dyn_orbit_nom.append(all_m_dyn_orbit[i].nominal_value)
-        all_m_dyn_orbit_err.append(all_m_dyn_orbit[i].std_dev)
-        all_m_phot_nom.append(all_m_phot[i].nominal_value)
-        all_m_phot_err.append(all_m_phot[i].std_dev)
-
-
-    all_mass = np.append(all_mass, all_m_dyn_mcmc_nom)
-    all_mass = np.append(all_mass, all_m_phot_nom)
-    all_mass = np.append(all_mass, all_m_dyn_orbit_nom)
-    for i in range(len(all_m_phot)):
-        plus_sig_phot =  all_m_phot_nom[i]+all_m_phot_err[i]
-        minus_sig_phot =  all_m_phot_nom[i]-all_m_phot_err[i]
-        plus_sig_mcmc =  all_m_dyn_mcmc_nom[i]+all_m_dyn_mcmc_err[i]
-        minus_sig_mcmc =  all_m_dyn_mcmc_nom[i]-all_m_dyn_mcmc_err[i]
-        plus_sig_orbit =  all_m_dyn_orbit_nom[i]+all_m_dyn_orbit_err[i]
-        minus_sig_orbit =  all_m_dyn_orbit_nom[i]-all_m_dyn_orbit_err[i]
-
-        all_mass= np.append(all_mass, plus_sig_phot)
-        all_mass= np.append(all_mass, minus_sig_phot)
-        all_mass= np.append(all_mass, plus_sig_mcmc)
-        all_mass= np.append(all_mass, minus_sig_mcmc)
-        all_mass= np.append(all_mass, plus_sig_orbit)
-        all_mass= np.append(all_mass, minus_sig_orbit)
-
-
-    all_mass = np.append(all_mass, all_m_dyn_mcmc_nom)
-    all_mass = np.append(all_mass, all_m_dyn_orbit_nom)
-    max = np.max(all_mass)+0.1
-    min = np.min(all_mass)-0.1
-    #pdb.set_trace()
-    ax8.plot(all_m_dyn_mcmc_nom[0:3], all_m_phot_nom[0:3], color = 'darkred', linewidth =5)
-    ax8.plot(all_m_dyn_mcmc_nom[3:6], all_m_phot_nom[3:6], color = 'navy', linewidth =5)
-    ax8.plot(all_m_dyn_mcmc_nom[6:9], all_m_phot_nom[6:9], color = 'darkgreen',linewidth =5)
-    ax8.plot(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], color = 'red', linewidth =5)
-    ax8.plot(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], color = 'blue', linewidth =5)
-    ax8.plot(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], color = 'green',linewidth =5)
-    ax8.errorbar(all_m_dyn_mcmc_nom[0:3], all_m_phot_nom[0:3], all_m_phot_err[0:3], all_m_dyn_mcmc_err[0:3],  color = 'darkred', linewidth =3)
-    ax8.errorbar(all_m_dyn_mcmc_nom[3:6], all_m_phot_nom[3:6], all_m_phot_err[3:6], all_m_dyn_mcmc_err[3:6], color = 'navy', linewidth =3)
-    ax8.errorbar(all_m_dyn_mcmc_nom[6:9], all_m_phot_nom[6:9], all_m_phot_err[6:9], all_m_dyn_mcmc_err[6:9], color = 'darkgreen',linewidth =3)
-    ax8.errorbar(all_m_dyn_orbit_nom[0:3], all_m_phot_nom[0:3], all_m_phot_err[0:3], all_m_dyn_orbit_err[0:3],color = 'red', linewidth =3)
-    ax8.errorbar(all_m_dyn_orbit_nom[3:6], all_m_phot_nom[3:6], all_m_phot_err[3:6], all_m_dyn_orbit_err[3:6], color = 'blue', linewidth =3)
-    ax8.errorbar(all_m_dyn_orbit_nom[6:9], all_m_phot_nom[6:9], all_m_phot_err[6:9], all_m_dyn_orbit_err[6:9], color = 'green',linewidth =3)
-    ax8.set_xlim(min,max)
-    ax8.set_ylim(min,max)
-    #ax8.set_xlim(-1,2)
-    #ax8.set_ylim(-1,2)
-    #ax8.plot([all_m_dyn_nom[2],all_m_dyn_nom[1]], [all_m_phot_nom[2],all_m_phot_nom[1]], color = 'red',linewidth =5)
-    #ax8.plot([all_m_dyn_nom[5],all_m_dyn_nom[4]], [all_m_phot_nom[5],all_m_phot_nom[4]], color = 'blue', linewidth =5)
-    #ax8.plot([all_m_dyn_nom[8],all_m_dyn_nom[7]], [all_m_phot_nom[8],all_m_phot_nom[7]], color = 'green', linewidth =5)
-    #ax8.annotate('Feh =-0.1', xy=(all_m_dyn_nom[2]+0.03, all_m_phot_nom[5]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2]))), xytext=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2]))), color = 'red',size=25)
-    #ax8.annotate('Feh =0.0', xy=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]), xytext=(all_m_dyn_nom[5]+0.03, all_m_phot_nom[5]), color = 'blue',size=25)
-    #ax8.annotate('Feh =0.1', xy=(all_m_dyn_nom[8]+0.03, all_m_phot_nom[5]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[8]))), xytext=(all_m_dyn_nom[8]+00.03, all_m_phot_nom[5]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[8]))), color = 'green',size=25)
-    #ax8.annotate('d=-$\sigma$', xy=(all_m_dyn_nom[1]- (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2])), all_m_phot_nom[0]-0.03), xytext=(all_m_dyn_nom[0]-0.07, all_m_phot_nom[0]-0.03), color = 'red',size=25)
-    #ax8.annotate('d=0$\sigma$', xy=(all_m_dyn_nom[1], all_m_phot_nom[1]-0.03), xytext=(all_m_dyn_nom[1]-0.01, all_m_phot_nom[1]-0.05),color = 'blue',size=25)
-    #ax8.annotate('d=+$\sigma$', xy=(all_m_dyn_nom[1]+ (np.absolute(all_m_phot_nom[5]- all_m_phot_nom[2])), all_m_phot_nom[2]-0.03), xytext=(all_m_dyn_nom[2]+0.03, all_m_phot_nom[2]-0.03),size=25, color ='green')
-    ax8.axline((0, 0), slope=1., color='green', label='M_dyn = M_phot')
-    #ax8.axvline(x=all_m_dyn[1].nominal_value, color='salmon')
-    ax8.legend(fontsize=35)
-    #ax8.set_aspect('equal')
-    ax8.set_xlabel('M_dyn', fontsize=35)
-    ax8.set_ylabel('M_phot', fontsize=35)
-    ax8.grid()
-
-
-
-    #pdb.set_trace()
-    file = f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf'
-    pdf_file = fitz.open(file)
-    for page in pdf_file:  # iterate through the pages
-        pix = page.get_pixmap()  # render page to an image
-        pix.save(f'{orbit_directory}HD{target_hd}.png')  # store image as a PNG
-
-    # Store Pdf with convert_from_path function
-    images = convert_from_path(f'{orbit_directory}HD{target_hd}__outer_mcmc.pdf',700)
-    for i in range(len(images)):
-        # Save pages as images in the pdf
-        images[i].save(f'{orbit_directory}HD{target_hd}.png', 'PNG')
-
-
-
-    pic = f'{orbit_directory}HD{target_hd}.png'
-
-    img = io.imread(pic)
-    ax7.imshow(img)
-    box = ax7.get_position()
-    box.y0 = box.y0 - 4000
-    box.y1 = box.y1 + 4000
-    ax7.set_position(box)
-    e = np.round(float(df_armada['e'][idx_armada]),2)
-    a = np.round(float(df_armada['a (mas)'][idx_armada]),2)
-    p = np.round(float(df_armada['P (yr)'][idx_armada]),2)
-    #pdb.set_trace()
-    ax7.set_aspect('equal')
-    e = ufloat(float(df_armada['e'][idx_armada]),float(df_armada['e_err'][idx_armada]))
-
-    ax7.tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
-    ax7.annotate(f"PA(deg)= {df_photometry['PA(deg)_tycoDouble'][idx_phot]}", xy=(0, 0), xytext=(2000, -300), color = 'black',size=35)
-    ax7.annotate(f"Sep(arcsec) ={df_photometry['Sep(arcsec)'][idx_phot]}", xy=(0, 0), xytext=(2000, -100), color = 'black',size=35)
-    ax7.annotate(f"Triple = {df_armada['triple'][idx_armada]}", xy=(0, 0), xytext=(0.0, -300), color = 'black',size=35)
-    ax7.annotate(f"Residual ={df_armada['residual (micro-as)'][idx_armada]}", xy=(0, 0), xytext=(0.0, -100), color = 'black',size=35)
-    ax7.annotate(f"e={e:4f}", xy=(0, 0), xytext=(0.0, 4300), color = 'black',size=35)
-    ax7.annotate(f"a(mas)={a_mas:.3f}", xy=(0, 0), xytext=(2000, 4300), color = 'black',size=35)
-    ax7.annotate(f"P(Yr)={p_yr:.3f}", xy=(0, 0), xytext=(0, 4100), color = 'black',size=35)
-    ax7.annotate(f"d(pc)={distance_best:.2f}", xy=(0, 0), xytext=(2000, 4100), color = 'black',size=35)
-    ax7.annotate(f"Spectral Type={df_armada['SpType (primary?)'][idx_armada]}", xy=(0, 0), xytext=(0, 3900), color = 'black',size=35)
-    ax7.annotate(f"M_Dyn Orbit={all_m_dyn_orbit[4]}", xy=(0, 0), xytext=(2000, 3900), color = 'black',size=35)
-    ax7.annotate(f"M_Dyn McMc={all_m_dyn_mcmc[4]}", xy=(0, 0), xytext=(2000, 3700), color='black', size=35)
-    ax7.annotate(f"M_Phot={all_m_phot[4]}", xy=(0, 0), xytext=(0, 3700), color='black', size=35)
-
-
-
-    #ax7.annotate(f"a={df_armada['plx (mas)'][idx]}", xy=(0.6, 0.01), xytext=(0.6, 0.01), color='black', size=5)
-
-
-    fig.savefig("%s/HD_%s_%s_all_SED_fit.pdf" % (directory2, target_hd, note))
-
-    # create a list of directories
-    dirs = [f'{corner_directory}HD_{target_hd}/']
-
-    # extract the image paths into a list
-    files = [f for dir_ in dirs for f in list(Path(dir_).glob('*.png'))]
-
-    # create the figure
-    fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(55, 44.2))
-    fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, hspace=0.0, wspace=0.0)
-
-    # flatten the axis into a 1-d array to make it easier to access each axes
-    axs = axs.flatten()
-
-    # iterate through and enumerate the files, use i to index the axes
-    for i, file in enumerate(files):
-        # read the image in
-        pic = plt.imread(file)
-
-        # add the image to the axes
-        axs[i].imshow(pic)
-        axs[i].axis('off')
-
-        # add an axes title; .stem is a pathlib method to get the filename
-        axs[i].set(title=file.stem)
-    fig.savefig(f'{corner_directory}_{target_hd}', dpi=fig.dpi)
->>>>>>> b4a171e56b94c556049c5857f3cb1e02b4f1a7d3
 
 
 
