@@ -756,9 +756,9 @@ zval_max = float(input("ZVAL MAX from synthetic data = "))
 #pe = float(input('period search end (days): '))
 ps = 2
 ## end at half the outer binary period?
-pe = P_start / 2
+pe = 2000
 P2_injection = np.logspace(np.log10(ps),np.log10(pe),20)
-a2 = np.logspace(np.log10(0.01),np.log10(1),20)
+a2 = np.logspace(np.log10(0.01),np.log10(10),20)
 
 print('Grid Searching over period -- adding planets at each step')
 
