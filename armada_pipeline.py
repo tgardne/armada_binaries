@@ -354,8 +354,8 @@ def ls_fit(params,xp,yp,tp,emaj,emin,epa):
     fig,ax=plt.subplots()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     if len(vlti_idx)>0:
-        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
-        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+        ax.plot(xpos[vlti_idx],ypos[vlti_idx],'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask]/mirc_scale_start,ypos[vlti_mask]/mirc_scale_start,'o', label='ARMADA-CHARA')
     else:
         ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
@@ -489,8 +489,8 @@ def on_click_remove(event):
     ax.cla()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     if len(vlti_idx)>0:
-        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
-        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+        ax.plot(xpos[vlti_idx],ypos[vlti_idx],'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask]/mirc_scale_start,ypos[vlti_mask]/mirc_scale_start,'o', label='ARMADA-CHARA')
     else:
         ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
@@ -521,8 +521,8 @@ def on_click_flip(event):
     ax.cla()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     if len(vlti_idx)>0:
-        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
-        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+        ax.plot(xpos[vlti_idx],ypos[vlti_idx],'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask]/mirc_scale_start,ypos[vlti_mask]/mirc_scale_start,'o', label='ARMADA-CHARA')
     else:
         ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
@@ -558,8 +558,8 @@ while filter_wds == 'y':
     fig,ax=plt.subplots()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     if len(vlti_idx)>0:
-        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
-        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+        ax.plot(xpos[vlti_idx],ypos[vlti_idx],'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask]/mirc_scale_start,ypos[vlti_mask]/mirc_scale_start,'o', label='ARMADA-CHARA')
     else:
         ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
@@ -585,8 +585,8 @@ while filter_wds == 'y':
     fig,ax=plt.subplots()
     ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
     if len(vlti_idx)>0:
-        ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
-        ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+        ax.plot(xpos[vlti_idx],ypos[vlti_idx],'o', label='ARMADA-VLTI')
+        ax.plot(xpos[vlti_mask]/mirc_scale_start,ypos[vlti_mask]/mirc_scale_start,'o', label='ARMADA-CHARA')
     else:
         ax.plot(xpos,ypos,'o', label='ARMADA')
     ax.plot(0,0,'*')
@@ -736,8 +736,8 @@ ra,dec,rapoints,decpoints = orbit_model(a_start,e_start,inc_start,
 fig,ax=plt.subplots()
 ax.plot(xpos_all[len(xpos):], ypos_all[len(xpos):], 'o', label='WDS')
 if len(vlti_idx)>0:
-    ax.plot(xpos[vlti_idx]*mirc_scale_start,ypos[vlti_idx]*mirc_scale_start,'o', label='ARMADA-VLTI')
-    ax.plot(xpos[vlti_mask],ypos[vlti_mask],'o', label='ARMADA-CHARA')
+    ax.plot(xpos[vlti_idx],ypos[vlti_idx],'o', label='ARMADA-VLTI')
+    ax.plot(xpos[vlti_mask]/mirc_scale_start,ypos[vlti_mask]/mirc_scale_start,'o', label='ARMADA-CHARA')
 else:
     ax.plot(xpos,ypos,'o', label='ARMADA')
 ax.plot(0,0,'*')
@@ -761,10 +761,10 @@ plt.close()
 ## plot resids for ARMADA
 fig,ax=plt.subplots()
 if len(vlti_idx)>0:
-    xresid_vlti = xpos[vlti_idx]*mirc_scale_start - rapoints[:len(xpos)][vlti_idx]
-    yresid_vlti = ypos[vlti_idx]*mirc_scale_start - decpoints[:len(ypos)][vlti_idx]
-    xresid_chara = xpos[vlti_mask] - rapoints[:len(xpos)][vlti_mask]
-    yresid_chara = ypos[vlti_mask] - decpoints[:len(ypos)][vlti_mask]
+    xresid_vlti = xpos[vlti_idx] - rapoints[:len(xpos)][vlti_idx]
+    yresid_vlti = ypos[vlti_idx] - decpoints[:len(ypos)][vlti_idx]
+    xresid_chara = xpos[vlti_mask]/mirc_scale_start - rapoints[:len(xpos)][vlti_mask]
+    yresid_chara = ypos[vlti_mask]/mirc_scale_start - decpoints[:len(ypos)][vlti_mask]
     xresid = np.concatenate([xresid_chara,xresid_vlti])
     yresid = np.concatenate([yresid_chara,yresid_vlti])
 else:
