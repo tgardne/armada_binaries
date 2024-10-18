@@ -38,7 +38,7 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
 
     #start = 1
     #end = -1
-    for file in os.listdir(dir):
+    for file in sorted(os.listdir(dir)):
         if file.endswith("_oifits.fits") or file.endswith("_viscal.fits") or file.endswith("_uvfix.fits"):
 
             filename = os.path.join(dir, file)
@@ -86,7 +86,7 @@ def read_chara(dir,target_id,interact='n',exclude='',bl_drop='n'):
                         bl = max(np.sqrt(u1coord**2+v1coord**2),
                                     np.sqrt(u2coord**2+v2coord**2),
                                     np.sqrt(u3coord**2+v2coord**2))
-                        if bl>250:
+                        if bl>200:
                             phases_empty = np.empty(oi_t3[i]['T3PHI'].shape)
                             phases_empty[:] = np.nan
                             t3phi.append(phases_empty)

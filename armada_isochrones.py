@@ -34,6 +34,7 @@ csv = '/Users/tgardner/ARMADA_isochrones/target_info_hip_all_sigma.csv'
 orbit_directory = '/Users/tgardner/ARMADA_final/ARMADA_orbits/'
 corner_directory = '/Users/tgardner/ARMADA_isochrones/summary/corner_plots/'
 wds_file = '/Users/tgardner/ARMADA_final/WDS_Data/WDS_Data_converted/'
+aavso_file = '/Users/tgardner/ARMADA_final/armada_photometry_aavso.xlsx'
 
 #summary_directory = '/home/colton/ARMADA_binaries/summary/' ## path for saved file
 #save_directory = '/home/colton/ARMADA_binaries/' ## path for saved files
@@ -52,6 +53,7 @@ Header =["HD", "M_Dyn_mcmc", "M_Dyn_mcmc_err", "M_Dyn_orbital", "M_Dyn_orbital_e
 
 df_armada = pd.read_csv(armada_file, dtype=object)
 df_photometry = pd.read_csv(photometry_file, dtype=object)
+df_aavso = pd.read_excel(aavso_file)
 ## note for saved files (e.g. 'hip' for hipparcos distance, or 'gaia')
 
 switch = input("Would you like to only use the main sequence ages?: ")
@@ -62,6 +64,8 @@ if (switch == 'yes') == True or (switch == 'Yes')== True:
     note = note_first+'_main_seq'
 #pdb.set_trace()
 
+photometry_method = input('Use new AAVSO magnitudes? (y/[n]):')
+
 Target_List = [1976,2772,5143,6456,10453,11031,16753,17094,27176,29316,29573,31093,31297,34319,36058,
                37269,37711,38545,38769,40932,41040,43358,43525,45542,46273,47105,48581,49643,60107,64235,
                75974,78316,82446,87652,87822,107259,112846,114993,118889,127726,128415,129246,133484,133955,
@@ -69,6 +73,7 @@ Target_List = [1976,2772,5143,6456,10453,11031,16753,17094,27176,29316,29573,310
                166045,173093,178475,179950,185404,185762,189037,189340,195206,196089,196867,198183,199766,
                201038,206901,217676,217782,220278,224512]
 
+Target_List = [17094,36058,46273,75974,78316,82446,87652,87822]
 
 #Target_List = [ '140159', '140436', '144892',
 #              '145589', '148283', '153370', '154569', '156190', '158140'
@@ -283,7 +288,7 @@ def find_max_mass(age,m1_grid,feh,TOT_Mag,DiffM,mag_wave_star,dmag_wave_star,d_m
             break
     return (m1_max)
 
-feh_set = [-0.1,0,0.1]
+feh_set = [0]
 
 for target_hd in Target_List:
     target_hd = str(target_hd)
@@ -403,6 +408,7 @@ for target_hd in Target_List:
             ## Get target from spreadsheet
             idx_armada = np.where(df_armada['HD'] == target_hd)[0][0]
             idx_phot = np.where(df_photometry['HD'] == target_hd)[0][0]
+            idx_aavso = np.where(df_aavso['typed ident'] == 'HD %s'%target_hd)[0][0]
             Av = float(df_armada['Av'][idx_armada])
 
             cdiff_h = ufloat(float(df_armada['dmag_h'][idx_armada]), float(df_armada['dmag_h_err'][idx_armada]) )
@@ -428,20 +434,33 @@ for target_hd in Target_List:
             fratio_all_wl = np.concatenate([fratio_wds_wl,fratio_data_wl])
 
             ## get total magnitudes and errors from photometry file. Set minimum error 
-            err_min = 0.02        
-            utot = ufloat(np.nan, np.nan)
-            if np.isnan(float(df_photometry['B_err_complete'][idx_phot])) or float(df_photometry['B_err_complete'][idx_phot]) < err_min:
-                btot = ufloat(float(df_photometry['B_complete'][idx_phot]), err_min)
-            else:
-                btot = ufloat(float(df_photometry['B_complete'][idx_phot]), float(df_photometry['B_err_complete'][idx_phot]))
-            if np.isnan(float(df_photometry['V_err_complete'][idx_phot])) or float(df_photometry['V_err_complete'][idx_phot]) < err_min:
-                vtot = ufloat(float(df_photometry['V_complete'][idx_phot]), err_min)
-            else:
-                vtot = ufloat(float(df_photometry['V_complete'][idx_phot]), float(df_photometry['V_err_complete'][idx_phot]))
-            #rtot = ufloat(float(df_photometry['R2_I/284'][idx_phot]), 0.15)
-            rtot = ufloat(np.nan, np.nan)
-            gtot = ufloat(np.nan, np.nan)
-            itot = ufloat(np.nan, np.nan)
+            ## Either from AAVSO, or collected from Simbad and literature
+            err_min = 0.02 
+            if photometry_method=='y':
+                utot = ufloat(np.nan, np.nan)
+                btot = ufloat(df_aavso['B'][idx_aavso],df_aavso['sig_B'][idx_aavso])
+                vtot = ufloat(df_aavso['V'][idx_aavso],df_aavso['sig_V'][idx_aavso])
+                rtot = ufloat(df_aavso['R'][idx_aavso],df_aavso['sig_R'][idx_aavso])
+                gtot = ufloat(np.nan, np.nan)
+                itot = ufloat(np.nan, np.nan)
+                if np.isnan(btot.nominal_value):
+                    print('No AAVSO for HD %s'%target_hd)
+                    continue
+            else:        
+                utot = ufloat(np.nan, np.nan)
+                if np.isnan(float(df_photometry['B_err_complete'][idx_phot])) or float(df_photometry['B_err_complete'][idx_phot]) < err_min:
+                    btot = ufloat(float(df_photometry['B_complete'][idx_phot]), err_min)
+                else:
+                    btot = ufloat(float(df_photometry['B_complete'][idx_phot]), float(df_photometry['B_err_complete'][idx_phot]))
+                if np.isnan(float(df_photometry['V_err_complete'][idx_phot])) or float(df_photometry['V_err_complete'][idx_phot]) < err_min:
+                    vtot = ufloat(float(df_photometry['V_complete'][idx_phot]), err_min)
+                else:
+                    vtot = ufloat(float(df_photometry['V_complete'][idx_phot]), float(df_photometry['V_err_complete'][idx_phot]))
+                #rtot = ufloat(float(df_photometry['R2_I/284'][idx_phot]), 0.15)
+                rtot = ufloat(np.nan, np.nan)
+                gtot = ufloat(np.nan, np.nan)
+                itot = ufloat(np.nan, np.nan)
+
             if np.isnan(float(df_photometry['J_err'][idx_phot])) or float(df_photometry['J_err'][idx_phot]) < err_min:
                 jtot = ufloat(float(df_photometry['J_ II/246/out'][idx_phot]), err_min)
             else:
@@ -467,6 +486,10 @@ for target_hd in Target_List:
             tot_mag_ratios = unumpy.uarray(tot_mag_ratios_val,tot_mag_ratios_err)
             split_mag1 = -2.5 * unumpy.log10(10 ** (-tot_mag_ratios / 2.5) / (1 + 10 ** (-cdiff_all / 2.5)))
             split_mag2 = cdiff_all + split_mag1
+
+            ## use speckle measurement + Vmag for HR diagram plotting
+            vval1 = -2.5 * unumpy.log10(10 ** (-vtot / 2.5) / (1 + 10 ** (-cdiff_b / 2.5)))
+            vval2 = cdiff_b + vval1
 
             ## A new isochrone model that interpolate the model photometry to add more constraint
             tracks = get_ichrone('mist', tracks=True, accurate=True)
@@ -506,9 +529,9 @@ for target_hd in Target_List:
                 ##################
                 ## Now let's find best masses and age
                 ##################
-                mass1_grid = np.linspace(0.5,7,50)
-                mass2_grid = np.linspace(0.5,7,50)
-                age_grid = np.linspace(6, 10, 100)  ## do fewer steps to go faster
+                mass1_grid = np.linspace(0.5,7,100)
+                mass2_grid = np.linspace(0.5,7,100)
+                age_grid = np.linspace(6, 10, 1000)  ## do fewer steps to go faster
 
                 print('Grid Searching over AGE to find best fit')
                 #pdb.set_trace()
@@ -544,8 +567,8 @@ for target_hd in Target_List:
                 ## Note: We only want to fit for the Main Sequence (Ages larger than 10 mill years or log 8)
                 ages_array = np.array(ages)
                 chi2_grid_array = np.array(chi2_grid)
-                ages_10mil = ages_array[ ages_array > 8]
-                idx_age_10mil = np.argmin(chi2_grid_array[ages_array > 8])
+                ages_10mil = ages_array[ ages_array > 7]
+                idx_age_10mil = np.argmin(chi2_grid_array[ages_array > 7])
                 best_age_ms = ages_10mil[idx_age_10mil]
                 #pdb.set_trace()
                 ##This is for minimum for entire age grid (Not being used in the fitting or plots)
@@ -807,18 +830,22 @@ for target_hd in Target_List:
                     K_best.append(iso['K_mag'])
 
                 ## Choose x/y axis for isochrone plot. For example, V-H vs V-K
+                #print('--'*10)
+                #print('split mag:')
+                #print(split_mag1)
+                #print('--'*10)
                 if np.isnan(split_mag1[-2].nominal_value) == True:
-                    xval1 = split_mag1[-4] - split_mag1[-1]  ## component 1
-                    yval1 = split_mag1[-4] - d_modulus
-                    xval2 = split_mag2[-4] - split_mag2[-1]  ## component 2
-                    yval2 = split_mag2[-4] - d_modulus
+                    xval1 = vval1 - split_mag1[-1]  ## component 1
+                    yval1 = vval1 - d_modulus
+                    xval2 = vval2 - split_mag2[-1]  ## component 2
+                    yval2 = vval2 - d_modulus
                     xlabel = "V - K"
                     ylabel = "V"
                 elif np.isnan(split_mag1[-2].nominal_value) == False:
-                    xval1 = split_mag1[-4] - split_mag1[-2]  ## component 1
-                    yval1 = split_mag1[-4] - d_modulus
-                    xval2 = split_mag2[-4] - split_mag2[-2]  ## component 2
-                    yval2 = split_mag2[-4] - d_modulus
+                    xval1 = vval1 - split_mag1[-2]  ## component 1
+                    yval1 = vval1 - d_modulus
+                    xval2 = vval2 - split_mag2[-2]  ## component 2
+                    yval2 = vval2 - d_modulus
                     xlabel = "V - H"
                     ylabel = "V"
 
@@ -1217,9 +1244,9 @@ for target_hd in Target_List:
         #pdb.set_trace()
         for i in range(len(all_m_dyn_mcmc)):
         
-            ax8.scatter(all_m_dyn_orbit[i].nominal_value, all_m_phot[i].nominal_value, s=25, color ='black')
+            ax8.scatter(all_m_dyn_mcmc[i].nominal_value, all_m_phot[i].nominal_value, s=25, color ='black')
             ax8.set_title('M_dyn vs M_phot', fontsize=40)
-            ax8.set_xlim(all_m_dyn_orbit[0].nominal_value - 0.2, all_m_dyn_orbit[8].nominal_value + 0.2)
+            ax8.set_xlim(all_m_dyn_mcmc[0].nominal_value - 0.2, all_m_dyn_mcmc[8].nominal_value + 0.2)
             ax8.set_ylim(all_m_phot[0].nominal_value - 0.3, all_m_phot[8].nominal_value + 0.3)
             #ax8.set_xlim(3.3,7.8)
             #ax8.set_ylim(3.3,7.8)

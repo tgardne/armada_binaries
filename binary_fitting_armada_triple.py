@@ -8,7 +8,7 @@
 
 from chara_uvcalc import uv_calc
 from binary_disks_vector import binary_disks_vector
-from read_oifits import read_chara,read_vlti
+from read_oifits import read_chara,read_vlti,read_chara_old,read_vlti_special
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy import units as u
@@ -198,12 +198,17 @@ def triple_minimizer(params,cp,cp_err,vphi,vphierr,v2,v2err,u_coord,v_coord,ucoo
 ######################################################################
 
 ## Ask the user which file contains the closure phases
-dtype = input('chara/vlti? ')
+dtype = input('chara/vlti/chara_old? ')
 date=input('Date for saved files (e.g. 2018Jul19):')
 dir=input('Path to oifits directory:')
 target_id=input('Target ID (e.g. HD_206901): ')
 interact = input('interactive session with data? (y/n): ')
 exclude = input('exclude a telescope (e.g. E1): ')
+
+## check directory exists for save files
+save_dir="/Users/tgardner/ARMADA_epochs/%s/"%target_id
+if not os.path.exists(save_dir):
+    os.makedirs(save_dir)
 
 ## get information from fits file
 #bl_drop = input('Drop long baselines? (y/n): ')
@@ -217,34 +222,35 @@ if dtype=='chara_old':
     t3phi,t3phierr,vis2,vis2err,visphi,visphierr,visamp,visamperr,u_coords,v_coords,ucoords,vcoords,eff_wave,tels,vistels,time_obs = read_chara_old(dir,interact,exclude)
 ########################################################
 print("T3phi shape = ", t3phi.shape)
-print("Vis2 shape = ", visphi.shape)
+print("Vis2 shape = ", vis2.shape)
+print("Visphi shape = ", visphi.shape)
 
-################################################
-## Dispersion fit for dphase
-################################################
-
-dispersion=[]
-for vis in visphi:
-    if np.count_nonzero(~np.isnan(vis))>0:
-        y=vis
-        x=eff_wave[0]
-        idx = np.isfinite(x) & np.isfinite(y)
-        z=np.polyfit(x[idx],y[idx],2)
-        p = np.poly1d(z)
-        dispersion.append(p(x))
-    else:
-        dispersion.append(vis)
-dispersion=np.array(dispersion)
-
-## subtract dispersion
-visphi_new = visphi-dispersion
+#################################################
+### Dispersion fit for dphase
+#################################################
+#
+#dispersion=[]
+#for vis in visphi:
+#    if np.count_nonzero(~np.isnan(vis))>0:
+#        y=vis
+#        x=eff_wave[0]
+#        idx = np.isfinite(x) & np.isfinite(y)
+#        z=np.polyfit(x[idx],y[idx],2)
+#        p = np.poly1d(z)
+#        dispersion.append(p(x))
+#    else:
+#        dispersion.append(vis)
+#dispersion=np.array(dispersion)
+#
+### subtract dispersion
+#visphi_new = visphi-dispersion
 
 ######################################################################
 ## Now fit for OUTER binary and subtract out
 ######################################################################
 
 #method=input('VISPHI METHOD (dphase or visphi): ')
-if dtype=='chara':
+if dtype=='chara' or dtype=='chara_old':
     method='dphase'
 else:
     method='visphi'
@@ -274,11 +280,11 @@ params.add('ud2', value= a5, vary=False)#min=0, max=2.0)
 params.add('bw', value=a6, min=0, max=1)
 
 if dtype=='vlti':
-    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi[:,::50],t3phierr[:,::50],visphi_new[:,::50],visphierr[:,::50],vis2[:,::50],vis2err[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50]),nan_policy='omit')
+    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi[:,::50],t3phierr[:,::50],visphi[:,::50],visphierr[:,::50],vis2[:,::50],vis2err[:,::50],u_coords,v_coords,ucoords,vcoords,eff_wave[0][::50]),nan_policy='omit')
     result = minner.minimize()
     report_fit(result)
 else:
-    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+    minner = Minimizer(combined_minimizer, params, fcn_args=(t3phi,t3phierr,visphi,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
     result = minner.minimize()
     report_fit(result)
 
@@ -330,7 +336,7 @@ print('Subtracting outer companion from data...')
 print('----------------------------------------')
 t3phi_subtracted = t3phi - cp_model
 vis2_subtracted = vis2 - vis2_model
-visphi_subtracted = visphi_new - visphi_model
+visphi_subtracted = visphi #- visphi_model
 
 ######################################################################
 ## Now run a grid search for inner companion
@@ -488,7 +494,7 @@ params.add('ud2', value= a8, vary=False)#min=0.0,max=2.0)
 params.add('ud3', value= a9, vary=False)#min=0.0,max=2.0)
 params.add('bw', value= a10, min=0,max=1)
 
-minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
 result = minner.minimize()
 report_fit(result)
 
@@ -517,7 +523,7 @@ bw_best = result.params['bw'].value
 #params.add('ud3', value= ud3_best, min=0.0,max=2.0)
 #params.add('bw', value= bw_best, vary=False)#min=0,max=1)
 #
-#minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
+#minner = Minimizer(triple_minimizer, params, fcn_args=(t3phi,t3phierr,visphi,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0]),nan_policy='omit')
 #result = minner.minimize()
 #report_fit(result)
 #
@@ -578,7 +584,7 @@ for item1,item2 in zip(ucoords,vcoords):
 vis2_model=np.array(vis2_model)
 
 ## plot results
-with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_TRIPLE_search.pdf"%{"1":target_id,"2":date}) as pdf:
+with PdfPages("/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_TRIPLE_search.pdf"%{"1":target_id,"2":date}) as pdf:
     
     ## first page - chisq grid
     plt.scatter(ra_results, dec_results, c=1/chi_sq, cmap=cm.inferno)
@@ -598,7 +604,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_TRIPLE_search.pdf"
     t3phi_plot = np.array(np.array_split(t3phi,n_cp))
     t3phierr_plot = np.array(np.array_split(t3phierr,n_cp))
     cp_model = np.array_split(cp_model,n_cp)
-    visphi_new_plot = np.array_split(visphi_new,n_vp)
+    visphi_plot = np.array_split(visphi,n_vp)
     visphierr_plot = np.array_split(visphierr,n_vp)
     visphi_model = np.array_split(visphi_model,n_vp)
     vis2_plot = np.array(np.array_split(vis2,n_v2))
@@ -631,7 +637,7 @@ with PdfPages("/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_TRIPLE_search.pdf"
 
     ## next pages - visphi fits
     index = np.linspace(0,14,15)
-    for visdata,viserrdata,modeldata in zip(visphi_new_plot,visphierr_plot,visphi_model):
+    for visdata,viserrdata,modeldata in zip(visphi_plot,visphierr_plot,visphi_model):
 
         label_size = 4
         mpl.rcParams['xtick.labelsize'] = label_size
@@ -712,7 +718,7 @@ for ra_try in tqdm(ra_grid):
         params = [ra_try,dec_try,ra13_best,dec13_best,ratio12_best,ratio13_best,ud1_best,ud2_best,ud3_best,bw_best]
 
         #do fit, minimizer uses LM for least square fitting of model to data
-        chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+        chi = triple_minimizer(params,t3phi,t3phierr,visphi,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
         raw_chi2 = np.nansum(chi**2)#/(len(np.ndarray.flatten(t3phi))-len(params))
 
         chi_sq.append(raw_chi2)
@@ -754,7 +760,7 @@ plt.colorbar()
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.axis('equal')
-plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
+plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
 ## isolate region where delta_chisq < 2.296
@@ -783,7 +789,7 @@ plt.title('a,b,thet=%s'%ellipse_params)
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.axis('equal')
-plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp1.pdf'%{"1":target_id,"2":date})
+plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp1.pdf'%{"1":target_id,"2":date})
 plt.close()
 
 #############################################
@@ -810,7 +816,7 @@ for ra_try in tqdm(ra_grid):
         params = [ra12_best,dec12_best,ra_try,dec_try,ratio12_best,ratio13_best,ud1_best,ud2_best,ud3_best,bw_best]
 
         #do fit, minimizer uses LM for least square fitting of model to data
-        chi = triple_minimizer(params,t3phi,t3phierr,visphi_new,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
+        chi = triple_minimizer(params,t3phi,t3phierr,visphi,visphierr,vis2,vis2err,u_coords,v_coords,ucoords,vcoords,eff_wave[0])
         raw_chi2 = np.nansum(chi**2)#/(len(np.ndarray.flatten(t3phi))-len(params))
 
         chi_sq.append(raw_chi2)
@@ -851,7 +857,7 @@ plt.colorbar()
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.axis('equal')
-plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
+plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_chi2_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
 ## isolate region where delta_chisq < 2.296
@@ -880,7 +886,7 @@ plt.title('a,b,thet=%s'%ellipse_params2)
 plt.xlabel('d_RA (mas)')
 plt.ylabel('d_DE (mas)')
 plt.axis('equal')
-plt.savefig('/Users/tgardne/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp2.pdf'%{"1":target_id,"2":date})
+plt.savefig('/Users/tgardner/ARMADA_epochs/%(1)s/%(1)s_%(2)s_ellipse_comp2.pdf'%{"1":target_id,"2":date})
 plt.close()
 
 txt_fit_cp = ('Best fit (ra12,dec12,ra13,dec13,ratio12,ratio13,ud1,ud2,ud2,bw,redchi2): %s'%best_fit)
@@ -888,7 +894,7 @@ txt_fit_cp = ('Best fit (ra12,dec12,ra13,dec13,ratio12,ratio13,ud1,ud2,ud2,bw,re
 t = np.around(np.nanmedian(time_obs),4)
 sep12,pa12 = np.around(cart2pol(best_fit[0],best_fit[1]),decimals=4)
 sep13,pa13 = np.around(cart2pol(best_fit[2],best_fit[3]),decimals=4)
-f = open("/Users/tgardne/ARMADA_epochs/%s/%s_%s_triple.txt"%(target_id,target_id,date),"w+")
+f = open("/Users/tgardner/ARMADA_epochs/%s/%s_%s_triple.txt"%(target_id,target_id,date),"w+")
 f.write("# date mjd sep12(mas) pa12(Deg) sep13(mas) pa13(Deg) err_maj12(mas) err_min12(mas) err_pa12(deg) err_maj13(mas) err_min13(mas) err_pa13(deg)\r\n")
 f.write("%s %s %s %s %s %s %s %s %s %s %s %s"%(date,t,sep12,pa12,ellipse_params[0],ellipse_params[1],ellipse_params[2],sep13,pa13,ellipse_params2[0],ellipse_params2[1],ellipse_params2[2]))
 f.close()
