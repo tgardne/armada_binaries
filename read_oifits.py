@@ -319,7 +319,7 @@ def read_vlti(dir,interact='n',exclude=''):
     fluxerr=[]
 
     for file in os.listdir(dir):
-        if file.endswith("fits"):
+        if file.endswith("singlescivis.fits"):
             filename = os.path.join(dir, file)
             oifile = fits.open(filename,quiet=True)
             oi_t3 = oifile['OI_T3',10].data
